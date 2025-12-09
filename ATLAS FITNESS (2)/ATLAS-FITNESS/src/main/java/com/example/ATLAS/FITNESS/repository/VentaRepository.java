@@ -13,19 +13,13 @@ import java.util.Optional;
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long> {
     
-    // Agregar este método
+    List<Venta> findByClienteClienteId(Long clienteId);
+    
     Optional<Venta> findByCodigoVenta(String codigoVenta);
     
-    List<Venta> findByClienteIdCliente(Long idCliente);
-    List<Venta> findByEstado(Venta.Estado estado);
-    List<Venta> findByFechaVentaBetween(LocalDateTime inicio, LocalDateTime fin);
+    @Query("SELECT SUM(v.total) FROM Venta v WHERE v.fechaVenta >= :fecha")
+    Double sumTotalByFechaAfter(@Param("fecha") LocalDateTime fecha);
     
-    @Query("SELECT v FROM Venta v WHERE v.cliente.idCliente = :idCliente ORDER BY v.fechaVenta DESC")
-    List<Venta> findHistorialByCliente(@Param("idCliente") Long idCliente);
-    
-    @Query("SELECT COUNT(v) FROM Venta v WHERE DATE(v.fechaVenta) = CURRENT_DATE")
-    Long countVentasHoy();
-    
-    @Query("SELECT SUM(v.total) FROM Venta v WHERE DATE(v.fechaVenta) = CURRENT_DATE AND v.estado = 'PAGADA'")
-    Double sumIngresosHoy();
+    @Query("SELECT COUNT(v) FROM Venta v WHERE v.fechaVenta >= :fecha")
+    Long countByFechaVentaAfter(@Param("fecha") LocalDateTime fecha);
 }

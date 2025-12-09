@@ -9,8 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional; // <-- IMPORT AÑADIDO
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -50,66 +51,69 @@ public class VentaService {
         Venta venta = new Venta();
         venta.setCodigoVenta(generarCodigoVenta());
         venta.setCliente(cliente);
-        venta.setTipoCliente(Venta.TipoCliente.REGISTRADO);
-        venta.setMetodoPago(Venta.MetodoPago.valueOf(checkoutDTO.getMetodoPago()));
+        
+        // CORREGIDO: Convertir String a Enum
+        try {
+            venta.setMetodoPago(Venta.MetodoPago.valueOf(checkoutDTO.getMetodoPago()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Método de pago inválido: " + checkoutDTO.getMetodoPago());
+        }
+        
         venta.setObservaciones(checkoutDTO.getObservaciones());
-        venta.setUsuarioRegistro(cliente.getNombreCompleto());
+        venta.setFechaVenta(LocalDateTime.now());
         
         // Crear detalles de venta
+        venta.setDetalles(new ArrayList<>());
         for (CarritoItem item : carrito.getItems()) {
             DetalleVenta detalle = new DetalleVenta();
             detalle.setVenta(venta);
             detalle.setProducto(item.getProducto());
             detalle.setCantidad(item.getCantidad());
             detalle.setPrecioUnitario(item.getPrecioUnitario());
-            detalle.setSubtotal(detalle.getSubtotal());
+            // El subtotal se calculará en la entidad
             
             venta.getDetalles().add(detalle);
             
             // Actualizar stock
             Producto producto = item.getProducto();
-            producto.setStock(producto.getStock() - item.getCantidad());
-            productoRepository.save(producto);
+            if (producto.getStock() != null) {
+                producto.setStock(producto.getStock() - item.getCantidad());
+                productoRepository.save(producto);
+            }
         }
         
-        // Calcular totales
-        venta.calcularTotales();
-        venta.setEstado(Venta.Estado.PAGADA);
-        venta.setFechaPago(LocalDateTime.now());
+        // Calcular total
+        venta.setTotal(carrito.getTotal());
+        
+        // CORREGIDO: Usar Enum en lugar de String
+        venta.setEstado(Venta.Estado.COMPLETADA);
         
         Venta ventaGuardada = ventaRepository.save(venta);
         
         // Vaciar carrito
         carritoService.vaciarCarrito(idCliente);
         
-        // Enviar email de confirmación
-        emailService.enviarEmailConfirmacionVenta(
-                cliente.getEmail(),
-                cliente.getNombre(),
-                ventaGuardada
-        );
+        // Enviar email de confirmación (si tienes el servicio)
+        try {
+            emailService.enviarEmailConfirmacionVenta(
+                    cliente.getEmail(),
+                    cliente.getNombreCompleto(),
+                    ventaGuardada
+            );
+        } catch (Exception e) {
+            // Log error pero no fallar la venta
+            System.err.println("Error enviando email: " + e.getMessage());
+        }
         
         return ventaGuardada;
     }
     
     public List<Venta> obtenerHistorialCliente(Long idCliente) {
-        return ventaRepository.findHistorialByCliente(idCliente);
+        return ventaRepository.findByClienteClienteId(idCliente);
     }
     
     public Optional<Venta> buscarVentaPorCodigo(String codigoVenta) {
-        // Método alternativo si findByCodigoVenta no existe
-        return ventaRepository.findAll().stream()
-                .filter(v -> v.getCodigoVenta().equals(codigoVenta))
-                .findFirst();
-    }
-    
-    // Método alternativo más eficiente (debes crear este método en el repository)
-    public Venta buscarVentaPorCodigoVenta(String codigoVenta) {
-        return ventaRepository.findAll().stream()
-                .filter(v -> v.getCodigoVenta() != null && 
-                            v.getCodigoVenta().equals(codigoVenta))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Venta no encontrada con código: " + codigoVenta));
+        return ventaRepository.findByCodigoVenta(codigoVenta);
     }
     
     private String generarCodigoVenta() {
@@ -117,11 +121,32 @@ public class VentaService {
     }
     
     public BigDecimal calcularIngresosHoy() {
-        Double ingresos = ventaRepository.sumIngresosHoy();
+        LocalDateTime hoy = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        Double ingresos = ventaRepository.sumTotalByFechaAfter(hoy);
         return ingresos != null ? BigDecimal.valueOf(ingresos) : BigDecimal.ZERO;
     }
     
     public Long contarVentasHoy() {
-        return ventaRepository.countVentasHoy();
+        LocalDateTime hoy = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        return ventaRepository.countByFechaVentaAfter(hoy);
+    }
+    
+    // Método alternativo para convertir String a Enum de forma segura
+    private Venta.MetodoPago obtenerMetodoPago(String metodoPagoStr) {
+        try {
+            return Venta.MetodoPago.valueOf(metodoPagoStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Si el método no es válido, usar uno por defecto
+            return Venta.MetodoPago.EFECTIVO;
+        }
+    }
+    
+    // Método para validar y convertir estado
+    private Venta.Estado obtenerEstado(String estadoStr) {
+        try {
+            return Venta.Estado.valueOf(estadoStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return Venta.Estado.PENDIENTE;
+        }
     }
 }

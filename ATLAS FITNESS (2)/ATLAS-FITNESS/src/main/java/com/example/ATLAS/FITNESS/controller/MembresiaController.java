@@ -4,17 +4,17 @@ import com.example.ATLAS.FITNESS.model.Cliente;
 import com.example.ATLAS.FITNESS.model.Membresia;
 import com.example.ATLAS.FITNESS.model.Usuario;
 import com.example.ATLAS.FITNESS.service.MembresiaService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/cliente/membresia")
-public class MembresiaController {
+public class MembresiaController extends BaseController {
     
     private final MembresiaService membresiaService;
     
@@ -24,13 +24,18 @@ public class MembresiaController {
     
     @GetMapping
     public String mostrarMembresia(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
-        var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getIdCliente());
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
+        
+        var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getClienteId());
         
         if (membresiaOpt.isPresent()) {
             Membresia membresia = membresiaOpt.get();
@@ -49,12 +54,16 @@ public class MembresiaController {
     public String contratarMembresia(@RequestParam String tipo,
                                     HttpSession session,
                                     RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
             Membresia.TipoMembresia tipoMembresia = Membresia.TipoMembresia.valueOf(tipo);
@@ -74,21 +83,34 @@ public class MembresiaController {
     @PostMapping("/renovar")
     public String renovarMembresia(HttpSession session,
                                   RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
-            var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getIdCliente());
+            var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getClienteId());
             if (membresiaOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "No tienes una membresía activa");
                 return "redirect:/cliente/membresia";
             }
             
-            var membresiaRenovada = membresiaService.renovarMembresia(membresiaOpt.get().getIdMembresia());
+            Membresia membresia = membresiaOpt.get();
+            
+            // Verificar si está vencida o inactiva
+            if (!membresia.estaActiva() || membresia.estaVencida()) {
+                redirectAttributes.addFlashAttribute("error", 
+                    membresia.estaVencida() ? "Tu membresía está vencida" : "Tu membresía no está activa");
+                return "redirect:/cliente/membresia";
+            }
+            
+            var membresiaRenovada = membresiaService.renovarMembresia(membresia.getIdMembresia());
             
             redirectAttributes.addFlashAttribute("success", 
                 "¡Membresía renovada exitosamente! Nueva fecha de vencimiento: " + 
@@ -103,15 +125,19 @@ public class MembresiaController {
     @PostMapping("/cancelar")
     public String cancelarMembresia(HttpSession session,
                                    RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
-            var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getIdCliente());
+            var membresiaOpt = membresiaService.buscarMembresiaActivaCliente(cliente.getClienteId());
             if (membresiaOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "No tienes una membresía activa");
                 return "redirect:/cliente/membresia";

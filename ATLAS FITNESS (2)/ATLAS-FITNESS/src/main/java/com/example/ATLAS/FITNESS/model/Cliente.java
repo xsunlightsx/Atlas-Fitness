@@ -1,88 +1,95 @@
 package com.example.ATLAS.FITNESS.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Entity
-@Table(name = "cliente")
+@Table(name = "Cliente")
 public class Cliente {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCliente;
+    @Column(name = "cliente_id")
+    private Long clienteId;
     
-    @Column(unique = true, nullable = false, length = 8)
+    @Column(name = "dni", unique = true, nullable = false, length = 8)
     private String dni;
     
-    @Column(length = 11)
+    @Column(name = "ruc", length = 11)
     private String ruc;
     
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
     
-    @Column(nullable = false, length = 100)
+    @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
     
-    @Column(nullable = false, length = 15)
+    @Column(name = "telefono", length = 15)
     private String telefono;
     
-    @Column(length = 200)
+    @Column(name = "direccion", columnDefinition = "TEXT")
     private String direccion;
     
-    @Column(unique = true, length = 100)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
     
-    @Temporal(TemporalType.DATE)
-    private Date fechaNacimiento;
+    @Column(name = "fecha_registro", insertable = false, updatable = false)
+    private LocalDateTime fechaRegistro;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 10)
-    private Genero genero = Genero.OTRO;
+    @Column(name = "estado", length = 20)
+    private String estado = "ACTIVO";
     
-    private Double peso;
-    private Double altura;
+    // Campos adicionales para perfil fitness
+    @Column(name = "fecha_nacimiento")
+    private LocalDateTime fechaNacimiento;
+    
+    @Column(name = "genero", length = 20)
+    private String genero;
+    
+    // CAMBIO IMPORTANTE: Cambiar Double por BigDecimal
+    @Column(name = "altura", precision = 5, scale = 2)
+    private BigDecimal altura;
+    
+    @Column(name = "peso", precision = 5, scale = 2)
+    private BigDecimal peso;
+    
+    @Column(name = "objetivo", length = 50)
     private String objetivo;
     
-    @Column(nullable = false)
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
-    
+    @Column(name = "fecha_ultima_visita")
     private LocalDateTime fechaUltimaVisita;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 10)
-    private Estado estado = Estado.ACTIVO;
+    // RELACIÓN ELIMINADA: No hay relación bidireccional con Usuario
+    // @OneToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "cliente_id", referencedColumnName = "cliente_id", insertable = false, updatable = false)
+    // private Usuario usuario;
     
-    @OneToOne
-    @JoinColumn(name = "id_usuario")
+    // En su lugar, uso @Transient
+    @Transient
     private Usuario usuario;
     
-    @OneToMany(mappedBy = "cliente")
-    private List<Venta> compras;
-    
-    // Enums
-    public enum Genero {
-        MASCULINO, FEMENINO, OTRO
-    }
-    
-    public enum Estado {
-        ACTIVO, INACTIVO, MOROSO
+    // Clase interna para Estado
+    public static final class Estado {
+        public static final String ACTIVO = "ACTIVO";
+        public static final String INACTIVO = "INACTIVO";
+        public static final String BLOQUEADO = "BLOQUEADO";
     }
     
     // Constructores
     public Cliente() {}
     
-    public Cliente(String dni, String nombre, String apellido, String telefono) {
+    public Cliente(String dni, String nombre, String apellido, String email) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.telefono = telefono;
+        this.email = email;
+        this.estado = Estado.ACTIVO;
     }
     
     // Getters y Setters
-    public Long getIdCliente() { return idCliente; }
-    public void setIdCliente(Long idCliente) { this.idCliente = idCliente; }
+    public Long getClienteId() { return clienteId; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
     
     public String getDni() { return dni; }
     public void setDni(String dni) { this.dni = dni; }
@@ -105,38 +112,69 @@ public class Cliente {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     
-    public Date getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
-    
-    public Genero getGenero() { return genero; }
-    public void setGenero(Genero genero) { this.genero = genero; }
-    
-    public Double getPeso() { return peso; }
-    public void setPeso(Double peso) { this.peso = peso; }
-    
-    public Double getAltura() { return altura; }
-    public void setAltura(Double altura) { this.altura = altura; }
-    
-    public String getObjetivo() { return objetivo; }
-    public void setObjetivo(String objetivo) { this.objetivo = objetivo; }
-    
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
     
-    public LocalDateTime getFechaUltimaVisita() { return fechaUltimaVisita; }
-    public void setFechaUltimaVisita(LocalDateTime fechaUltimaVisita) { this.fechaUltimaVisita = fechaUltimaVisita; }
-    
-    public Estado getEstado() { return estado; }
-    public void setEstado(Estado estado) { this.estado = estado; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
     
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     
-    public List<Venta> getCompras() { return compras; }
-    public void setCompras(List<Venta> compras) { this.compras = compras; }
+    public LocalDateTime getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDateTime fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     
-    // Métodos auxiliares
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
+    
+    // Getters y Setters para BigDecimal
+    public BigDecimal getAltura() { return altura; }
+    public void setAltura(BigDecimal altura) { this.altura = altura; }
+    
+    public BigDecimal getPeso() { return peso; }
+    public void setPeso(BigDecimal peso) { this.peso = peso; }
+    
+    // Métodos utilitarios para trabajar con Double (compatibilidad)
+    public Double getAlturaAsDouble() {
+        return altura != null ? altura.doubleValue() : null;
+    }
+    
+    public void setAltura(Double altura) {
+        this.altura = altura != null ? BigDecimal.valueOf(altura) : null;
+    }
+    
+    public Double getPesoAsDouble() {
+        return peso != null ? peso.doubleValue() : null;
+    }
+    
+    public void setPeso(Double peso) {
+        this.peso = peso != null ? BigDecimal.valueOf(peso) : null;
+    }
+    
+    public String getObjetivo() { return objetivo; }
+    public void setObjetivo(String objetivo) { this.objetivo = objetivo; }
+    
+    public LocalDateTime getFechaUltimaVisita() { return fechaUltimaVisita; }
+    public void setFechaUltimaVisita(LocalDateTime fechaUltimaVisita) { this.fechaUltimaVisita = fechaUltimaVisita; }
+    
+    // Métodos utilitarios
     public String getNombreCompleto() {
         return nombre + " " + apellido;
+    }
+    
+    public boolean estaActivo() {
+        return Estado.ACTIVO.equals(estado);
+    }
+    
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "clienteId=" + clienteId +
+                ", dni='" + dni + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", email='" + email + '\'' +
+                ", estado='" + estado + '\'' +
+                '}';
     }
 }

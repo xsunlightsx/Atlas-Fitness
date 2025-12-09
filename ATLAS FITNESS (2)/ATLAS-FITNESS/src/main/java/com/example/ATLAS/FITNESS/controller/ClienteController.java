@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/cliente")
-public class ClienteController {
+public class ClienteController extends BaseController {
     
     private final ClienteService clienteService;
     
@@ -21,13 +21,21 @@ public class ClienteController {
     
     @GetMapping("/perfil")
     public String mostrarPerfil(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Usuario usuario = getUsuario(session);
+        Cliente cliente = getCliente(session);
+        
+        // Si el cliente no está en sesión, buscarlo
+        if (cliente == null) {
+            cliente = clienteService.buscarPorUsername(usuario.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+            session.setAttribute("cliente", cliente);
+        }
         
         model.addAttribute("cliente", cliente);
         return "cliente/perfil";
@@ -37,17 +45,33 @@ public class ClienteController {
     public String actualizarPerfil(@ModelAttribute Cliente clienteActualizado,
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
         try {
-            Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
+            // 1. Obtener cliente actual de BD
+            Usuario usuario = getUsuario(session);
+            Cliente clienteBD = clienteService.buscarPorUsername(usuario.getUsername())
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
             
-            clienteService.actualizarPerfil(cliente.getIdCliente(), clienteActualizado);
-            session.setAttribute("cliente", cliente);
+            // 2. Copiar solo los campos permitidos del formulario
+            clienteBD.setTelefono(clienteActualizado.getTelefono());
+            clienteBD.setDireccion(clienteActualizado.getDireccion());
+            clienteBD.setFechaNacimiento(clienteActualizado.getFechaNacimiento());
+            clienteBD.setGenero(clienteActualizado.getGenero());
+            clienteBD.setAltura(clienteActualizado.getAltura());
+            clienteBD.setPeso(clienteActualizado.getPeso());
+            clienteBD.setObjetivo(clienteActualizado.getObjetivo());
+            // NO copiar: dni, nombre, apellido, email (deben venir de Usuario)
+            
+            // 3. Actualizar en BD
+            Cliente clienteActualizadoBD = clienteService.actualizarPerfil(clienteBD);
+            
+            // 4. Actualizar sesión
+            session.setAttribute("cliente", clienteActualizadoBD);
             
             redirectAttributes.addFlashAttribute("success", "Perfil actualizado exitosamente");
         } catch (RuntimeException e) {
@@ -59,61 +83,33 @@ public class ClienteController {
     
     @GetMapping("/historial")
     public String mostrarHistorial(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         model.addAttribute("cliente", cliente);
         return "cliente/historial";
     }
     
-    // ⚠️ ELIMINADO: Este método está DUPLICADO en MembresiaController
-    // @GetMapping("/membresia")
-    // public String mostrarMembresia(HttpSession session, Model model) {
-    //     Usuario usuario = (Usuario) session.getAttribute("usuario");
-    //     if (usuario == null) {
-    //         return "redirect:/auth/login";
-    //     }
-    //     
-    //     Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
-    //             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-    //     
-    //     model.addAttribute("cliente", cliente);
-    //     return "cliente/membresia";
-    // }
-    
-    // ⚠️ ELIMINADO: Este método está DUPLICADO en MembresiaController
-    // @PostMapping("/membresia/renovar")
-    // public String renovarMembresia(HttpSession session,
-    //                               RedirectAttributes redirectAttributes) {
-    //     Usuario usuario = (Usuario) session.getAttribute("usuario");
-    //     if (usuario == null) {
-    //         return "redirect:/auth/login";
-    //     }
-    //     
-    //     try {
-    //         // Lógica para renovar membresía
-    //         redirectAttributes.addFlashAttribute("success", "Membresía renovada exitosamente");
-    //     } catch (RuntimeException e) {
-    //         redirectAttributes.addFlashAttribute("error", "Error al renovar membresía: " + e.getMessage());
-    //     }
-    //     
-    //     return "redirect:/cliente/membresia";
-    // }
-    
     @GetMapping("/rutinas")
     public String mostrarRutinas(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         
-        Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Cliente cliente = getCliente(session);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         model.addAttribute("cliente", cliente);
         return "cliente/rutinas";
@@ -123,8 +119,9 @@ public class ClienteController {
     public String registrarProgreso(@RequestParam String progreso,
                                    HttpSession session,
                                    RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        try {
+            requireCliente(session);
+        } catch (SecurityException e) {
             return "redirect:/auth/login";
         }
         

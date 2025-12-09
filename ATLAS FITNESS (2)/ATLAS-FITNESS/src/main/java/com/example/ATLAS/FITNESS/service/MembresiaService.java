@@ -26,18 +26,27 @@ public class MembresiaService {
     }
     
     public List<Membresia> obtenerMembresiasCliente(Long idCliente) {
-        return membresiaRepository.findByClienteIdCliente(idCliente);
+        return membresiaRepository.findByClienteClienteId(idCliente);
     }
     
     @Transactional
     public Membresia crearMembresia(Cliente cliente, Membresia.TipoMembresia tipo, BigDecimal precio) {
         // Desactivar membresías anteriores
-        List<Membresia> membresiasAnteriores = membresiaRepository.findByClienteIdCliente(cliente.getIdCliente());
-        membresiasAnteriores.forEach(m -> m.setEstado(Membresia.Estado.VENCIDA));
-        membresiaRepository.saveAll(membresiasAnteriores);
+        List<Membresia> membresiasAnteriores = membresiaRepository.findByClienteClienteId(cliente.getClienteId());
+        if (membresiasAnteriores != null && !membresiasAnteriores.isEmpty()) {
+            membresiasAnteriores.forEach(m -> m.setEstado(Membresia.Estado.VENCIDA));
+            membresiaRepository.saveAll(membresiasAnteriores);
+        }
         
-        // Crear nueva membresía
-        Membresia nuevaMembresia = new Membresia(cliente, tipo, LocalDate.now(), precio);
+        // Crear nueva membresía usando el constructor
+        LocalDate fechaInicio = LocalDate.now();
+        Membresia nuevaMembresia = new Membresia(cliente, tipo, fechaInicio, precio);
+        
+        // Asegurar que se calcule la fecha fin
+        if (nuevaMembresia.getFechaFin() == null) {
+            nuevaMembresia.setFechaFin(Membresia.calcularFechaFin(tipo, fechaInicio));
+        }
+        
         nuevaMembresia.setEstado(Membresia.Estado.ACTIVA);
         nuevaMembresia.setFechaRegistro(LocalDateTime.now());
         
@@ -47,17 +56,21 @@ public class MembresiaService {
     @Transactional
     public Membresia renovarMembresia(Long idMembresia) {
         return membresiaRepository.findById(idMembresia).map(membresia -> {
+            // Verificar si la membresía está activa y no vencida
             if (!membresia.estaActiva()) {
                 throw new RuntimeException("La membresía no está activa");
             }
             
+            if (membresia.estaVencida()) {
+                throw new RuntimeException("La membresía está vencida. No se puede renovar.");
+            }
+            
+            // Si la fecha fin es null, usar fecha actual
+            LocalDate fechaBase = (membresia.getFechaFin() != null) ? 
+                                 membresia.getFechaFin() : LocalDate.now();
+            
             // Calcular nueva fecha de fin según el tipo
-            LocalDate nuevaFechaFin = switch (membresia.getTipo()) {
-                case MENSUAL -> membresia.getFechaFin().plusMonths(1);
-                case TRIMESTRAL -> membresia.getFechaFin().plusMonths(3);
-                case SEMESTRAL -> membresia.getFechaFin().plusMonths(6);
-                case ANUAL -> membresia.getFechaFin().plusYears(1);
-            };
+            LocalDate nuevaFechaFin = Membresia.calcularFechaFin(membresia.getTipo(), fechaBase);
             
             membresia.setFechaFin(nuevaFechaFin);
             membresia.setFechaRenovacion(LocalDateTime.now());
@@ -90,5 +103,20 @@ public class MembresiaService {
     
     public Long contarMembresiasActivas() {
         return membresiaRepository.countMembresiasActivas();
+    }
+    
+    // Método adicional para buscar membresía por código
+    public Optional<Membresia> buscarPorCodigo(String codigoMembresia) {
+        return membresiaRepository.findByCodigoMembresia(codigoMembresia);
+    }
+    
+    // Método para verificar si un cliente tiene membresía activa
+    public boolean tieneMembresiaActiva(Long idCliente) {
+        return membresiaRepository.findMembresiaActivaByCliente(idCliente).isPresent();
+    }
+    
+    // Método para obtener membresía vigente (activa y dentro de fechas)
+    public Optional<Membresia> obtenerMembresiaVigente(Long idCliente) {
+        return membresiaRepository.findMembresiaVigenteByCliente(idCliente);
     }
 }

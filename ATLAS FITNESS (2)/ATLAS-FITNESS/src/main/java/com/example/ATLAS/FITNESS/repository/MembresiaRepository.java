@@ -3,7 +3,9 @@ package com.example.ATLAS.FITNESS.repository;
 import com.example.ATLAS.FITNESS.model.Membresia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -11,20 +13,25 @@ import java.util.Optional;
 @Repository
 public interface MembresiaRepository extends JpaRepository<Membresia, Long> {
     
-    Optional<Membresia> findByCodigoMembresia(String codigoMembresia);
-    List<Membresia> findByClienteIdCliente(Long idCliente);
-    List<Membresia> findByEstado(Membresia.Estado estado);
-    List<Membresia> findByTipo(Membresia.TipoMembresia tipo);
+    @Query("SELECT m FROM Membresia m WHERE m.cliente.clienteId = :clienteId AND m.estado = 'ACTIVA'")
+    Optional<Membresia> findMembresiaActivaByCliente(@Param("clienteId") Long clienteId);
     
-    @Query("SELECT m FROM Membresia m WHERE m.cliente.idCliente = :idCliente AND m.estado = 'ACTIVA'")
-    Optional<Membresia> findMembresiaActivaByCliente(Long idCliente);
+    List<Membresia> findByClienteClienteId(Long clienteId);
     
-    @Query("SELECT m FROM Membresia m WHERE m.fechaFin < :fecha AND m.estado = 'ACTIVA'")
-    List<Membresia> findMembresiasPorVencer(LocalDate fecha);
+    @Query("SELECT m FROM Membresia m WHERE m.fechaFin <= :fechaLimite AND m.estado = 'ACTIVA'")
+    List<Membresia> findMembresiasPorVencer(@Param("fechaLimite") LocalDate fechaLimite);
     
     @Query("SELECT COUNT(m) FROM Membresia m WHERE m.estado = 'ACTIVA'")
     Long countMembresiasActivas();
     
-    @Query("SELECT SUM(m.precio) FROM Membresia m WHERE m.fechaInicio >= :inicio AND m.fechaInicio <= :fin")
-    Double sumIngresosMembresias(LocalDate inicio, LocalDate fin);
+    Optional<Membresia> findByCodigoMembresia(String codigoMembresia);
+    
+    @Query("SELECT m FROM Membresia m WHERE m.cliente.clienteId = :clienteId AND m.estado = 'ACTIVA' AND CURRENT_DATE BETWEEN m.fechaInicio AND m.fechaFin")
+    Optional<Membresia> findMembresiaVigenteByCliente(@Param("clienteId") Long clienteId);
+    
+    // Método para buscar por estado
+    List<Membresia> findByEstado(String estado);
+    
+    // Método para buscar por tipo
+    List<Membresia> findByTipo(String tipo);
 }

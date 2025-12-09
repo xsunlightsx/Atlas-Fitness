@@ -27,7 +27,11 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
-        var carrito = carritoService.obtenerCarritoCliente(cliente.getIdCliente());
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
+        
+        var carrito = carritoService.obtenerCarritoCliente(cliente.getClienteId()); // CAMBIADO: getClienteId()
         
         if (carrito.isPresent()) {
             model.addAttribute("carrito", carrito.get());
@@ -51,9 +55,12 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
-            carritoService.agregarProducto(cliente.getIdCliente(), productoId, cantidad);
+            carritoService.agregarProducto(cliente.getClienteId(), productoId, cantidad); // CAMBIADO
             redirectAttributes.addFlashAttribute("success", "Producto agregado al carrito");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -72,7 +79,11 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
-        carritoService.actualizarCantidad(cliente.getIdCliente(), productoId, cantidad);
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
+        
+        carritoService.actualizarCantidad(cliente.getClienteId(), productoId, cantidad); // CAMBIADO
         
         return "redirect:/carrito";
     }
@@ -87,9 +98,12 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
-            carritoService.eliminarProducto(cliente.getIdCliente(), productoId);
+            carritoService.eliminarProducto(cliente.getClienteId(), productoId); // CAMBIADO
             redirectAttributes.addFlashAttribute("success", "Producto eliminado del carrito");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -107,9 +121,12 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
+        if (cliente == null) {
+            return "redirect:/auth/login";
+        }
         
         try {
-            carritoService.vaciarCarrito(cliente.getIdCliente());
+            carritoService.vaciarCarrito(cliente.getClienteId()); // CAMBIADO
             redirectAttributes.addFlashAttribute("success", "Carrito vaciado");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -127,7 +144,11 @@ public class CarritoController {
         }
         
         Cliente cliente = (Cliente) session.getAttribute("cliente");
-        Integer totalItems = carritoService.contarItems(cliente.getIdCliente());
+        if (cliente == null) {
+            return "0";
+        }
+        
+        Integer totalItems = carritoService.contarItems(cliente.getClienteId()); // CAMBIADO
         return totalItems.toString();
     }
 }

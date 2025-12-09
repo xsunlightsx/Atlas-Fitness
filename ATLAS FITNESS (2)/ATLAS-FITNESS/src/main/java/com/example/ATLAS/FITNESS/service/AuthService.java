@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -19,16 +20,46 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
     
     public AuthService(UsuarioRepository usuarioRepository,
                       ClienteRepository clienteRepository,
-                      PasswordEncoder passwordEncoder,
-                      EmailService emailService) {
+                      PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.clienteRepository = clienteRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
+    }
+    
+    @Transactional
+    public Usuario autenticar(LoginDTO loginDTO) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(loginDTO.getUsername());
+        
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        
+        Usuario usuario = usuarioOpt.get();
+        
+        // Verificar estado
+        if (!usuario.estaActivo()) {
+            throw new RuntimeException("Usuario inactivo o bloqueado");
+        }
+        
+        // Verificar contraseña
+        if (!passwordEncoder.matches(loginDTO.getPassword(), usuario.getPassword())) {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+        
+        // Cargar el cliente asociado si existe
+        if (usuario.getClienteId() != null) {
+            Optional<Cliente> clienteOpt = clienteRepository.findById(usuario.getClienteId());
+            clienteOpt.ifPresent(usuario::setCliente);
+        }
+        
+        // Actualizar último login
+        usuario.setUltimoLogin(LocalDateTime.now());
+        usuarioRepository.save(usuario);
+        
+        return usuario;
     }
     
     @Transactional
@@ -48,15 +79,7 @@ public class AuthService {
             throw new RuntimeException("El DNI ya está registrado");
         }
         
-        // Crear usuario
-        Usuario usuario = new Usuario();
-        usuario.setUsername(registroDTO.getUsername());
-        usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
-        usuario.setEmail(registroDTO.getEmail());
-        usuario.setRol(Usuario.Rol.CLIENTE);
-        usuario.setEstado(Usuario.Estado.ACTIVO);
-        
-        // Crear cliente
+        // 1. Crear el cliente
         Cliente cliente = new Cliente();
         cliente.setDni(registroDTO.getDni());
         cliente.setNombre(registroDTO.getNombre());
@@ -64,28 +87,25 @@ public class AuthService {
         cliente.setTelefono(registroDTO.getTelefono());
         cliente.setEmail(registroDTO.getEmail());
         cliente.setDireccion(registroDTO.getDireccion());
-        cliente.setUsuario(usuario);
+        cliente.setEstado("ACTIVO");
         
-        // Guardar en cascada
-        usuario.setCliente(cliente);
-        usuarioRepository.save(usuario);
+        Cliente clienteGuardado = clienteRepository.save(cliente);
         
-        // Enviar email de bienvenida
-        emailService.enviarEmailBienvenida(cliente.getEmail(), cliente.getNombre());
+        // 2. Crear usuario vinculado
+        Usuario usuario = new Usuario();
+        usuario.setUsername(registroDTO.getUsername());
+        usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
+        usuario.setEmail(registroDTO.getEmail());
+        usuario.setRol(Usuario.Rol.CLIENTE);
+        usuario.setEstado(Usuario.Estado.ACTIVO);
+        usuario.setClienteId(clienteGuardado.getClienteId());
         
-        return usuario;
-    }
-    
-    public Usuario autenticar(LoginDTO loginDTO) {
-        return usuarioRepository.findByUsername(loginDTO.getUsername())
-                .filter(usuario -> passwordEncoder.matches(loginDTO.getPassword(), usuario.getPassword()))
-                .filter(usuario -> usuario.getEstado() == Usuario.Estado.ACTIVO)
-                .map(usuario -> {
-                    usuario.setUltimoLogin(LocalDateTime.now());
-                    usuario.setIntentosLogin(0);
-                    return usuarioRepository.save(usuario);
-                })
-                .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+        
+        // Asociar cliente al usuario (en memoria)
+        usuarioGuardado.setCliente(clienteGuardado);
+        
+        return usuarioGuardado;
     }
     
     public void solicitarResetPassword(String email) {
@@ -95,22 +115,35 @@ public class AuthService {
             usuario.setTokenExpira(LocalDateTime.now().plusHours(24));
             usuarioRepository.save(usuario);
             
-            // Enviar email con token
-            emailService.enviarEmailResetPassword(email, token);
+            // TODO: Implementar envío de email
+            System.out.println("Token para " + email + ": " + token);
         });
     }
     
     @Transactional
     public void resetPassword(String token, String nuevaPassword) {
-        usuarioRepository.findByResetToken(token).ifPresent(usuario -> {
-            if (usuario.getTokenExpira().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Token expirado");
-            }
-            
-            usuario.setPassword(passwordEncoder.encode(nuevaPassword));
-            usuario.setResetToken(null);
-            usuario.setTokenExpira(null);
-            usuarioRepository.save(usuario);
-        });
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByResetToken(token);
+        
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("Token inválido");
+        }
+        
+        Usuario usuario = usuarioOpt.get();
+        
+        if (!usuario.tokenValido()) {
+            throw new RuntimeException("Token expirado");
+        }
+        
+        usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        usuario.setResetToken(null);
+        usuario.setTokenExpira(null);
+        usuarioRepository.save(usuario);
+    }
+    
+    public boolean verificarCredenciales(String username, String password) {
+        return usuarioRepository.findByUsername(username)
+                .filter(usuario -> usuario.estaActivo())
+                .filter(usuario -> passwordEncoder.matches(password, usuario.getPassword()))
+                .isPresent();
     }
 }

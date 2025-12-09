@@ -4,52 +4,68 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "Usuario")
 public class Usuario {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUsuario;
+    @Column(name = "usuario_id")
+    private Long usuarioId;
     
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(name = "cliente_id", insertable = false, updatable = false)
+    private Long clienteId;
+    
+    @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
     
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false, length = 255)
     private String password;
     
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Rol rol = Rol.CLIENTE;
+    @Column(name = "rol", nullable = false, length = 20)
+    private String rol;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Estado estado = Estado.ACTIVO;
-    
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
+    @Column(name = "ultimo_login")
     private LocalDateTime ultimoLogin;
-    private Integer intentosLogin = 0;
+    
+    @Column(name = "estado", length = 20)
+    private String estado = "ACTIVO";
+    
+    // Campos para reset de contraseña
+    @Column(name = "reset_token", length = 255)
     private String resetToken;
+    
+    @Column(name = "token_expira")
     private LocalDateTime tokenExpira;
     
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    // RELACIÓN ELIMINADA: No hay relación bidireccional para evitar error
+    // @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private Cliente cliente;
+    
+    // En su lugar, uso @Transient
+    @Transient
     private Cliente cliente;
     
-    // Enums
-    public enum Rol {
-        ADMIN, RECEPCIONISTA, ENTRENADOR, CLIENTE
+    // Enums como constantes (para evitar conflictos)
+    public static final class Rol {
+        public static final String ADMIN = "ADMIN";
+        public static final String RECEPCIONISTA = "RECEPCIONISTA";
+        public static final String ENTRENADOR = "ENTRENADOR";
+        public static final String CLIENTE = "CLIENTE";
     }
     
-    public enum Estado {
-        ACTIVO, INACTIVO, BLOQUEADO
+    public static final class Estado {
+        public static final String ACTIVO = "ACTIVO";
+        public static final String INACTIVO = "INACTIVO";
+        public static final String BLOQUEADO = "BLOQUEADO";
     }
     
     // Constructores
     public Usuario() {}
     
-    public Usuario(String username, String password, String email, Rol rol) {
+    public Usuario(String username, String password, String email, String rol) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -57,8 +73,11 @@ public class Usuario {
     }
     
     // Getters y Setters
-    public Long getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+    public Long getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    
+    public Long getClienteId() { return clienteId; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
     
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -69,20 +88,14 @@ public class Usuario {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
-    
-    public Estado getEstado() { return estado; }
-    public void setEstado(Estado estado) { this.estado = estado; }
-    
-    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
-    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
     
     public LocalDateTime getUltimoLogin() { return ultimoLogin; }
     public void setUltimoLogin(LocalDateTime ultimoLogin) { this.ultimoLogin = ultimoLogin; }
     
-    public Integer getIntentosLogin() { return intentosLogin; }
-    public void setIntentosLogin(Integer intentosLogin) { this.intentosLogin = intentosLogin; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
     
     public String getResetToken() { return resetToken; }
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
@@ -92,4 +105,30 @@ public class Usuario {
     
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    
+    // Métodos utilitarios
+    public boolean estaActivo() {
+        return Estado.ACTIVO.equals(estado);
+    }
+    
+    public boolean esAdmin() {
+        return Rol.ADMIN.equals(rol);
+    }
+    
+    public boolean tokenValido() {
+        return resetToken != null && 
+               tokenExpira != null && 
+               tokenExpira.isAfter(LocalDateTime.now());
+    }
+    
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "usuarioId=" + usuarioId +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", rol='" + rol + '\'' +
+                ", estado='" + estado + '\'' +
+                '}';
+    }
 }

@@ -9,35 +9,24 @@ public class CarritoItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCarritoItem;
+    private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "id_carrito", nullable = false)
+    @JoinColumn(name = "carrito_id", nullable = false)
     private Carrito carrito;
     
     @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
     
-    @Column(nullable = false)
     private Integer cantidad = 1;
     
-    @Column(precision = 10, scale = 2)
+    @Column(name = "precio_unitario", precision = 10, scale = 2)
     private BigDecimal precioUnitario;
     
-    // Constructores
-    public CarritoItem() {}
-    
-    public CarritoItem(Carrito carrito, Producto producto, Integer cantidad) {
-        this.carrito = carrito;
-        this.producto = producto;
-        this.cantidad = cantidad;
-        this.precioUnitario = producto.getPrecio();
-    }
-    
     // Getters y Setters
-    public Long getIdCarritoItem() { return idCarritoItem; }
-    public void setIdCarritoItem(Long idCarritoItem) { this.idCarritoItem = idCarritoItem; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     
     public Carrito getCarrito() { return carrito; }
     public void setCarrito(Carrito carrito) { this.carrito = carrito; }
@@ -51,7 +40,7 @@ public class CarritoItem {
     public BigDecimal getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
     
-    @Transient
+    // Métodos utilitarios
     public BigDecimal getSubtotal() {
         if (precioUnitario == null || cantidad == null) {
             return BigDecimal.ZERO;

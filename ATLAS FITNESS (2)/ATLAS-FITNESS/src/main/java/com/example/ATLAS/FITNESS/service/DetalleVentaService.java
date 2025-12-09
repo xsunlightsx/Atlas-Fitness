@@ -3,6 +3,7 @@ package com.example.ATLAS.FITNESS.service;
 import com.example.ATLAS.FITNESS.model.DetalleVenta;
 import com.example.ATLAS.FITNESS.repository.DetalleVentaRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -14,23 +15,26 @@ public class DetalleVentaService {
         this.detalleVentaRepository = detalleVentaRepository;
     }
     
-    public List<DetalleVenta> obtenerDetallesPorVenta(Long idVenta) {
-        return detalleVentaRepository.findByVentaIdVenta(idVenta);
+    // Usar método derivado automático en lugar de @Query
+    public List<DetalleVenta> obtenerDetallesPorCliente(Long clienteId) {
+        return detalleVentaRepository.findByVentaClienteClienteId(clienteId);
     }
     
-    public List<DetalleVenta> obtenerHistorialComprasCliente(Long idCliente) {
-        return detalleVentaRepository.findByClienteId(idCliente);
+    // Métodos básicos CRUD
+    public List<DetalleVenta> obtenerTodos() {
+        return detalleVentaRepository.findAll();
     }
     
-    public Long contarVentasProducto(Long idProducto) {
-        return detalleVentaRepository.sumCantidadVendidaByProducto(idProducto);
+    public DetalleVenta obtenerPorId(Long id) {
+        return detalleVentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Detalle de venta no encontrado"));
     }
     
-    public List<DetalleVenta> obtenerDetallesPorProducto(Long idProducto) {
-        return detalleVentaRepository.findByProductoId(idProducto);
+    public DetalleVenta guardar(DetalleVenta detalleVenta) {
+        return detalleVentaRepository.save(detalleVenta);
     }
     
-    public List<DetalleVenta> obtenerDetallesPorServicio(Long idServicio) {
-        return detalleVentaRepository.findByServicioId(idServicio);
+    public void eliminar(Long id) {
+        detalleVentaRepository.deleteById(id);
     }
 }

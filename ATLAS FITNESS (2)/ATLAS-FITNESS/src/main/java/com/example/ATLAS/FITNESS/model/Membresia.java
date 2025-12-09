@@ -11,10 +11,11 @@ public class Membresia {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "membresia_id")
     private Long idMembresia;
     
     @ManyToOne
-    @JoinColumn(name = "id_cliente", nullable = false)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
     
     @Column(name = "codigo_membresia", unique = true, nullable = false, length = 20)
@@ -66,7 +67,7 @@ public class Membresia {
         this.fechaInicio = fechaInicio;
         this.precio = precio;
         this.codigoMembresia = generarCodigoMembresia(cliente);
-        calcularFechaFin();
+        calcularFechaFin(); // Llama al método privado
     }
     
     // Getters y Setters
@@ -82,13 +83,13 @@ public class Membresia {
     public TipoMembresia getTipo() { return tipo; }
     public void setTipo(TipoMembresia tipo) { 
         this.tipo = tipo;
-        calcularFechaFin();
+        calcularFechaFin(); // Recalcula al cambiar tipo
     }
     
     public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { 
         this.fechaInicio = fechaInicio;
-        calcularFechaFin();
+        calcularFechaFin(); // Recalcula al cambiar fecha inicio
     }
     
     public LocalDate getFechaFin() { return fechaFin; }
@@ -112,16 +113,25 @@ public class Membresia {
     public String getObservaciones() { return observaciones; }
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
     
-    // Métodos auxiliares
+    // Métodos auxiliares PRIVADO (solo para uso interno de la clase)
     private void calcularFechaFin() {
         if (fechaInicio != null && tipo != null) {
-            switch (tipo) {
-                case MENSUAL -> this.fechaFin = fechaInicio.plusMonths(1);
-                case TRIMESTRAL -> this.fechaFin = fechaInicio.plusMonths(3);
-                case SEMESTRAL -> this.fechaFin = fechaInicio.plusMonths(6);
-                case ANUAL -> this.fechaFin = fechaInicio.plusYears(1);
-            }
+            this.fechaFin = calcularFechaFin(tipo, fechaInicio);
         }
+    }
+    
+    // Método PÚBLICO y ESTÁTICO para calcular fecha fin
+    public static LocalDate calcularFechaFin(TipoMembresia tipo, LocalDate fechaInicio) {
+        if (fechaInicio == null || tipo == null) {
+            return null;
+        }
+        
+        return switch (tipo) {
+            case MENSUAL -> fechaInicio.plusMonths(1);
+            case TRIMESTRAL -> fechaInicio.plusMonths(3);
+            case SEMESTRAL -> fechaInicio.plusMonths(6);
+            case ANUAL -> fechaInicio.plusYears(1);
+        };
     }
     
     private String generarCodigoMembresia(Cliente cliente) {

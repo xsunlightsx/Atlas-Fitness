@@ -8,6 +8,7 @@ import com.example.ATLAS.FITNESS.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -26,12 +27,14 @@ public class CarritoService {
     }
     
     public Optional<Carrito> obtenerCarritoCliente(Long idCliente) {
-        return carritoRepository.findByClienteIdCliente(idCliente);
+        // CORREGIDO: Cambiar findByClienteIdCliente a findByClienteClienteId
+        return carritoRepository.findByClienteClienteId(idCliente);
     }
     
     @Transactional
     public Carrito obtenerOCrearCarrito(Long idCliente) {
-        return carritoRepository.findByClienteIdCliente(idCliente)
+        // CORREGIDO: Cambiar findByClienteIdCliente a findByClienteClienteId
+        return carritoRepository.findByClienteClienteId(idCliente)
                 .orElseGet(() -> {
                     Cliente cliente = clienteService.buscarPorId(idCliente)
                             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -98,15 +101,23 @@ public class CarritoService {
     }
     
     @Transactional
-    public Double calcularTotal(Long idCliente) {
+    public BigDecimal calcularTotal(Long idCliente) {
+        // CORREGIDO: getTotal() retorna BigDecimal, orElse debe devolver BigDecimal
         return obtenerCarritoCliente(idCliente)
                 .map(Carrito::getTotal)
+                .orElse(BigDecimal.ZERO); // Usar BigDecimal.ZERO en lugar de 0.0
+    }
+    
+    // Opcional: Método para obtener como Double si lo necesitas
+    public Double calcularTotalDouble(Long idCliente) {
+        return obtenerCarritoCliente(idCliente)
+                .map(carrito -> carrito.getTotal().doubleValue())
                 .orElse(0.0);
     }
     
     public Integer contarItems(Long idCliente) {
         return obtenerCarritoCliente(idCliente)
-                .map(carrito -> carrito.getTotalItems())
+                .map(Carrito::getTotalItems)
                 .orElse(0);
     }
 }

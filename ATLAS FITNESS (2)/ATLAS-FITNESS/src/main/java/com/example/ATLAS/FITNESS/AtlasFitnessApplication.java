@@ -9,5 +9,5 @@ public class AtlasFitnessApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AtlasFitnessApplication.class, args);
 	}
-
+ 
 }
