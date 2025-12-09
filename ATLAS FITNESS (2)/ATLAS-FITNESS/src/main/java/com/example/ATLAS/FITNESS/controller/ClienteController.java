@@ -71,37 +71,39 @@ public class ClienteController {
         return "cliente/historial";
     }
     
-    @GetMapping("/membresia")
-    public String mostrarMembresia(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
-            return "redirect:/auth/login";
-        }
-        
-        Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-        
-        model.addAttribute("cliente", cliente);
-        return "cliente/membresia";
-    }
+    // ⚠️ ELIMINADO: Este método está DUPLICADO en MembresiaController
+    // @GetMapping("/membresia")
+    // public String mostrarMembresia(HttpSession session, Model model) {
+    //     Usuario usuario = (Usuario) session.getAttribute("usuario");
+    //     if (usuario == null) {
+    //         return "redirect:/auth/login";
+    //     }
+    //     
+    //     Cliente cliente = clienteService.buscarPorUsername(usuario.getUsername())
+    //             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    //     
+    //     model.addAttribute("cliente", cliente);
+    //     return "cliente/membresia";
+    // }
     
-    @PostMapping("/membresia/renovar")
-    public String renovarMembresia(HttpSession session,
-                                  RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
-            return "redirect:/auth/login";
-        }
-        
-        try {
-            // Lógica para renovar membresía
-            redirectAttributes.addFlashAttribute("success", "Membresía renovada exitosamente");
-        } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al renovar membresía: " + e.getMessage());
-        }
-        
-        return "redirect:/cliente/membresia";
-    }
+    // ⚠️ ELIMINADO: Este método está DUPLICADO en MembresiaController
+    // @PostMapping("/membresia/renovar")
+    // public String renovarMembresia(HttpSession session,
+    //                               RedirectAttributes redirectAttributes) {
+    //     Usuario usuario = (Usuario) session.getAttribute("usuario");
+    //     if (usuario == null) {
+    //         return "redirect:/auth/login";
+    //     }
+    //     
+    //     try {
+    //         // Lógica para renovar membresía
+    //         redirectAttributes.addFlashAttribute("success", "Membresía renovada exitosamente");
+    //     } catch (RuntimeException e) {
+    //         redirectAttributes.addFlashAttribute("error", "Error al renovar membresía: " + e.getMessage());
+    //     }
+    //     
+    //     return "redirect:/cliente/membresia";
+    // }
     
     @GetMapping("/rutinas")
     public String mostrarRutinas(HttpSession session, Model model) {
