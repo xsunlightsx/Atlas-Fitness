@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="content">
+    <div class="container mt-4">
+        <!-- Título -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="text-yellow fw-bold">
+                    <i class="bi bi-activity me-2"></i>Mis Rutinas
+                </h1>
+                <p class="text-white">Planifica y registra tu entrenamiento</p>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-week fs-1 text-yellow"></i>
+                        <h3 class="mt-2">4/5</h3>
+                        <p class="mb-0">Días esta semana</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-fire fs-1 text-yellow"></i>
+                        <h3 class="mt-2">2,450</h3>
+                        <p class="mb-0">Calorías hoy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-clock-history fs-1 text-yellow"></i>
+                        <h3 class="mt-2">1h 30m</h3>
+                        <p class="mb-0">Tiempo promedio</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-trophy fs-1 text-yellow"></i>
+                        <h3 class="mt-2">85%</h3>
+                        <p class="mb-0">Objetivo semanal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Panel izquierdo: Rutina actual -->
+            <div class="col-lg-8">
+                <!-- Rutina del día -->
+                <div class="card card-yellow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-day me-2"></i>Rutina de Hoy
+                            <small class="text-white ms-2">(Miércoles - Piernas)</small>
+                        </h5>
+                        <span class="badge bg-yellow text-black">EN PROGRESO</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Progreso del día -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold">Progreso diario</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="progress" style="height: 15px;">
+                                <div class="progress-bar bg-yellow" style="width: 60%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Ejercicios -->
+                        <div class="accordion" id="rutinaAccordion">
+                            <!-- Ejercicio 1 -->
+                            <div class="accordion-item border-yellow mb-2">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ejercicio1">
+                                        <div class="d-flex w-100 align-items-center">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <span class="fw-bold">Sentadillas con Barra</span>
+                                            <span class="badge bg-yellow text-black ms-auto me-2">4x10</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="ejercicio1" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">Detalles:</h6>
+                                                <p><strong>Peso:</strong> 80 kg</p>
+                                                <p><strong>Descanso:</strong> 90 segundos</p>
+                                                <p><strong>Notas:</strong> Mantener espalda recta</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">Registro:</h6>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Peso realizado (kg)</label>
+                                                    <input type="number" class="form-control" value="80">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Repeticiones</label>
+                                                    <input type="number" class="form-control" value="10">
+                                                </div>
+                                                <button class="btn btn-sm btn-yellow">
+                                                    <i class="bi bi-save me-1"></i>Guardar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ejercicio 2 -->
+                            <div class="accordion-item border-yellow mb-2">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ejercicio2">
+                                        <div class="d-flex w-100 align-items-center">
+                                            <i class="bi bi-check-circle text-yellow me-2"></i>
+                                            <span class="fw-bold">Prensa de Piernas</span>
+                                            <span class="badge bg-yellow text-black ms-auto me-2">3x12</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="ejercicio2" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">Detalles:</h6>
+                                                <p><strong>Peso:</strong> 120 kg</p>
+                                                <p><strong>Descanso:</strong> 60 segundos</p>
+                                                <p><strong>Notas:</strong> Controlar movimiento</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">Registro:</h6>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Peso realizado (kg)</label>
+                                                    <input type="number" class="form-control" value="">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Repeticiones</label>
+                                                    <input type="number" class="form-control" value="">
+                                                </div>
+                                                <button class="btn btn-sm btn-yellow">
+                                                    <i class="bi bi-save me-1"></i>Guardar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="mt-4 d-flex justify-content-between">
+                            <button class="btn btn-yellow" onclick="completarRutina()">
+                                <i class="bi bi-check-circle me-1"></i>Completar Rutina
+                            </button>
+                            <button class="btn btn-outline-yellow" onclick="omitirRutina()">
+                                <i class="bi bi-skip-forward me-1"></i>Omitir Hoy
+                            </button>
+                            <button class="btn btn-outline-black" data-bs-toggle="modal" data-bs-target="#agregarEjercicioModal">
+                                <i class="bi bi-plus-circle me-1"></i>Agregar Ejercicio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendario semanal -->
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-week me-2"></i>Semana de Entrenamiento
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-black text-yellow">Lunes</th>
+                                        <th class="bg-black text-yellow">Martes</th>
+                                        <th class="bg-black text-yellow">Miércoles</th>
+                                        <th class="bg-black text-yellow">Jueves</th>
+                                        <th class="bg-black text-yellow">Viernes</th>
+                                        <th class="bg-black text-yellow">Sábado</th>
+                                        <th class="bg-black text-yellow">Domingo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Pecho/Tríceps</strong>
+                                                <br>
+                                                <small class="text-success">✓ Completado</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Espalda/Bíceps</strong>
+                                                <br>
+                                                <small class="text-success">✓ Completado</small>
+                                            </div>
+                                        </td>
+                                        <td class="bg-yellow text-black">
+                                            <div class="p-2">
+                                                <strong>Piernas</strong>
+                                                <br>
+                                                <small>En progreso</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Descanso</strong>
+                                                <br>
+                                                <small class="text-muted">Programado</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Hombros</strong>
+                                                <br>
+                                                <small class="text-muted">Pendiente</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Cardio</strong>
+                                                <br>
+                                                <small class="text-muted">Pendiente</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="p-2">
+                                                <strong>Descanso</strong>
+                                                <br>
+                                                <small class="text-muted">Programado</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho: Progreso y herramientas -->
+            <div class="col-lg-4">
+                <!-- Progreso mensual -->
+                <div class="card card-yellow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>Progreso Mensual
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="display-4 text-yellow fw-bold">85%</div>
+                            <p class="text-muted">Objetivo del mes</p>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Asistencia</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-yellow" style="width: 90%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Intensidad</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-yellow" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Consistencia</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-yellow" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Objetivos -->
+                <div class="card card-yellow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bullseye me-2"></i>Mis Objetivos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Perder 5kg</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-yellow" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Aumentar Press 10kg</span>
+                                <span>40%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-yellow" style="width: 40%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Correr 10km</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-yellow" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-yellow w-100 mt-2" data-bs-toggle="modal" data-bs-target="#nuevoObjetivoModal">
+                            <i class="bi bi-plus-circle me-1"></i>Nuevo Objetivo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Herramientas rápidas -->
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-tools me-2"></i>Herramientas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#calculadoraModal">
+                                <i class="bi bi-calculator me-1"></i>Calculadora de Calorías
+                            </button>
+                            <button class="btn btn-outline-yellow" onclick="generarNuevaRutina()">
+                                <i class="bi bi-magic me-1"></i>Generar Nueva Rutina
+                            </button>
+                            <button class="btn btn-outline-yellow" onclick="verProgresoGrafico()">
+                                <i class="bi bi-bar-chart me-1"></i>Ver Gráficos
+                            </button>
+                            <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#notasModal">
+                                <i class="bi bi-journal-text me-1"></i>Agregar Notas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <!-- Agregar Ejercicio -->
+    <div class="modal fade" id="agregarEjercicioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-black text-yellow">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar Ejercicio
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEjercicio">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Ejercicio</label>
+                            <input type="text" class="form-control" placeholder="Ej: Press Banca" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Series</label>
+                                <input type="number" class="form-control" value="3" min="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Repeticiones</label>
+                                <input type="number" class="form-control" value="10" min="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Peso (kg)</label>
+                                <input type="number" class="form-control" value="0" step="0.5">
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="form-label">Notas</label>
+                            <textarea class="form-control" rows="2" placeholder="Observaciones..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-yellow" onclick="agregarEjercicio()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuevo Objetivo -->
+    <div class="modal fade" id="nuevoObjetivoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-black text-yellow">
+                    <h5 class="modal-title">
+                        <i class="bi bi-bullseye me-2"></i>Nuevo Objetivo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formObjetivo">
+                        <div class="mb-3">
+                            <label class="form-label">Descripción del Objetivo</label>
+                            <input type="text" class="form-control" placeholder="Ej: Perder 5kg en 3 meses" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Inicio</label>
+                                <input type="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Meta</label>
+                                <input type="date" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="form-label">Prioridad</label>
+                            <select class="form-select">
+                                <option value="ALTA">Alta</option>
+                                <option value="MEDIA" selected>Media</option>
+                                <option value="BAJA">Baja</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-yellow" onclick="crearObjetivo()">Crear Objetivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="pageScripts">
+    <script>
+        function completarRutina() {
+            showNotification('¡Rutina completada exitosamente!', 'success');
+            // Aquí iría la lógica para marcar como completada
+        }
+        
+        function omitirRutina() {
+            if (confirm('¿Estás seguro de que quieres omitir la rutina de hoy?')) {
+                showNotification('Rutina omitida', 'warning');
+                // Aquí iría la lógica para omitir
+            }
+        }
+        
+        function agregarEjercicio() {
+            const form = document.getElementById('formEjercicio');
+            if (form.checkValidity()) {
+                showNotification('Ejercicio agregado a la rutina', 'success');
+                $('#agregarEjercicioModal').modal('hide');
+                form.reset();
+            } else {
+                form.reportValidity();
+            }
+        }
+        
+        function crearObjetivo() {
+            const form = document.getElementById('formObjetivo');
+            if (form.checkValidity()) {
+                showNotification('Nuevo objetivo creado', 'success');
+                $('#nuevoObjetivoModal').modal('hide');
+                form.reset();
+            } else {
+                form.reportValidity();
+            }
+        }
+        
+        function generarNuevaRutina() {
+            showNotification('Generando nueva rutina personalizada...', 'info');
+            // Simular proceso
+            setTimeout(() => {
+                showNotification('¡Nueva rutina generada! Revisa tu calendario.', 'success');
+            }, 2000);
+        }
+        
+        function verProgresoGrafico() {
+            showNotification('Mostrando gráficos de progreso...', 'info');
+            // Aquí iría la lógica para mostrar gráficos
+        }
+        
+        // Inicializar accordion
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordions = document.querySelectorAll('.accordion-button');
+            accordions.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('bi-check-circle')) {
+                        icon.classList.remove('bi-check-circle');
+                        icon.classList.add('bi-check-circle-fill', 'text-success');
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>

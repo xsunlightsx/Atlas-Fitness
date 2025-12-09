@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="content">
+    <div class="container mt-4">
+        <!-- Título -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="text-yellow fw-bold">
+                    <i class="bi bi-cart3 me-2"></i>Mi Carrito
+                </h1>
+                <p class="text-white">Revisa y gestiona tus productos</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Productos en el carrito -->
+            <div class="col-lg-8">
+                <div class="card card-yellow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bag me-2"></i>Productos (<span id="cart-count">3</span>)
+                        </h5>
+                        <button class="btn btn-sm btn-outline-yellow" onclick="vaciarCarrito()">
+                            <i class="bi bi-trash me-1"></i>Vaciar Carrito
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Lista de productos -->
+                        <div id="lista-carrito">
+                            <!-- Producto 1 -->
+                            <div class="cart-item border-bottom pb-3 mb-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img src="https://via.placeholder.com/80" class="img-fluid rounded" alt="Producto">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="fw-bold mb-1">Proteína Whey Gold Standard</h5>
+                                        <p class="text-muted mb-0">Sabor: Chocolate</p>
+                                        <small class="text-yellow">Disponible</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-yellow" onclick="decrementarCantidad(1)">-</button>
+                                            <input type="number" class="form-control text-center" value="2" min="1" id="cantidad-1">
+                                            <button class="btn btn-outline-yellow" onclick="incrementarCantidad(1)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h6 class="fw-bold mb-0">$750.00</h6>
+                                        <small class="text-muted">$375.00 c/u</small>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <button class="btn btn-sm btn-outline-black" onclick="eliminarProducto(1)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Producto 2 -->
+                            <div class="cart-item border-bottom pb-3 mb-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <img src="https://via.placeholder.com/80" class="img-fluid rounded" alt="Producto">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="fw-bold mb-1">Shaker Profesional</h5>
+                                        <p class="text-muted mb-0">Color: Negro</p>
+                                        <small class="text-yellow">Disponible</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-yellow" onclick="decrementarCantidad(2)">-</button>
+                                            <input type="number" class="form-control text-center" value="1" min="1" id="cantidad-2">
+                                            <button class="btn btn-outline-yellow" onclick="incrementarCantidad(2)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h6 class="fw-bold mb-0">$150.00</h6>
+                                        <small class="text-muted">$150.00 c/u</small>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <button class="btn btn-sm btn-outline-black" onclick="eliminarProducto(2)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cupón de descuento -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold text-black mb-3">
+                                <i class="bi bi-ticket-perforated me-2"></i>Cupón de Descuento
+                            </h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Ingresa tu código" id="codigo-cupon">
+                                <button class="btn btn-yellow" onclick="aplicarCupon()">Aplicar</button>
+                            </div>
+                            <div id="cupon-mensaje" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos recomendados -->
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightbulb me-2"></i>También te puede interesar
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card product-card">
+                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Producto">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title fw-bold">Creatina Monohidrato</h6>
+                                        <p class="text-yellow fw-bold">$450.00</p>
+                                        <button class="btn btn-sm btn-yellow w-100" onclick="agregarAlCarrito(3, 'Creatina Monohidrato', 450)">
+                                            <i class="bi bi-cart-plus me-1"></i>Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card product-card">
+                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Producto">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title fw-bold">BCAA en Polvo</h6>
+                                        <p class="text-yellow fw-bold">$550.00</p>
+                                        <button class="btn btn-sm btn-yellow w-100" onclick="agregarAlCarrito(4, 'BCAA en Polvo', 550)">
+                                            <i class="bi bi-cart-plus me-1"></i>Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card product-card">
+                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Producto">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title fw-bold">Guantes de Gimnasio</h6>
+                                        <p class="text-yellow fw-bold">$250.00</p>
+                                        <button class="btn btn-sm btn-yellow w-100" onclick="agregarAlCarrito(5, 'Guantes de Gimnasio', 250)">
+                                            <i class="bi bi-cart-plus me-1"></i>Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div class="col-lg-4">
+                <div class="card card-yellow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt me-2"></i>Resumen del Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal (3 productos)</span>
+                                <span id="subtotal">$1,650.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Envío</span>
+                                <span id="envio">$99.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Descuento</span>
+                                <span class="text-success" id="descuento">-$0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total</span>
+                                <span id="total">$1,749.00</span>
+                            </div>
+                            <small class="text-muted d-block mt-2">* IVA incluido</small>
+                        </div>
+
+                        <!-- Método de envío -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-black mb-3">Método de Envío</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="envio" id="envio-estandar" checked>
+                                <label class="form-check-label" for="envio-estandar">
+                                    Estándar (3-5 días) - $99.00
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="envio" id="envio-express">
+                                <label class="form-check-label" for="envio-express">
+                                    Express (24h) - $199.00
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Botón de compra -->
+                        <a th:href="@{/carrito/checkout}" class="btn btn-yellow w-100 btn-lg mb-3">
+                            <i class="bi bi-lock me-2"></i>Proceder al Pago
+                        </a>
+                        
+                        <p class="text-center text-muted mb-0">
+                            <small>
+                                <i class="bi bi-shield-check text-yellow me-1"></i>
+                                Pago 100% seguro
+                            </small>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Información de seguridad -->
+                <div class="card card-yellow">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-black mb-3">
+                            <i class="bi bi-shield-check text-yellow me-2"></i>Compra Segura
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-yellow me-2"></i>
+                                <small>Pago encriptado SSL</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-yellow me-2"></i>
+                                <small>No almacenamos datos de tu tarjeta</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-yellow me-2"></i>
+                                <small>Garantía de devolución 30 días</small>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle text-yellow me-2"></i>
+                                <small>Soporte 24/7</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="pageScripts">
+    <script>
+        // Variables del carrito
+        let carrito = [
+            { id: 1, nombre: "Proteína Whey Gold Standard", precio: 375, cantidad: 2 },
+            { id: 2, nombre: "Shaker Profesional", precio: 150, cantidad: 1 }
+        ];
+        
+        let descuentoAplicado = 0;
+        let cuponActivo = null;
+        
+        // Inicializar carrito
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarResumen();
+            actualizarContador();
+        });
+        
+        // Funciones del carrito
+        function incrementarCantidad(id) {
+            const producto = carrito.find(p => p.id === id);
+            if (producto) {
+                producto.cantidad++;
+                document.getElementById(`cantidad-${id}`).value = producto.cantidad;
+                actualizarResumen();
+                actualizarContador();
+            }
+        }
+        
+        function decrementarCantidad(id) {
+            const producto = carrito.find(p => p.id === id);
+            if (producto && producto.cantidad > 1) {
+                producto.cantidad--;
+                document.getElementById(`cantidad-${id}`).value = producto.cantidad;
+                actualizarResumen();
+                actualizarContador();
+            }
+        }
+        
+        function eliminarProducto(id) {
+            if (confirm('¿Eliminar producto del carrito?')) {
+                carrito = carrito.filter(p => p.id !== id);
+                actualizarResumen();
+                actualizarContador();
+                showNotification('Producto eliminado del carrito', 'info');
+            }
+        }
+        
+        function vaciarCarrito() {
+            if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+                carrito = [];
+                actualizarResumen();
+                actualizarContador();
+                showNotification('Carrito vaciado', 'warning');
+            }
+        }
+        
+        function agregarAlCarrito(id, nombre, precio) {
+            const productoExistente = carrito.find(p => p.id === id);
+            
+            if (productoExistente) {
+                productoExistente.cantidad++;
+            } else {
+                carrito.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: 1
+                });
+            }
+            
+            actualizarResumen();
+            actualizarContador();
+            showNotification(`${nombre} agregado al carrito`, 'success');
+        }
+        
+        function aplicarCupon() {
+            const codigo = document.getElementById('codigo-cupon').value.trim();
+            const mensajeDiv = document.getElementById('cupon-mensaje');
+            
+            if (!codigo) {
+                mensajeDiv.innerHTML = '<small class="text-danger">Ingresa un código</small>';
+                return;
+            }
+            
+            // Simular validación de cupón
+            const cupones = {
+                'ATLAS10': 0.10,  // 10% descuento
+                'BIENVENIDA': 0.15, // 15% descuento
+                'FITNESS20': 0.20  // 20% descuento
+            };
+            
+            if (cupones[codigo.toUpperCase()]) {
+                const descuento = cupones[codigo.toUpperCase()];
+                cuponActivo = { codigo: codigo.toUpperCase(), descuento: descuento };
+                mensajeDiv.innerHTML = `<small class="text-success">¡Cupón ${codigo.toUpperCase()} aplicado! ${descuento*100}% de descuento</small>`;
+                actualizarResumen();
+            } else {
+                mensajeDiv.innerHTML = '<small class="text-danger">Cupón no válido</small>';
+            }
+        }
+        
+        function calcularSubtotal() {
+            return carrito.reduce((total, producto) => total + (producto.precio * producto.cantidad), 0);
+        }
+        
+        function calcularEnvio() {
+            const envioExpress = document.getElementById('envio-express').checked;
+            return envioExpress ? 199 : 99;
+        }
+        
+        function calcularDescuento(subtotal) {
+            if (cuponActivo) {
+                return subtotal * cuponActivo.descuento;
+            }
+            return 0;
+        }
+        
+        function actualizarResumen() {
+            const subtotal = calcularSubtotal();
+            const envio = calcularEnvio();
+            const descuento = calcularDescuento(subtotal);
+            const total = subtotal + envio - descuento;
+            
+            // Actualizar displays
+            document.getElementById('cart-count').textContent = carrito.length;
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('envio').textContent = `$${envio.toFixed(2)}`;
+            document.getElementById('descuento').textContent = `-$${descuento.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        }
+        
+        function actualizarContador() {
+            const contador = document.getElementById('cart-counter');
+            if (contador) {
+                contador.textContent = carrito.reduce((total, p) => total + p.cantidad, 0);
+                contador.style.display = carrito.length > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        // Escuchar cambios en método de envío
+        document.querySelectorAll('input[name="envio"]').forEach(radio => {
+            radio.addEventListener('change', actualizarResumen);
+        });
+    </script>
+</th:block>

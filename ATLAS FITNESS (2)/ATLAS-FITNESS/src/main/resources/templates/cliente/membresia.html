@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="content">
+    <div class="container mt-4">
+        <!-- Título -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="text-yellow fw-bold">
+                    <i class="bi bi-card-checklist me-2"></i>Mi Membresía
+                </h1>
+                <p class="text-white">Gestiona tu membresía y beneficios</p>
+            </div>
+        </div>
+        
+        <!-- Mensajes -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div class="row">
+            <!-- Panel izquierdo: Membresía actual -->
+            <div class="col-lg-8">
+                <!-- Estado de membresía -->
+                <div class="card card-yellow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-card-checklist me-2"></i>Membresía Actual
+                        </h5>
+                        <th:block th:if="${membresia != null}">
+                            <span th:class="'badge ' + (${membresia.estaActiva()} ? 'bg-success' : 'bg-danger')">
+                                <span th:text="${membresia.estaActiva()} ? 'ACTIVA' : 'INACTIVA'"></span>
+                            </span>
+                        </th:block>
+                    </div>
+                    <div class="card-body">
+                        <th:block th:if="${membresia != null}">
+                            <!-- Información de membresía activa -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-black">Tipo de Membresía</h6>
+                                    <p class="fs-5 text-yellow fw-bold" th:text="${membresia.tipo}"></p>
+                                    
+                                    <h6 class="fw-bold text-black mt-3">Código</h6>
+                                    <code class="bg-light p-2 rounded d-block" th:text="${membresia.codigoMembresia}"></code>
+                                    
+                                    <h6 class="fw-bold text-black mt-3">Precio</h6>
+                                    <p class="fs-4 text-yellow fw-bold" th:text="${#numbers.formatDecimal(membresia.precio, 0, 'COMMA', 2, 'POINT') + ' MXN'}"></p>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-black">Fecha de Inicio</h6>
+                                    <p th:text="${#dates.format(membresia.fechaInicio, 'dd/MM/yyyy')}"></p>
+                                    
+                                    <h6 class="fw-bold text-black mt-3">Fecha de Vencimiento</h6>
+                                    <p th:class="${membresia.estaVencida()} ? 'text-danger fw-bold' : 'text-success fw-bold'"
+                                       th:text="${#dates.format(membresia.fechaFin, 'dd/MM/yyyy')}"></p>
+                                    
+                                    <h6 class="fw-bold text-black mt-3">Días Restantes</h6>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-yellow" 
+                                             role="progressbar" 
+                                             th:style="'width: ' + ${membresia.diasRestantes} + '%;'"
+                                             th:text="${membresia.diasRestantes} + ' días'"></div>
+                                    </div>
+                                    
+                                    <th:block th:if="${membresia.estaVencida()}">
+                                        <div class="alert alert-warning mt-3">
+                                            <i class="bi bi-exclamation-triangle me-2"></i>
+                                            Tu membresía ha vencido. Renueva para continuar disfrutando de los beneficios.
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+                            
+                            <!-- Beneficios -->
+                            <div class="mt-4">
+                                <h6 class="fw-bold text-black">
+                                    <i class="bi bi-award me-2"></i>Beneficios Incluidos
+                                </h6>
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <i class="bi bi-door-open fs-1 text-yellow"></i>
+                                            <p class="fw-bold mt-2">Acceso Ilimitado</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <i class="bi bi-droplet fs-1 text-yellow"></i>
+                                            <p class="fw-bold mt-2">Área de Pool</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <i class="bi bi-person-badge fs-1 text-yellow"></i>
+                                            <p class="fw-bold mt-2">Entrenador Personal</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones -->
+                            <div class="mt-4 d-flex justify-content-between">
+                                <button class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#renovarModal">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Renovar Membresía
+                                </button>
+                                
+                                <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#upgradeModal">
+                                    <i class="bi bi-arrow-up-circle me-1"></i>Mejorar Plan
+                                </button>
+                                
+                                <button class="btn btn-outline-black" data-bs-toggle="modal" data-bs-target="#cancelarModal">
+                                    <i class="bi bi-x-circle me-1"></i>Cancelar Membresía
+                                </button>
+                            </div>
+                        </th:block>
+                        
+                        <th:block th:unless="${membresia != null}">
+                            <!-- Sin membresía activa -->
+                            <div class="text-center py-5">
+                                <i class="bi bi-credit-card fs-1 text-yellow"></i>
+                                <h4 class="mt-3 text-black">No tienes una membresía activa</h4>
+                                <p class="text-muted">Contrata una membresía para disfrutar de todos nuestros beneficios</p>
+                                <a th:href="@{/cliente/membresia#contratar}" class="btn btn-yellow btn-lg mt-3">
+                                    <i class="bi bi-plus-circle me-1"></i>Contratar Membresía
+                                </a>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+                
+                <!-- Historial de pagos -->
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Historial de Pagos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Concepto</th>
+                                        <th>Monto</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Ejemplo de datos -->
+                                    <tr>
+                                        <td>15/11/2023</td>
+                                        <td>Membresía Mensual</td>
+                                        <td class="fw-bold">$1,000.00 MXN</td>
+                                        <td><span class="badge bg-success">Pagado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-receipt"></i> Recibo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>15/10/2023</td>
+                                        <td>Membresía Mensual</td>
+                                        <td class="fw-bold">$1,000.00 MXN</td>
+                                        <td><span class="badge bg-success">Pagado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-receipt"></i> Recibo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel derecho: Opciones y planes -->
+            <div class="col-lg-4">
+                <!-- Próximo pago -->
+                <div class="card card-yellow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-check me-2"></i>Próximo Pago
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="display-4 text-yellow fw-bold" th:if="${membresia != null}">
+                            <span th:text="${#dates.format(membresia.fechaFin, 'dd')}"></span>
+                        </div>
+                        <div class="text-black" th:if="${membresia != null}">
+                            <span th:text="${#dates.format(membresia.fechaFin, 'MMMM')}"></span>
+                            <br>
+                            <span th:text="${#dates.format(membresia.fechaFin, 'yyyy')}"></span>
+                        </div>
+                        <hr>
+                        <p class="mb-2">
+                            <span class="fw-bold">Monto:</span>
+                            <span class="text-yellow fw-bold" th:if="${membresia != null}" th:text="${#numbers.formatDecimal(membresia.precio, 0, 'COMMA', 2, 'POINT') + ' MXN'}"></span>
+                        </p>
+                        <button class="btn btn-yellow w-100">
+                            <i class="bi bi-credit-card me-1"></i>Pagar Ahora
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contratar nueva membresía -->
+                <div class="card card-yellow mb-4" id="contratar">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-plus-circle me-2"></i>Contratar Membresía
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/cliente/membresia/contratar}" method="post">
+                            <div class="mb-3">
+                                <label for="tipoMembresia" class="form-label fw-bold">Selecciona un plan</label>
+                                <select class="form-select" id="tipoMembresia" name="tipo" required>
+                                    <option value="">-- Elegir plan --</option>
+                                    <th:block th:each="tipo : ${tiposMembresia}">
+                                        <option th:value="${tipo}" th:text="${tipo}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            
+                            <!-- Precios -->
+                            <div class="mb-3">
+                                <div class="list-group">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Mensual</span>
+                                        <span class="fw-bold text-yellow">$1,000.00 MXN</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Trimestral</span>
+                                        <span class="fw-bold text-yellow">$2,700.00 MXN</span>
+                                        <small class="text-success">-10% descuento</small>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Semestral</span>
+                                        <span class="fw-bold text-yellow">$5,000.00 MXN</span>
+                                        <small class="text-success">-15% descuento</small>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Anual</span>
+                                        <span class="fw-bold text-yellow">$9,000.00 MXN</span>
+                                        <small class="text-success">-25% descuento</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-yellow w-100">
+                                <i class="bi bi-check-circle me-1"></i>Contratar Ahora
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Información de contacto -->
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-headset me-2"></i>Soporte
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">¿Necesitas ayuda con tu membresía?</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-yellow">
+                                <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                            </button>
+                            <button class="btn btn-outline-black">
+                                <i class="bi bi-telephone me-1"></i>Llamar
+                            </button>
+                            <button class="btn btn-outline-yellow">
+                                <i class="bi bi-envelope me-1"></i>Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Renovar -->
+    <div class="modal fade" id="renovarModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-black text-yellow">
+                    <h5 class="modal-title">
+                        <i class="bi bi-arrow-repeat me-2"></i>Renovar Membresía
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/cliente/membresia/renovar}" method="post">
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que quieres renovar tu membresía actual?</p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            La renovación extenderá tu membresía por otro periodo completo.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Monto a pagar</label>
+                            <div class="fs-4 text-yellow fw-bold" th:if="${membresia != null}">
+                                <span th:text="${#numbers.formatDecimal(membresia.precio, 0, 'COMMA', 2, 'POINT') + ' MXN'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-yellow">Renovar Ahora</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Mejorar -->
+    <div class="modal fade" id="upgradeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-black text-yellow">
+                    <h5 class="modal-title">
+                        <i class="bi bi-arrow-up-circle me-2"></i>Mejorar Plan
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Selecciona el nuevo plan al que quieres cambiar:</p>
+                    <div class="list-group">
+                        <label class="list-group-item">
+                            <input class="form-check-input me-2" type="radio" name="nuevoPlan" value="TRIMESTRAL">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Trimestral</h6>
+                                <small class="text-success">-10%</small>
+                            </div>
+                            <p class="mb-1">$2,700.00 MXN</p>
+                        </label>
+                        <label class="list-group-item">
+                            <input class="form-check-input me-2" type="radio" name="nuevoPlan" value="SEMESTRAL">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Semestral</h6>
+                                <small class="text-success">-15%</small>
+                            </div>
+                            <p class="mb-1">$5,000.00 MXN</p>
+                        </label>
+                        <label class="list-group-item">
+                            <input class="form-check-input me-2" type="radio" name="nuevoPlan" value="ANUAL">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Anual</h6>
+                                <small class="text-success">-25%</small>
+                            </div>
+                            <p class="mb-1">$9,000.00 MXN</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-yellow">Mejorar Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Cancelar -->
+    <div class="modal fade" id="cancelarModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-black text-yellow">
+                    <h5 class="modal-title">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar Membresía
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/cliente/membresia/cancelar}" method="post">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>¡Atención!</strong> Esta acción cancelará tu membresía inmediatamente.
+                        </div>
+                        <p>¿Estás seguro de que quieres cancelar tu membresía?</p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmCancel" required>
+                            <label class="form-check-label" for="confirmCancel">
+                                Entiendo que perderé el acceso inmediatamente y no habrá reembolso por días no utilizados.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Volver</button>
+                        <button type="submit" class="btn btn-danger">Sí, Cancelar Membresía</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="pageScripts">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar precios según selección
+            const tipoSelect = document.getElementById('tipoMembresia');
+            if (tipoSelect) {
+                tipoSelect.addEventListener('change', function() {
+                    const precios = {
+                        'MENSUAL': '1,000.00',
+                        'TRIMESTRAL': '2,700.00',
+                        'SEMESTRAL': '5,000.00',
+                        'ANUAL': '9,000.00'
+                    };
+                    
+                    const precio = precios[this.value];
+                    if (precio) {
+                        // Actualizar display de precio si existe
+                        const precioDisplay = document.querySelector('.precio-display');
+                        if (precioDisplay) {
+                            precioDisplay.textContent = `$${precio} MXN`;
+                        }
+                    }
+                });
+            }
+            
+            // Validar cancelación
+            const cancelForm = document.querySelector('form[action*="cancelar"]');
+            if (cancelForm) {
+                cancelForm.addEventListener('submit', function(e) {
+                    const checkbox = document.getElementById('confirmCancel');
+                    if (!checkbox.checked) {
+                        e.preventDefault();
+                        alert('Debes confirmar la cancelación');
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>

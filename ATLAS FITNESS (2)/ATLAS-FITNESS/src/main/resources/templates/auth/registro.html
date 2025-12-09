@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLAS FITNESS - Registro</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-yellow: #FFD700;
+            --primary-white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+        }
+        
+        body {
+            background-color: var(--primary-black);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
+        .register-container {
+            background: var(--primary-white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+            border: 2px solid var(--primary-yellow);
+            overflow: hidden;
+        }
+        .register-header {
+            background: var(--primary-black);
+            color: var(--primary-yellow);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-yellow);
+        }
+        .register-body {
+            padding: 2rem;
+            background: var(--light-gray);
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid var(--dark-gray);
+            transition: all 0.3s;
+            background: var(--primary-white);
+        }
+        .form-control:focus {
+            border-color: var(--primary-yellow);
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+        }
+        .btn-register {
+            background: var(--primary-black);
+            border: 2px solid var(--primary-yellow);
+            color: var(--primary-yellow);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-register:hover {
+            background: var(--primary-yellow);
+            color: var(--primary-black);
+            border-color: var(--primary-black);
+            transform: translateY(-2px);
+        }
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+            background: var(--dark-gray);
+        }
+        .strength-meter {
+            height: 100%;
+            border-radius: 5px;
+            background: var(--primary-yellow);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .fitness-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-yellow);
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        .text-yellow {
+            color: var(--primary-yellow) !important;
+        }
+        .text-black {
+            color: var(--primary-black) !important;
+        }
+        .link-yellow {
+            color: var(--primary-yellow);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link-yellow:hover {
+            color: var(--primary-black);
+            text-decoration: underline;
+        }
+        .requirements-list {
+            list-style: none;
+            padding-left: 0;
+            font-size: 0.9rem;
+        }
+        .requirements-list li {
+            margin-bottom: 5px;
+        }
+        .requirements-list li.valid {
+            color: #198754;
+        }
+        .requirements-list li.invalid {
+            color: #dc3545;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .step-indicator::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--dark-gray);
+            z-index: 1;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--dark-gray);
+            color: var(--primary-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        .step.active {
+            background: var(--primary-yellow);
+            color: var(--primary-black);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="register-container">
+                    <!-- Header -->
+                    <div class="register-header">
+                        <i class="bi bi-person-plus-fill fitness-icon"></i>
+                        <h1 class="h3 mb-3 fw-bold">CREAR CUENTA</h1>
+                        <p class="mb-0">Únete a la familia ATLAS FITNESS</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="register-body">
+                        <!-- Mensajes -->
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        
+                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${success}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <!-- Formulario -->
+                        <form th:action="@{/auth/registro}" method="post" id="registerForm">
+                            <div class="row g-3">
+                                <!-- Columna Izquierda -->
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold text-black mb-3 border-bottom pb-2">
+                                        <i class="bi bi-person-badge text-yellow me-2"></i>Información Personal
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label fw-bold text-black">
+                                            Nombre Completo *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="nombre" 
+                                               name="nombre"
+                                               placeholder="Ej: Juan Pérez"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label fw-bold text-black">
+                                            <i class="bi bi-envelope-fill text-yellow me-2"></i>Email *
+                                        </label>
+                                        <input type="email" 
+                                               class="form-control" 
+                                               id="email" 
+                                               name="email"
+                                               placeholder="tucorreo@ejemplo.com"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="telefono" class="form-label fw-bold text-black">
+                                            <i class="bi bi-telephone-fill text-yellow me-2"></i>Teléfono
+                                        </label>
+                                        <input type="tel" 
+                                               class="form-control" 
+                                               id="telefono" 
+                                               name="telefono"
+                                               placeholder="+52 123 456 7890">
+                                    </div>
+                                </div>
+                                
+                                <!-- Columna Derecha -->
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold text-black mb-3 border-bottom pb-2">
+                                        <i class="bi bi-shield-lock text-yellow me-2"></i>Seguridad
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label fw-bold text-black">
+                                            <i class="bi bi-person-fill text-yellow me-2"></i>Nombre de Usuario *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="username" 
+                                               name="username"
+                                               placeholder="Elige un nombre de usuario"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="mb-3 position-relative">
+                                        <label for="password" class="form-label fw-bold text-black">
+                                            <i class="bi bi-lock-fill text-yellow me-2"></i>Contraseña *
+                                        </label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="password" 
+                                               name="password"
+                                               placeholder="Mínimo 8 caracteres"
+                                               required
+                                               onkeyup="checkPasswordStrength()">
+                                        <span class="password-toggle" onclick="togglePassword('password')">
+                                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                        </span>
+                                        <div class="password-strength">
+                                            <div class="strength-meter" id="passwordStrength"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 position-relative">
+                                        <label for="confirmPassword" class="form-label fw-bold text-black">
+                                            <i class="bi bi-lock-fill text-yellow me-2"></i>Confirmar Contraseña *
+                                        </label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="confirmPassword" 
+                                               name="confirmPassword"
+                                               placeholder="Repite tu contraseña"
+                                               required
+                                               onkeyup="checkPasswordMatch()">
+                                        <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                            <i class="bi bi-eye" id="toggleConfirmIcon"></i>
+                                        </span>
+                                        <div class="mt-1" id="passwordMatch"></div>
+                                    </div>
+                                    
+                                    <!-- Requisitos de contraseña -->
+                                    <div class="card border-yellow mb-3">
+                                        <div class="card-body p-2">
+                                            <small class="text-black fw-bold">La contraseña debe contener:</small>
+                                            <ul class="requirements-list mt-2 mb-0">
+                                                <li id="req-length" class="invalid">
+                                                    <i class="bi bi-x-circle me-1"></i>Mínimo 8 caracteres
+                                                </li>
+                                                <li id="req-uppercase" class="invalid">
+                                                    <i class="bi bi-x-circle me-1"></i>Una mayúscula
+                                                </li>
+                                                <li id="req-lowercase" class="invalid">
+                                                    <i class="bi bi-x-circle me-1"></i>Una minúscula
+                                                </li>
+                                                <li id="req-number" class="invalid">
+                                                    <i class="bi bi-x-circle me-1"></i>Un número
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Términos y condiciones -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="terms" 
+                                           name="terms"
+                                           required>
+                                    <label class="form-check-label text-black" for="terms">
+                                        Acepto los 
+                                        <a href="#" class="link-yellow">Términos y Condiciones</a> 
+                                        y la 
+                                        <a href="#" class="link-yellow">Política de Privacidad</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Botones -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-register">
+                                    <i class="bi bi-person-plus-fill me-2"></i>CREAR CUENTA
+                                </button>
+                                
+                                <a th:href="@{/auth/login}" class="btn btn-outline-dark">
+                                    <i class="bi bi-arrow-left me-2"></i>Ya tengo cuenta
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="text-center mt-4">
+                    <p class="text-white mb-0">
+                        <i class="bi bi-info-circle text-yellow me-2"></i>
+                        Todos los campos marcados con * son obligatorios
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId === 'password' ? 'togglePasswordIcon' : 'toggleConfirmIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+
+        // Check password strength
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthMeter = document.getElementById('passwordStrength');
+            const reqs = {
+                length: document.getElementById('req-length'),
+                uppercase: document.getElementById('req-uppercase'),
+                lowercase: document.getElementById('req-lowercase'),
+                number: document.getElementById('req-number')
+            };
+            
+            let strength = 0;
+            let totalReqs = 4;
+            let metReqs = 0;
+            
+            // Check length
+            if (password.length >= 8) {
+                strength += 25;
+                reqs.length.classList.remove('invalid');
+                reqs.length.classList.add('valid');
+                reqs.length.innerHTML = '<i class="bi bi-check-circle me-1"></i>Mínimo 8 caracteres';
+                metReqs++;
+            } else {
+                reqs.length.classList.remove('valid');
+                reqs.length.classList.add('invalid');
+                reqs.length.innerHTML = '<i class="bi bi-x-circle me-1"></i>Mínimo 8 caracteres';
+            }
+            
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                strength += 25;
+                reqs.uppercase.classList.remove('invalid');
+                reqs.uppercase.classList.add('valid');
+                reqs.uppercase.innerHTML = '<i class="bi bi-check-circle me-1"></i>Una mayúscula';
+                metReqs++;
+            } else {
+                reqs.uppercase.classList.remove('valid');
+                reqs.uppercase.classList.add('invalid');
+                reqs.uppercase.innerHTML = '<i class="bi bi-x-circle me-1"></i>Una mayúscula';
+            }
+            
+            // Check lowercase
+            if (/[a-z]/.test(password)) {
+                strength += 25;
+                reqs.lowercase.classList.remove('invalid');
+                reqs.lowercase.classList.add('valid');
+                reqs.lowercase.innerHTML = '<i class="bi bi-check-circle me-1"></i>Una minúscula';
+                metReqs++;
+            } else {
+                reqs.lowercase.classList.remove('valid');
+                reqs.lowercase.classList.add('invalid');
+                reqs.lowercase.innerHTML = '<i class="bi bi-x-circle me-1"></i>Una minúscula';
+            }
+            
+            // Check number
+            if (/[0-9]/.test(password)) {
+                strength += 25;
+                reqs.number.classList.remove('invalid');
+                reqs.number.classList.add('valid');
+                reqs.number.innerHTML = '<i class="bi bi-check-circle me-1"></i>Un número';
+                metReqs++;
+            } else {
+                reqs.number.classList.remove('valid');
+                reqs.number.classList.add('invalid');
+                reqs.number.innerHTML = '<i class="bi bi-x-circle me-1"></i>Un número';
+            }
+            
+            // Update strength meter
+            strengthMeter.style.width = strength + '%';
+            
+            // Color based on strength
+            if (strength <= 25) {
+                strengthMeter.style.background = '#dc3545';
+            } else if (strength <= 50) {
+                strengthMeter.style.background = '#fd7e14';
+            } else if (strength <= 75) {
+                strengthMeter.style.background = '#ffc107';
+            } else {
+                strengthMeter.style.background = '#198754';
+            }
+        }
+
+        // Check password match
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchDiv = document.getElementById('passwordMatch');
+            
+            if (confirmPassword === '') {
+                matchDiv.innerHTML = '';
+                return;
+            }
+            
+            if (password === confirmPassword) {
+                matchDiv.innerHTML = '<small class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Las contraseñas coinciden</small>';
+            } else {
+                matchDiv.innerHTML = '<small class="text-danger"><i class="bi bi-x-circle-fill me-1"></i>Las contraseñas no coinciden</small>';
+            }
+        }
+
+        // Form validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+            
+            if (!terms) {
+                e.preventDefault();
+                alert('Debes aceptar los términos y condiciones');
+                return false;
+            }
+            
+            return true;
+        });
+
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

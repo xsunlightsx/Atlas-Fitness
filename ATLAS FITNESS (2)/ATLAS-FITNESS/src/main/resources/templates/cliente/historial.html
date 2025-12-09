@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="content">
+    <div class="container mt-4">
+        <!-- Título -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="text-yellow fw-bold">
+                    <i class="bi bi-clock-history me-2"></i>Mi Historial
+                </h1>
+                <p class="text-white">Consulta tu actividad y registros</p>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card card-yellow mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="filtroFecha" class="form-label fw-bold">Fecha</label>
+                        <input type="date" class="form-control" id="filtroFecha">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroTipo" class="form-label fw-bold">Tipo</label>
+                        <select class="form-select" id="filtroTipo">
+                            <option value="">Todos</option>
+                            <option value="ASISTENCIA">Asistencia</option>
+                            <option value="PAGO">Pagos</option>
+                            <option value="RUTINA">Rutinas</option>
+                            <option value="COMPRA">Compras</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtroMes" class="form-label fw-bold">Mes</label>
+                        <select class="form-select" id="filtroMes">
+                            <option value="">Todos los meses</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-yellow w-100" onclick="filtrarHistorial()">
+                            <i class="bi bi-funnel me-1"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-check fs-1 text-yellow"></i>
+                        <h3 class="mt-2">24</h3>
+                        <p class="mb-0">Días este mes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-clock fs-1 text-yellow"></i>
+                        <h3 class="mt-2">48h</h3>
+                        <p class="mb-0">Horas totales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-activity fs-1 text-yellow"></i>
+                        <h3 class="mt-2">85%</h3>
+                        <p class="mb-0">Consistencia</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-black text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-fire fs-1 text-yellow"></i>
+                        <h3 class="mt-2">12.5k</h3>
+                        <p class="mb-0">Calorías quemadas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs mb-4 border-yellow" id="historialTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="asistencias-tab" data-bs-toggle="tab" data-bs-target="#asistencias">
+                    <i class="bi bi-door-open me-1"></i>Asistencias
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos">
+                    <i class="bi bi-credit-card me-1"></i>Pagos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rutinas-tab" data-bs-toggle="tab" data-bs-target="#rutinas">
+                    <i class="bi bi-activity me-1"></i>Rutinas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="compras-tab" data-bs-toggle="tab" data-bs-target="#compras">
+                    <i class="bi bi-cart me-1"></i>Compras
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de pestañas -->
+        <div class="tab-content" id="historialTabContent">
+            <!-- Asistencias -->
+            <div class="tab-pane fade show active" id="asistencias">
+                <div class="card card-yellow">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-door-open me-2"></i>Registro de Asistencias
+                        </h5>
+                        <button class="btn btn-sm btn-outline-yellow" onclick="exportarAsistencias()">
+                            <i class="bi bi-download me-1"></i>Exportar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora Entrada</th>
+                                        <th>Hora Salida</th>
+                                        <th>Duración</th>
+                                        <th>Área</th>
+                                        <th>Entrenador</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15/11/2023</td>
+                                        <td>08:30 AM</td>
+                                        <td>10:15 AM</td>
+                                        <td><span class="badge bg-yellow text-black">1h 45m</span></td>
+                                        <td>Gimnasio Principal</td>
+                                        <td>Carlos R.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/11/2023</td>
+                                        <td>06:45 PM</td>
+                                        <td>08:30 PM</td>
+                                        <td><span class="badge bg-yellow text-black">1h 45m</span></td>
+                                        <td>Cardio</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <!-- Más filas... -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Calendario de asistencias -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold text-black mb-3">
+                                <i class="bi bi-calendar-week me-2"></i>Calendario de Asistencia
+                            </h6>
+                            <div id="calendarioAsistencia" class="bg-light p-3 rounded">
+                                <!-- Aquí iría un calendario interactivo -->
+                                <p class="text-center text-muted mb-0">
+                                    <i class="bi bi-calendar3"></i> Calendario interactivo
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagos -->
+            <div class="tab-pane fade" id="pagos">
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-credit-card me-2"></i>Historial de Pagos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Concepto</th>
+                                        <th>Método</th>
+                                        <th>Monto</th>
+                                        <th>Estado</th>
+                                        <th>Recibo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15/11/2023</td>
+                                        <td>Renovación Mensual</td>
+                                        <td>Tarjeta Visa</td>
+                                        <td class="fw-bold">$1,000.00</td>
+                                        <td><span class="badge bg-success">Completado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-receipt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>15/10/2023</td>
+                                        <td>Membresía Mensual</td>
+                                        <td>Transferencia</td>
+                                        <td class="fw-bold">$1,000.00</td>
+                                        <td><span class="badge bg-success">Completado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-receipt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Resumen financiero -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-black">Total Pagado (Últimos 30 días)</h6>
+                                        <h3 class="text-yellow fw-bold">$2,000.00 MXN</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-black">Próximo Pago</h6>
+                                        <h3 class="text-yellow fw-bold">$1,000.00 MXN</h3>
+                                        <p class="mb-0">Fecha: 15/12/2023</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rutinas -->
+            <div class="tab-pane fade" id="rutinas">
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity me-2"></i>Historial de Rutinas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-black">Rutina Actual</h6>
+                                        <h4 class="text-yellow fw-bold">Fuerza y Tono</h4>
+                                        <p class="mb-2"><strong>Inicio:</strong> 01/11/2023</p>
+                                        <p class="mb-2"><strong>Sesiones:</strong> 12 completadas</p>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-yellow" style="width: 60%;"></div>
+                                        </div>
+                                        <small class="text-muted">60% completado</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-black">Mejor Logro</h6>
+                                        <h4 class="text-yellow fw-bold">+5kg Press</h4>
+                                        <p class="mb-2"><strong>Fecha:</strong> 10/11/2023</p>
+                                        <p class="mb-2"><strong>Incremento:</strong> 20%</p>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-trophy-fill text-yellow fs-4 me-2"></i>
+                                            <span>Nuevo récord personal</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tabla de progreso -->
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Ejercicio</th>
+                                        <th>Peso (kg)</th>
+                                        <th>Repeticiones</th>
+                                        <th>Series</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15/11/2023</td>
+                                        <td>Press Banca</td>
+                                        <td class="fw-bold">60</td>
+                                        <td>10</td>
+                                        <td>4</td>
+                                        <td><small>Buena forma</small></td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/11/2023</td>
+                                        <td>Sentadillas</td>
+                                        <td class="fw-bold">80</td>
+                                        <td>8</td>
+                                        <td>4</td>
+                                        <td><small>Incremento exitoso</small></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compras -->
+            <div class="tab-pane fade" id="compras">
+                <div class="card card-yellow">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cart me-2"></i>Historial de Compras
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Orden #</th>
+                                        <th>Fecha</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-00123</td>
+                                        <td>10/11/2023</td>
+                                        <td>Proteína (2), Shaker</td>
+                                        <td class="fw-bold">$850.00</td>
+                                        <td><span class="badge bg-success">Entregado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-00122</td>
+                                        <td>01/11/2023</td>
+                                        <td>Guantes, Toalla</td>
+                                        <td class="fw-bold">$450.00</td>
+                                        <td><span class="badge bg-success">Entregado</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-yellow">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Estadísticas de compras -->
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="fw-bold text-black">Total Compras</h6>
+                                        <h3 class="text-yellow fw-bold">$1,300.00</h3>
+                                        <p class="mb-0">2 órdenes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="fw-bold text-black">Productos Favoritos</h6>
+                                        <h3 class="text-yellow fw-bold">Proteína</h3>
+                                        <p class="mb-0">Comprado 3 veces</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="fw-bold text-black">Última Compra</h6>
+                                        <h3 class="text-yellow fw-bold">Hace 5 días</h3>
+                                        <p class="mb-0">10/11/2023</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="pageScripts">
+    <script>
+        function filtrarHistorial() {
+            const fecha = document.getElementById('filtroFecha').value;
+            const tipo = document.getElementById('filtroTipo').value;
+            const mes = document.getElementById('filtroMes').value;
+            
+            // Aquí iría la lógica para filtrar
+            showNotification('Filtros aplicados', 'info');
+        }
+        
+        function exportarAsistencias() {
+            // Simular exportación
+            showNotification('Exportando asistencias...', 'info');
+            setTimeout(() => {
+                showNotification('Archivo descargado exitosamente', 'success');
+            }, 1500);
+        }
+        
+        // Inicializar pestañas
+        document.addEventListener('DOMContentLoaded', function() {
+            const triggerTabList = [].slice.call(document.querySelectorAll('#historialTab button'));
+            triggerTabList.forEach(function (triggerEl) {
+                const tabTrigger = new bootstrap.Tab(triggerEl);
+                triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    tabTrigger.show();
+                });
+            });
+        });
+    </script>
+</th:block>

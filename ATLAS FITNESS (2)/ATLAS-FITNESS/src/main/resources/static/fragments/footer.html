@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="footer">
+    <footer class="footer bg-black text-white mt-5">
+        <div class="container">
+            <div class="row">
+                <!-- Información -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-yellow fw-bold mb-3">
+                        <i class="bi bi-activity me-2"></i>ATLAS FITNESS
+                    </h5>
+                    <p class="mb-3">
+                        Transformamos vidas a través del fitness. Únete a nuestra comunidad y alcanza tus metas.
+                    </p>
+                    <div class="social-icons">
+                        <a href="#" class="text-yellow me-3 fs-5">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="text-yellow me-3 fs-5">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="text-yellow me-3 fs-5">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="#" class="text-yellow fs-5">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Enlaces rápidos -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="text-yellow fw-bold mb-3">Enlaces Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-chevron-right text-yellow me-1"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a th:href="@{/productos/catalogo}" class="text-white text-decoration-none">
+                                <i class="bi bi-chevron-right text-yellow me-1"></i> Productos
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a th:href="@{/auth/login}" class="text-white text-decoration-none">
+                                <i class="bi bi-chevron-right text-yellow me-1"></i> Mi Cuenta
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-chevron-right text-yellow me-1"></i> Horarios
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Membresías -->
+                <div class="col-md-3 mb-4">
+                    <h6 class="text-yellow fw-bold mb-3">Membresías</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-check-circle text-yellow me-1"></i> Mensual
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-check-circle text-yellow me-1"></i> Trimestral
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-check-circle text-yellow me-1"></i> Semestral
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white text-decoration-none">
+                                <i class="bi bi-check-circle text-yellow me-1"></i> Anual
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Contacto -->
+                <div class="col-md-3 mb-4">
+                    <h6 class="text-yellow fw-bold mb-3">Contacto</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt text-yellow me-2"></i>
+                            <span>Calle Fitness 123, Ciudad</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-telephone text-yellow me-2"></i>
+                            <span>+52 123 456 7890</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-envelope text-yellow me-2"></i>
+                            <span>info@atlasfitness.com</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock text-yellow me-2"></i>
+                            <span>Lun-Vie: 5:00-22:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="border-yellow my-4">
+            
+            <!-- Derechos de autor -->
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">
+                        &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> ATLAS FITNESS. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3">Términos y Condiciones</a>
+                    <a href="#" class="text-white text-decoration-none">Política de Privacidad</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</th:block>
