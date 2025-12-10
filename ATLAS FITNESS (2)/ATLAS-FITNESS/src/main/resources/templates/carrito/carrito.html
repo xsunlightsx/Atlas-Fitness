@@ -1,36 +1,250 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="layout :: content">
+<head th:replace="base :: head('Carrito', ~{}, ~{})">
+</head>
+<body>
+    <!-- Header -->
+    <header th:replace="base :: header"></header>
 
-<div class="container mt-4">
-    <h2 class="text-gold mb-4">Mi Carrito</h2>
-
-    <div th:if="${carrito.items.size() == 0}">
-        <p class="text-white-50">Tu carrito está vacío.</p>
-        <a th:href="@{/productos/catalogo}" class="btn btn-gold mt-3">Ir al Catálogo</a>
-    </div>
-
-    <div th:each="item : ${carrito.items}" class="cart-item d-flex justify-content-between align-items-center">
-        <div>
-            <h5 th:text="${item.producto.nombre}">Producto</h5>
-            <p class="text-white-50">Cantidad: <span th:text="${item.cantidad}"></span></p>
+    <!-- Contenido Principal -->
+    <main class="container py-5">
+        <div class="row">
+            <!-- Título -->
+            <div class="col-12 mb-4">
+                <h2 class="text-gold">
+                    <i class="bi bi-cart3 me-2"></i>Mi Carrito de Compras
+                </h2>
+                <p class="text-white-50">Revisa y gestiona los productos en tu carrito</p>
+            </div>
         </div>
-        <div class="text-end">
-            <span class="text-gold fw-bold" th:text="'S/ ' + ${item.total}">S/ 0.00</span>
-            <a th:href="@{/carrito/eliminar/{id}(id=${item.producto.id})}"
-               class="btn btn-outline-gold btn-sm ms-3">
-               <i class="bi bi-trash"></i>
-            </a>
+
+        <div class="row">
+            <!-- Lista de productos -->
+            <div class="col-lg-8 mb-4">
+                <!-- Carrito vacío -->
+                <div th:if="${carrito == null or carrito.items.isEmpty()}" 
+                     class="text-center p-5 bg-dark rounded border-gold">
+                    <i class="bi bi-cart-x text-gold icon-large mb-3"></i>
+                    <h4 class="text-white mb-3">Tu carrito está vacío</h4>
+                    <p class="text-white-50 mb-4">Agrega productos para comenzar tu compra</p>
+                    <a th:href="@{/productos/catalogo}" class="btn btn-gold btn-lg">
+                        <i class="bi bi-shop me-2"></i>Ir al Catálogo
+                    </a>
+                </div>
+
+                <!-- Carrito con productos -->
+                <div th:unless="${carrito == null or carrito.items.isEmpty()}" 
+                     class="bg-dark rounded p-4 border-gold">
+                    <!-- Producto 1 -->
+                    <div class="cart-item d-flex align-items-center py-3 border-bottom border-secondary">
+                        <div class="flex-shrink-0">
+                            <img th:src="@{/images/proteina-whey.jpg}" 
+                                 class="rounded" 
+                                 alt="Producto" 
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="text-white mb-1">Proteína Whey Gold</h5>
+                            <p class="text-white-50 mb-1">Sabor: Chocolate</p>
+                            <p class="text-white-50 mb-0">Peso: 2kg</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center mb-2">
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <span class="mx-3 text-white" style="min-width: 30px; text-align: center;">1</span>
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <h5 class="text-gold mb-0">S/ 120.00</h5>
+                            <a href="#" class="btn btn-outline-gold btn-sm mt-2">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Producto 2 -->
+                    <div class="cart-item d-flex align-items-center py-3 border-bottom border-secondary">
+                        <div class="flex-shrink-0">
+                            <img th:src="@{/images/creatina.jpg}" 
+                                 class="rounded" 
+                                 alt="Producto" 
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="text-white mb-1">Creatina Monohidratada</h5>
+                            <p class="text-white-50 mb-1">Pureza: 99%</p>
+                            <p class="text-white-50 mb-0">Peso: 300g</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center mb-2">
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <span class="mx-3 text-white" style="min-width: 30px; text-align: center;">2</span>
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <h5 class="text-gold mb-0">S/ 170.00</h5>
+                            <a href="#" class="btn btn-outline-gold btn-sm mt-2">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Producto 3 -->
+                    <div class="cart-item d-flex align-items-center py-3">
+                        <div class="flex-shrink-0">
+                            <img th:src="@{/images/guantes.jpg}" 
+                                 class="rounded" 
+                                 alt="Producto" 
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="text-white mb-1">Guantes de Gimnasio</h5>
+                            <p class="text-white-50 mb-1">Color: Negro</p>
+                            <p class="text-white-50 mb-0">Talla: L</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center mb-2">
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <span class="mx-3 text-white" style="min-width: 30px; text-align: center;">1</span>
+                                <button class="btn btn-outline-gold btn-sm" style="width: 30px;">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <h5 class="text-gold mb-0">S/ 45.00</h5>
+                            <a href="#" class="btn btn-outline-gold btn-sm mt-2">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Continuar comprando -->
+                    <div class="mt-4">
+                        <a th:href="@{/productos/catalogo}" class="btn btn-outline-gold">
+                            <i class="bi bi-arrow-left me-2"></i>Continuar comprando
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div class="col-lg-4">
+                <div class="bg-dark rounded p-4 border-gold sticky-top" style="top: 20px;">
+                    <h4 class="text-gold mb-4">
+                        <i class="bi bi-receipt me-2"></i>Resumen del Pedido
+                    </h4>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white-50">Subtotal:</span>
+                            <span class="text-white">S/ 335.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white-50">Envío:</span>
+                            <span class="text-white">S/ 15.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-white-50">Descuento:</span>
+                            <span class="text-success">-S/ 0.00</span>
+                        </div>
+                        <hr class="bg-secondary">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-white fw-bold">Total:</span>
+                            <span class="text-gold fw-bold h5">S/ 350.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Cupón de descuento -->
+                    <div class="mb-4">
+                        <label for="cupon" class="form-label text-white">Cupón de descuento</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control bg-dark text-white border-gold" 
+                                   id="cupon" 
+                                   placeholder="Código del cupón">
+                            <button class="btn btn-gold" type="button">Aplicar</button>
+                        </div>
+                    </div>
+
+                    <!-- Método de envío -->
+                    <div class="mb-4">
+                        <label class="form-label text-white">Método de envío</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="envio" id="envio1" checked>
+                            <label class="form-check-label text-white-50" for="envio1">
+                                Envío estándar (3-5 días) - S/ 15.00
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="envio" id="envio2">
+                            <label class="form-check-label text-white-50" for="envio2">
+                                Envío express (24h) - S/ 30.00
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botón de checkout -->
+                    <a th:href="@{/carrito/checkout}" class="btn btn-gold w-100 btn-lg">
+                        <i class="bi bi-lock-fill me-2"></i>Proceder al Pago
+                    </a>
+
+                    <!-- Seguridad -->
+                    <div class="mt-4 text-center">
+                        <small class="text-white-50">
+                            <i class="bi bi-shield-check text-gold me-1"></i>
+                            Compra 100% segura
+                        </small>
+                        <p class="text-white-50 mt-2 mb-0">
+                            <small>
+                                <i class="bi bi-arrow-counterclockwise text-gold me-1"></i>
+                                30 días para devoluciones
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
-    <div class="mt-4 text-end">
-        <h4>Total: <span class="text-gold" th:text="'S/ ' + ${carrito.total}">S/ 0.00</span></h4>
-        <a th:href="@{/carrito/checkout}" class="btn btn-gold btn-lg mt-3">
-            Proceder al Pago
-        </a>
-    </div>
-</div>
+    <!-- Footer -->
+    <footer th:replace="base :: footer"></footer>
 
-</th:block>
+    <!-- Scripts -->
+    <script>
+        // Control de cantidad
+        document.addEventListener('DOMContentLoaded', function() {
+            const minusButtons = document.querySelectorAll('.btn-outline-gold .bi-dash').forEach(icon => {
+                icon.closest('button').addEventListener('click', function() {
+                    const span = this.nextElementSibling;
+                    let quantity = parseInt(span.textContent);
+                    if (quantity > 1) {
+                        span.textContent = quantity - 1;
+                        updateTotal();
+                    }
+                });
+            });
+
+            const plusButtons = document.querySelectorAll('.btn-outline-gold .bi-plus').forEach(icon => {
+                icon.closest('button').addEventListener('click', function() {
+                    const span = this.previousElementSibling;
+                    let quantity = parseInt(span.textContent);
+                    span.textContent = quantity + 1;
+                    updateTotal();
+                });
+            });
+
+            function updateTotal() {
+                // Aquí iría la lógica para actualizar el total
+                console.log('Actualizar total del carrito');
+            }
+        });
+    </script>
+</body>
 </html>

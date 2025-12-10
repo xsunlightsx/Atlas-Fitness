@@ -206,6 +206,13 @@
     
     <!-- Estilos específicos de cada página -->
     <th:block th:replace="${pageStyles} ?: ~{}"></th:block>
+    <!-- Agrega esto en base.html justo antes del </body> -->
+    <th:block th:fragment="content(content)">
+        <!-- Contenido Principal -->
+        <main>
+            <th:block th:replace="${content} ?: ~{}"></th:block>
+        </main>
+    </th:block>
 </head>
 <body>
     <!-- Header/Navbar -->

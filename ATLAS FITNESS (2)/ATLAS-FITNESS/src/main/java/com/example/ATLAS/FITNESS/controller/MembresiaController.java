@@ -2,7 +2,6 @@ package com.example.ATLAS.FITNESS.controller;
 
 import com.example.ATLAS.FITNESS.model.Cliente;
 import com.example.ATLAS.FITNESS.model.Membresia;
-import com.example.ATLAS.FITNESS.model.Usuario;
 import com.example.ATLAS.FITNESS.service.MembresiaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

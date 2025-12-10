@@ -2,7 +2,6 @@ package com.example.ATLAS.FITNESS.controller;
 
 import com.example.ATLAS.FITNESS.dto.CheckoutDTO;
 import com.example.ATLAS.FITNESS.model.Cliente;
-import com.example.ATLAS.FITNESS.model.Usuario;
 import com.example.ATLAS.FITNESS.model.Venta;
 import com.example.ATLAS.FITNESS.service.VentaService;
 import jakarta.servlet.http.HttpSession;
