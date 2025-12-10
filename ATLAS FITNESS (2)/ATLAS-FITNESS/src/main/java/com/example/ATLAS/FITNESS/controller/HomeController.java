@@ -42,30 +42,6 @@ public class HomeController {
         return "productos/catalogo";
     }
     
-    @GetMapping("/carrito/carrito")
-    public String carrito(Model model, Authentication authentication) {
-        model.addAttribute("pageTitle", "Carrito");
-        
-        if (authentication != null && authentication.isAuthenticated()) {
-            model.addAttribute("isAuthenticated", true);
-            model.addAttribute("username", authentication.getName());
-        }
-        
-        return "carrito/carrito";
-    }
-    
-    @GetMapping("/carrito/checkout")
-    public String checkout(Model model, Authentication authentication) {
-        model.addAttribute("pageTitle", "Checkout");
-        
-        if (authentication != null && authentication.isAuthenticated()) {
-            model.addAttribute("isAuthenticated", true);
-            model.addAttribute("username", authentication.getName());
-        }
-        
-        return "carrito/checkout";
-    }
-    
     @GetMapping("/productos/detalle")
     public String detalle(Model model, Authentication authentication) {
         model.addAttribute("pageTitle", "Detalle de Producto");

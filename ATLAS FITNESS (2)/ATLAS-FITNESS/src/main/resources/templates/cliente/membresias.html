@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="base :: head('Planes de Membresía', ~{::style}, ~{::script})">
+    <style>
+        /* Puedes agregar estilos específicos aquí si los necesitas */
+        .membership-hero {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
+                        url('https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Usa el navbar de base.html -->
+    <div th:replace="base :: header"></div>
+    
+    <main>
+        <!-- Este archivo es para PLANES (plural), no necesita sidebar -->
+        <div class="container mt-5">
+            <h1 th:text="${pageTitle}">Planes de Membresía</h1>
+            <p>Usuario: <span th:text="${username} ?: 'Invitado'"></span></p>
+            <p th:if="${isAuthenticated}">Estás autenticado</p>
+            <p th:unless="${isAuthenticated}">No estás autenticado</p>
+            
+            <!-- Puedes añadir más contenido de planes aquí -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Plan Básico</h5>
+                            <p th:text="'$' + ${planBasico}">$29</p>
+                            <a th:href="@{/cliente/membresia}" class="btn btn-primary">
+                                Seleccionar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Más planes... -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- Usa el footer de base.html -->
+    <div th:replace="base :: footer"></div>
+    
+    <!-- Bootstrap JS ya está en base.html -->
+</body>
+</html>
