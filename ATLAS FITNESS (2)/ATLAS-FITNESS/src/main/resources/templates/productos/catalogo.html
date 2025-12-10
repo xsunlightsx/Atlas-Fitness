@@ -15,10 +15,10 @@
                 <p class="text-white-50">Encuentra los mejores productos para tu entrenamiento</p>
             </div>
             <div class="col-md-4">
-                <form th:action="@{/productos}" method="get" class="input-group">
+                <form class="input-group">
                     <input type="text" name="busqueda" class="form-control bg-dark text-white border-gold" 
-                           placeholder="Buscar productos..." th:value="${busqueda}">
-                    <button class="btn btn-gold" type="submit">
+                           placeholder="Buscar productos..." id="inputBusqueda">
+                    <button class="btn btn-gold" type="button" onclick="buscarProductos()">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
@@ -29,102 +29,272 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex flex-wrap gap-2">
-                    <a th:href="@{/productos}" 
-                       class="btn" 
-                       th:class="${categoriaSeleccionada == null} ? 'btn-gold' : 'btn-outline-gold'">
-                        Todos
-                    </a>
-                    <a th:each="categoria : ${categorias}" 
-                       th:href="@{/productos(categoria=${categoria.name})}" 
-                       class="btn" 
-                       th:class="${categoriaSeleccionada == categoria} ? 'btn-gold' : 'btn-outline-gold'"
-                       th:text="${categoria}">
-                        Categoría
-                    </a>
+                    <button onclick="mostrarTodos()" class="btn btn-gold">Todos</button>
+                    <button onclick="filtrarCategoria('Suplementos')" class="btn btn-outline-gold">Suplementos</button>
+                    <button onclick="filtrarCategoria('Ropa Deportiva')" class="btn btn-outline-gold">Ropa Deportiva</button>
+                    <button onclick="filtrarCategoria('Accesorios')" class="btn btn-outline-gold">Accesorios</button>
+                    <button onclick="filtrarCategoria('Equipamiento')" class="btn btn-outline-gold">Equipamiento</button>
                 </div>
             </div>
         </div>
 
-        <!-- Mensajes de éxito/error -->
-        <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${param.success}">Producto agregado al carrito</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        
-        <div th:if="${param.error != null}" class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${param.error}">Error al agregar producto</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-
         <!-- Productos -->
-        <div class="row g-4" th:if="${!productos.isEmpty()}">
-            <!-- Producto dinámico -->
-            <div class="col-md-4 col-lg-3" th:each="producto : ${productos}">
+        <div class="row g-4" id="contenedorProductos">
+            <!-- Producto 1 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Suplementos" data-nombre="Proteína Wiley Jkg" data-descripcion="Proteína de suero de leche">
                 <div class="card card-gym product-card h-100">
-                    <img th:src="@{'/images/' + (producto.imagenUrl != null ? producto.imagenUrl : 'default-product.png')}" 
-                         class="product-img card-img-top" 
-                         th:alt="${producto.nombre}" 
-                         style="height: 200px; object-fit: cover;">
+                    <img src="/images/proteina.jpg" class="product-img card-img-top" alt="Proteína Wiley Jkg" style="height: 200px; object-fit: cover;">
                     <div class="card-body d-flex flex-column">
                         <div class="mb-2">
-                            <span class="badge" 
-                                  th:class="${producto.estaDisponible()} ? 'bg-gold text-black' : 'bg-danger text-white'"
-                                  th:text="${producto.categoria}">
-                                PROTEÍNAS
-                            </span>
+                            <span class="badge bg-gold text-black">Suplementos</span>
                         </div>
-                        <h5 class="card-title text-white" th:text="${producto.nombre}">Proteína Whey Gold</h5>
+                        <h5 class="card-title text-white">Proteína Wiley Jkg</h5>
                         <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
-                            <span th:text="${producto.descripcion != null ? producto.descripcion.substring(0, math.min(producto.descripcion.length(), 80)) + '...' : 'Sin descripción'}">
-                                Proteína de suero de leche de alta calidad para recuperación muscular.
-                            </span>
+                            Proteína de suero de leche de alta calidad para recuperación muscular después del entrenamiento.
                         </p>
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div>
-                                <span class="text-gold fw-bold h5" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}">
-                                    S/ 120.00
-                                </span>
+                                <span class="text-gold fw-bold h5">S/ 120.00</span>
                                 <br>
                                 <small class="text-white-50">
-                                    <span th:if="${producto.estaDisponible()}" class="text-success">
+                                    <span class="text-success">
                                         <i class="bi bi-check-circle me-1"></i>En stock
-                                    </span>
-                                    <span th:unless="${producto.estaDisponible()}" class="text-danger">
-                                        <i class="bi bi-x-circle me-1"></i>Agotado
                                     </span>
                                 </small>
                             </div>
                             <div>
-                                <form th:action="@{/carrito/agregar}" method="post" th:if="${producto.estaDisponible()}">
-                                    <input type="hidden" name="productoId" th:value="${producto.idProducto}">
-                                    <input type="hidden" name="cantidad" value="1">
-                                    <input type="hidden" name="redirect" value="catalogo">
-                                    <button type="submit" class="btn btn-gold btn-sm">
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </form>
-                                <a th:href="@{/productos/{id}(id=${producto.idProducto})}" 
-                                   class="btn btn-outline-gold btn-sm" 
-                                   th:unless="${producto.estaDisponible()}">
-                                    Ver
-                                </a>
+                                <button onclick="agregarAlCarrito(1)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Sin resultados -->
-        <div class="text-center py-5" th:if="${productos.isEmpty()}">
-            <i class="bi bi-search text-gold icon-large mb-3"></i>
-            <h4 class="text-white mb-3">No se encontraron productos</h4>
-            <p class="text-white-50 mb-4">Intenta con otros términos de búsqueda</p>
-            <a th:href="@{/productos}" class="btn btn-gold">
-                <i class="bi bi-arrow-clockwise me-2"></i>Ver todos los productos
-            </a>
+            <!-- Producto 2 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Suplementos" data-nombre="Creatina Monohidrato" data-descripcion="Creatina pura 300g">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/creatina.jpg" class="product-img card-img-top" alt="Creatina Monohidrato" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Suplementos</span>
+                        </div>
+                        <h5 class="card-title text-white">Creatina Monohidrato</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Creatina pura 300g. Aumenta la fuerza y potencia muscular durante entrenamientos intensos.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 65.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(2)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 3 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Ropa Deportiva" data-nombre="Camiseta Dry Fit" data-descripcion="Camiseta técnica deportiva">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/camiseta.jpg" class="product-img card-img-top" alt="Camiseta Dry Fit" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Ropa Deportiva</span>
+                        </div>
+                        <h5 class="card-title text-white">Camiseta Dry Fit</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Camiseta técnica deportiva con tecnología de secado rápido. Ideal para entrenamientos intensos.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 45.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(3)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 4 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Accesorios" data-nombre="Guantes de Gimnasio" data-descripcion="Guantes con soporte para muñeca">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/guantes.jpg" class="product-img card-img-top" alt="Guantes de Gimnasio" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Accesorios</span>
+                        </div>
+                        <h5 class="card-title text-white">Guantes de Gimnasio</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Guantes con soporte para muñeca. Protege tus manos y mejora el agarre durante el entrenamiento.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 35.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(4)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 5 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Equipamiento" data-nombre="Mancuerna 10kg" data-descripcion="Mancuerna hexagonal recubierta">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/mancuerna.jpg" class="product-img card-img-top" alt="Mancuerna 10kg" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Equipamiento</span>
+                        </div>
+                        <h5 class="card-title text-white">Mancuerna 10kg</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Mancuerna hexagonal recubierta de vinilo. No daña pisos y es cómoda para el agarre.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 85.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(5)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 6 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Suplementos" data-nombre="Barra de Proteína" data-descripcion="Barra con 20g de proteína">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/barra-proteina.jpg" class="product-img card-img-top" alt="Barra de Proteína" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Suplementos</span>
+                        </div>
+                        <h5 class="card-title text-white">Barra de Proteína</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Barra con 20g de proteína de alta calidad. Snack saludable para después del entrenamiento.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 8.50</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(6)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 7 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Accesorios" data-nombre="Shaker 700ml" data-descripcion="Vaso mezclador para proteínas">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/shaker.jpg" class="product-img card-img-top" alt="Shaker 700ml" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Accesorios</span>
+                        </div>
+                        <h5 class="card-title text-white">Shaker 700ml</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Vaso mezclador para proteínas con bola mezcladora. Fácil de limpiar y libre de BPA.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 15.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(7)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 8 -->
+            <div class="col-md-4 col-lg-3 producto" data-categoria="Equipamiento" data-nombre="Pantalón Deportivo" data-descripcion="Pantalón térmico para entrenamiento">
+                <div class="card card-gym product-card h-100">
+                    <img src="/images/pantalon.jpg" class="product-img card-img-top" alt="Pantalón Deportivo" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-gold text-black">Equipamiento</span>
+                        </div>
+                        <h5 class="card-title text-white">Pantalón Deportivo</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            Pantalón térmico para entrenamiento. Confeccionado con tejido transpirable y elástico.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <span class="text-gold fw-bold h5">S/ 75.00</span>
+                                <br>
+                                <small class="text-white-50">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                </small>
+                            </div>
+                            <div>
+                                <button onclick="agregarAlCarrito(8)" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Información adicional -->
@@ -158,23 +328,127 @@
 
     <!-- Scripts -->
     <script>
-        // Animación al agregar al carrito
-        document.addEventListener('DOMContentLoaded', function() {
-            const addToCartButtons = document.querySelectorAll('.btn-gold[type="submit"]');
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    // Animación visual
-                    this.innerHTML = '<i class="bi bi-check"></i>';
-                    this.classList.remove('btn-gold');
-                    this.classList.add('btn-success');
-                    
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="bi bi-cart-plus"></i>';
-                        this.classList.remove('btn-success');
-                        this.classList.add('btn-gold');
-                    }, 1000);
-                });
+        // Función para filtrar por categoría
+        function filtrarCategoria(categoria) {
+            // Cambiar estilos de botones
+            document.querySelectorAll('.btn-outline-gold').forEach(btn => {
+                btn.classList.remove('btn-gold');
+                btn.classList.add('btn-outline-gold');
             });
+            document.querySelectorAll('.btn-gold').forEach(btn => {
+                btn.classList.remove('btn-gold');
+                btn.classList.add('btn-outline-gold');
+            });
+            
+            // Activar el botón de la categoría seleccionada
+            event.target.classList.remove('btn-outline-gold');
+            event.target.classList.add('btn-gold');
+            
+            // Mostrar/Ocultar productos
+            const productos = document.querySelectorAll('.producto');
+            productos.forEach(producto => {
+                if (producto.getAttribute('data-categoria') === categoria) {
+                    producto.style.display = 'block';
+                } else {
+                    producto.style.display = 'none';
+                }
+            });
+        }
+        
+        // Función para mostrar todos los productos
+        function mostrarTodos() {
+            // Cambiar estilos de botones
+            document.querySelectorAll('.btn-outline-gold').forEach(btn => {
+                btn.classList.remove('btn-gold');
+                btn.classList.add('btn-outline-gold');
+            });
+            document.querySelectorAll('.btn-gold').forEach(btn => {
+                btn.classList.remove('btn-gold');
+                btn.classList.add('btn-outline-gold');
+            });
+            
+            // Activar botón "Todos"
+            event.target.classList.remove('btn-outline-gold');
+            event.target.classList.add('btn-gold');
+            
+            // Mostrar todos los productos
+            const productos = document.querySelectorAll('.producto');
+            productos.forEach(producto => {
+                producto.style.display = 'block';
+            });
+        }
+        
+        // Función para buscar productos
+        function buscarProductos() {
+            const busqueda = document.getElementById('inputBusqueda').value.toLowerCase();
+            const productos = document.querySelectorAll('.producto');
+            
+            productos.forEach(producto => {
+                const nombre = producto.getAttribute('data-nombre').toLowerCase();
+                const descripcion = producto.getAttribute('data-descripcion').toLowerCase();
+                
+                if (nombre.includes(busqueda) || descripcion.includes(busqueda)) {
+                    producto.style.display = 'block';
+                } else {
+                    producto.style.display = 'none';
+                }
+            });
+        }
+        
+        // Función para agregar al carrito
+        function agregarAlCarrito(productoId) {
+            const boton = event.target.closest('button');
+            
+            // Animación visual
+            boton.innerHTML = '<i class="bi bi-check"></i>';
+            boton.classList.remove('btn-gold');
+            boton.classList.add('btn-success');
+            boton.disabled = true;
+            
+            // Mostrar mensaje temporal
+            mostrarMensaje('Producto agregado al carrito', 'success');
+            
+            // Restaurar botón después de 1.5 segundos
+            setTimeout(() => {
+                boton.innerHTML = '<i class="bi bi-cart-plus"></i>';
+                boton.classList.remove('btn-success');
+                boton.classList.add('btn-gold');
+                boton.disabled = false;
+            }, 1500);
+            
+            // Aquí podrías agregar lógica para guardar en localStorage o enviar a servidor
+            console.log(`Producto ${productoId} agregado al carrito`);
+        }
+        
+        // Función para mostrar mensajes
+        function mostrarMensaje(texto, tipo) {
+            // Crear elemento de mensaje
+            const mensajeDiv = document.createElement('div');
+            mensajeDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            mensajeDiv.style.zIndex = '1050';
+            mensajeDiv.innerHTML = `
+                <i class="bi bi-${tipo === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
+                ${texto}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Agregar al body
+            document.body.appendChild(mensajeDiv);
+            
+            // Auto-eliminar después de 3 segundos
+            setTimeout(() => {
+                if (mensajeDiv.parentNode) {
+                    mensajeDiv.remove();
+                }
+            }, 3000);
+        }
+        
+        // Permitir buscar con Enter
+        document.getElementById('inputBusqueda').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarProductos();
+            }
         });
     </script>
 </body>
