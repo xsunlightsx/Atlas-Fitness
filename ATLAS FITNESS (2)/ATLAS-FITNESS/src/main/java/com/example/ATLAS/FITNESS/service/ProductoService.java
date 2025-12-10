@@ -24,12 +24,12 @@ public class ProductoService {
         return productoRepository.buscarProductos(query);
     }
     
-    public List<Producto> listarPorCategoria(Producto.Categoria categoria) {
-        return productoRepository.findByCategoria(categoria);
+    public List<Producto> listarPorCategoriaId(Long categoriaId) {
+        return productoRepository.findByCategoriaId(categoriaId);
     }
     
     public List<Producto> listarProductosStockBajo() {
-        return productoRepository.findProductosStockBajo();
+        return productoRepository.findByStockLessThan(10);
     }
     
     public Optional<Producto> buscarPorId(Long id) {
@@ -48,14 +48,14 @@ public class ProductoService {
     }
     
     public List<Producto> listarSuplementos() {
-        return productoRepository.findByCategoria(Producto.Categoria.SUPLEMENTO)
+        return productoRepository.findByCategoriaId(1L) // ID para SUPLEMENTO
                 .stream()
                 .filter(Producto::estaDisponible)
                 .toList();
     }
     
     public List<Producto> listarAccesorios() {
-        return productoRepository.findByCategoria(Producto.Categoria.ACCESORIO)
+        return productoRepository.findByCategoriaId(2L) // ID para ACCESORIO
                 .stream()
                 .filter(Producto::estaDisponible)
                 .toList();

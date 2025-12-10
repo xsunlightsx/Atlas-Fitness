@@ -31,6 +31,15 @@ public class Venta {
     private Estado estado = Estado.PENDIENTE;
     
     @Column(precision = 10, scale = 2)
+    private BigDecimal subtotal;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal igv;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal costoEnvio;
+    
+    @Column(precision = 10, scale = 2)
     private BigDecimal total;
     
     @Column(name = "fecha_venta")
@@ -38,6 +47,9 @@ public class Venta {
     
     @Column(columnDefinition = "TEXT")
     private String observaciones;
+    
+    @Column(name = "direccion_entrega", length = 200)
+    private String direccionEntrega;
     
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
@@ -86,6 +98,15 @@ public class Venta {
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
     
+    public BigDecimal getSubtotal() { return subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+    
+    public BigDecimal getIgv() { return igv; }
+    public void setIgv(BigDecimal igv) { this.igv = igv; }
+    
+    public BigDecimal getCostoEnvio() { return costoEnvio; }
+    public void setCostoEnvio(BigDecimal costoEnvio) { this.costoEnvio = costoEnvio; }
+    
     public BigDecimal getTotal() { return total; }
     public void setTotal(BigDecimal total) { this.total = total; }
     
@@ -94,6 +115,9 @@ public class Venta {
     
     public String getObservaciones() { return observaciones; }
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
+    
+    public String getDireccionEntrega() { return direccionEntrega; }
+    public void setDireccionEntrega(String direccionEntrega) { this.direccionEntrega = direccionEntrega; }
     
     public List<DetalleVenta> getDetalles() { return detalles; }
     public void setDetalles(List<DetalleVenta> detalles) { this.detalles = detalles; }

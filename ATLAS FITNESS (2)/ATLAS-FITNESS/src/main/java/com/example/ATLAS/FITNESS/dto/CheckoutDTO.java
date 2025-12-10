@@ -3,6 +3,7 @@ package com.example.ATLAS.FITNESS.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.math.BigDecimal;
 
 public class CheckoutDTO {
     
@@ -28,6 +29,10 @@ public class CheckoutDTO {
     @NotNull(message = "Debe aceptar los términos y condiciones")
     private Boolean aceptaTerminos = false;
     
+    // Nuevos campos para compatibilidad
+    private Boolean esDelivery = false;
+    private BigDecimal costoEnvio;
+    
     // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -49,4 +54,10 @@ public class CheckoutDTO {
     
     public Boolean getAceptaTerminos() { return aceptaTerminos; }
     public void setAceptaTerminos(Boolean aceptaTerminos) { this.aceptaTerminos = aceptaTerminos; }
+    
+    public Boolean getEsDelivery() { return esDelivery; }
+    public void setEsDelivery(Boolean esDelivery) { this.esDelivery = esDelivery; }
+    
+    public BigDecimal getCostoEnvio() { return costoEnvio; }
+    public void setCostoEnvio(BigDecimal costoEnvio) { this.costoEnvio = costoEnvio; }
 }
