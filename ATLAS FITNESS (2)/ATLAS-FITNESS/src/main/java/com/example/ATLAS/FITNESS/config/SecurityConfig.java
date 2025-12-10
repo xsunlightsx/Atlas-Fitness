@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpSession;
-
 
 @Configuration
 @EnableWebSecurity
@@ -36,8 +36,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index", "/auth/**", "/css/**", "/js/**", 
-                                "/images/**", "/webjars/**", "/error").permitAll()
+                .requestMatchers("/", "/index", "/home", "/inicio", "/auth/**", 
+                                "/css/**", "/js/**", "/images/**", "/webjars/**", 
+                                "/error", "/public/**", "/registro").permitAll()
                 .requestMatchers("/cliente/**").hasAnyRole("CLIENTE", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
@@ -51,7 +52,7 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/auth/logout")
-                .logoutSuccessUrl("/auth/login?logout=true")
+                .logoutSuccessUrl("/?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
@@ -75,11 +76,21 @@ public class SecurityConfig {
             String redirectUrl = (String) session.getAttribute("url_prior_login");
             
             if (redirectUrl == null || redirectUrl.isEmpty()) {
-                if (authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-                    redirectUrl = "/admin/usuarios";
+                // Redirigir según el rol del usuario
+                boolean isAdmin = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(authority -> authority.equals("ROLE_ADMIN"));
+                
+                boolean isCliente = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(authority -> authority.equals("ROLE_CLIENTE"));
+                
+                if (isAdmin) {
+                    redirectUrl = "/admin/dashboard"; // Panel de administrador
+                } else if (isCliente) {
+                    redirectUrl = "/cliente/dashboard"; // Panel del cliente
                 } else {
-                    redirectUrl = "/cliente/rutinas";
+                    redirectUrl = "/"; // Página principal por defecto
                 }
             } else {
                 session.removeAttribute("url_prior_login");
