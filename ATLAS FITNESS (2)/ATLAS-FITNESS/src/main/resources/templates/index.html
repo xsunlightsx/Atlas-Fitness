@@ -189,78 +189,89 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: var(--primary-black); border-bottom: 2px solid var(--primary-yellow);">
-        <div class="container">
-            <a class="navbar-brand text-gold" th:href="@{/}">
-                <i class="bi bi-activity me-2"></i>ATLAS FITNESS
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/#inicio}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/#servicios}">Servicios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/#entrenadores}">Entrenadores</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/#precios}">Precios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/#contacto}">Contacto</a>
-                    </li>
-                </ul>
+   <header th:fragment="header">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-black);">
+            <div class="container">
+                <a class="navbar-brand text-gold" th:href="@{/}">
+                    <i class="bi bi-activity me-2"></i>ATLAS FITNESS
+                </a>
                 
-                <div class="d-flex align-items-center">
-                    <!-- Mostrar opciones según autenticación -->
-                    <div th:if="${isAuthenticated}" class="dropdown">
-                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
-                           data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle fs-4 me-2 text-gold"></i>
-                            <span th:text="${username}"></span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="bi bi-house-door me-1"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/productos/catalogo}">
+                                <i class="bi bi-shop me-1"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/cliente/rutinas}">
+                                <i class="bi bi-calendar-check me-1"></i> Rutinas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/cliente/membresia}">
+                                <i class="bi bi-award me-1"></i> Membresía
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center">
+                        <a th:href="@{/carrito/carrito}" class="btn btn-outline-gold me-3 position-relative">
+                            <i class="bi bi-cart3"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            <li>
-                                <a class="dropdown-item" th:href="@{/cliente/dashboard}">
-                                    <i class="bi bi-speedometer2 me-2"></i> Mi Panel
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" th:href="@{/cliente/perfil}">
-                                    <i class="bi bi-person me-2"></i> Mi Perfil
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form th:action="@{/auth/logout}" method="post" id="logoutForm">
-                                    <a class="dropdown-item text-danger" href="#" onclick="document.getElementById('logoutForm').submit();">
+                        
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle icon-large me-2 text-gold"></i>
+                                <span>Cuenta</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/cliente/perfil}">
+                                        <i class="bi bi-person me-2"></i> Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/cliente/historial}">
+                                        <i class="bi bi-clock-history me-2"></i> Historial
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/auth/login}">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/auth/registro}">
+                                        <i class="bi bi-person-plus me-2"></i> Registrarse
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#">
                                         <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                                     </a>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div th:unless="${isAuthenticated}" class="d-flex gap-3">
-                        <a th:href="@{/auth/login}" class="btn btn-outline-gold">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
-                        </a>
-                        <a th:href="@{/auth/registro}" class="btn btn-gold">
-                            <i class="bi bi-person-plus me-2"></i> Registrarse
-                        </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <!-- Hero Section -->
     <section id="inicio" class="hero-section">
