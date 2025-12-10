@@ -1,1301 +1,640 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="base :: head('Detalle de Producto', ~{::style}, ~{::script})">
+<head th:replace="base :: head('Detalle del Producto', ~{}, ~{})">
     <style>
-        /* Estilos específicos para detalle de producto */
-        .product-detail-container {
-            background: linear-gradient(135deg, #000, #111);
-            border-radius: 15px;
-            border: 2px solid var(--primary-yellow);
-            overflow: hidden;
-        }
-        
         .product-gallery {
             position: relative;
-            overflow: hidden;
-            border-radius: 10px;
         }
         
-        .main-image {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
+        .product-main-img {
             border-radius: 10px;
-            cursor: zoom-in;
+            transition: transform 0.3s;
         }
         
-        .thumbnail-gallery {
+        .product-main-img:hover {
+            transform: scale(1.02);
+        }
+        
+        .product-thumbnails {
             display: flex;
             gap: 10px;
             margin-top: 15px;
-            overflow-x: auto;
-            padding-bottom: 10px;
         }
         
-        .thumbnail {
+        .product-thumbnail {
             width: 80px;
             height: 80px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
             border: 2px solid transparent;
             transition: all 0.3s;
         }
         
-        .thumbnail:hover, .thumbnail.active {
-            border-color: var(--primary-yellow);
-            transform: scale(1.05);
-        }
-        
-        .product-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .wishlist-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: all 0.3s;
-        }
-        
-        .wishlist-btn:hover {
-            background-color: var(--primary-yellow);
-            color: #000;
-        }
-        
-        .wishlist-btn.active {
-            background-color: #dc3545;
-            color: white;
-        }
-        
-        .product-info {
-            padding: 30px;
-        }
-        
-        .product-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-        }
-        
-        .product-brand {
-            color: var(--primary-yellow);
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-        
-        .product-rating {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .rating-stars {
-            color: var(--primary-yellow);
-            margin-right: 10px;
-        }
-        
-        .rating-count {
-            color: #666;
-            margin-left: 10px;
-        }
-        
-        .product-price {
-            margin-bottom: 20px;
-        }
-        
-        .current-price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary-yellow);
-            margin-right: 15px;
-        }
-        
-        .original-price {
-            font-size: 1.5rem;
-            color: #666;
-            text-decoration: line-through;
-        }
-        
-        .discount-percent {
-            background-color: #28a745;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            margin-left: 10px;
-        }
-        
-        .product-options {
-            margin-bottom: 25px;
-        }
-        
-        .option-group {
-            margin-bottom: 15px;
-        }
-        
-        .option-label {
-            color: var(--primary-yellow);
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
-        .option-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .option-btn {
-            background-color: #000;
-            border: 2px solid #333;
-            color: #ccc;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .option-btn:hover {
-            border-color: var(--primary-yellow);
-            color: var(--primary-yellow);
-        }
-        
-        .option-btn.active {
-            background-color: var(--primary-yellow);
-            border-color: var(--primary-yellow);
-            color: #000;
-            font-weight: bold;
-        }
-        
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            width: 150px;
-        }
-        
-        .quantity-btn {
-            background-color: var(--primary-yellow);
-            color: var(--primary-black);
-            border: none;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        
-        .quantity-input {
-            flex: 1;
-            text-align: center;
-            border: 2px solid #333;
-            background-color: transparent;
-            color: white;
-            height: 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .btn-add-cart {
-            flex: 2;
-        }
-        
-        .btn-buy-now {
-            flex: 1;
-        }
-        
-        .product-meta {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            color: #ccc;
-        }
-        
-        .meta-item i {
-            color: var(--primary-yellow);
-            margin-right: 8px;
-            font-size: 1.2rem;
-        }
-        
-        .product-tabs {
-            margin-top: 40px;
-        }
-        
-        .product-tab-buttons {
-            display: flex;
-            border-bottom: 2px solid #333;
-            margin-bottom: 30px;
-        }
-        
-        .product-tab-btn {
-            background: none;
-            border: none;
-            color: #666;
-            padding: 15px 30px;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .product-tab-btn:hover {
-            color: var(--primary-yellow);
-        }
-        
-        .product-tab-btn.active {
-            color: var(--primary-yellow);
-            border-bottom-color: var(--primary-yellow);
-        }
-        
-        .tab-content-section {
-            background-color: #111;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #333;
-        }
-        
-        .specs-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .specs-table tr {
-            border-bottom: 1px solid #333;
-        }
-        
-        .specs-table tr:last-child {
-            border-bottom: none;
-        }
-        
-        .specs-table td {
-            padding: 12px 0;
-            color: #ccc;
-        }
-        
-        .specs-table td:first-child {
-            color: var(--primary-yellow);
-            font-weight: bold;
-            width: 40%;
-        }
-        
-        .review-card {
-            background-color: #000;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--primary-yellow);
-        }
-        
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .review-author {
-            display: flex;
-            align-items: center;
-        }
-        
-        .review-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
-        
-        .review-rating {
-            color: var(--primary-yellow);
-        }
-        
-        .related-products {
-            margin-top: 50px;
-        }
-        
-        .zoom-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .zoom-image {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 10px;
-        }
-        
-        .close-zoom {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-        }
-        
-        .stock-status {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        .product-thumbnail:hover,
+        .product-thumbnail.active {
+            border-color: #FFD700;
         }
         
         .stock-badge {
+            display: inline-block;
             padding: 5px 10px;
             border-radius: 20px;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        
-        .in-stock {
-            background-color: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid #28a745;
-        }
-        
-        .low-stock {
-            background-color: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            border: 1px solid #ffc107;
-        }
-        
-        .out-stock {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-        
-        .stock-count {
-            color: #ccc;
             font-size: 0.9rem;
         }
         
-        .shipping-info {
-            background-color: rgba(255, 215, 0, 0.1);
-            border: 1px solid var(--primary-yellow);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .quantity-control {
+            max-width: 150px;
         }
         
-        .guarantee-badge {
-            display: inline-flex;
-            align-items: center;
-            background-color: #000;
-            border: 1px solid #333;
-            border-radius: 20px;
-            padding: 8px 15px;
+        .product-features {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .product-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .product-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .product-features li i {
+            color: #FFD700;
             margin-right: 10px;
-            margin-bottom: 10px;
         }
         
-        .guarantee-badge i {
-            color: var(--primary-yellow);
-            margin-right: 8px;
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <div th:replace="base :: header"></div>
-    
-    <main th:fragment="content">
-        <!-- Overlay de zoom -->
-        <div class="zoom-overlay" id="zoomOverlay">
-            <button class="close-zoom" onclick="closeZoom()">&times;</button>
-            <img src="" alt="" class="zoom-image" id="zoomImage">
+    <!-- Header -->
+    <header th:replace="base :: header"></header>
+
+    <!-- Contenido Principal -->
+    <main class="container py-5">
+        <!-- Mensajes -->
+        <div th:if="${#request.getParameter('success') != null}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${#request.getParameter('success')}">Producto agregado al carrito</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${#request.getParameter('error') != null}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${#request.getParameter('error')}">Error al agregar producto</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
-        <!-- Breadcrumb -->
-        <section class="py-3" style="background-color: #111;">
-            <div class="container">
+        <div class="row">
+            <!-- Navegación -->
+            <div class="col-12 mb-4">
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a th:href="@{/}" class="text-white-50">Inicio</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/productos/catalogo}" class="text-white-50">Productos</a></li>
-                        <li class="breadcrumb-item"><a href="#" class="text-white-50">Suplementos</a></li>
-                        <li class="breadcrumb-item active text-gold" aria-current="page">Proteína Whey</li>
+                    <ol class="breadcrumb bg-transparent">
+                        <li class="breadcrumb-item">
+                            <a th:href="@{/}" class="text-gold text-decoration-none">
+                                <i class="bi bi-house-door"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a th:href="@{/productos}" class="text-gold text-decoration-none">
+                                Productos
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a th:href="@{'/productos?categoria=' + ${producto.categoria.name}}" 
+                               class="text-gold text-decoration-none"
+                               th:text="${producto.categoria}">
+                                Categoría
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active text-white" th:text="${producto.nombre}" aria-current="page">
+                            Producto
+                        </li>
                     </ol>
                 </nav>
             </div>
-        </section>
+        </div>
 
-        <!-- Detalle del producto -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 mb-5 mb-lg-0">
-                        <div class="product-gallery">
-                            <span class="product-badge">-20%</span>
-                            <button class="wishlist-btn" id="wishlistBtn" onclick="toggleWishlist()">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                            <img src="https://images.unsplash.com/photo-1593081891731-f4d6c3a2e5e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-                                 class="main-image" alt="Proteína Whey" onclick="openZoom(this.src)">
-                            
-                            <div class="thumbnail-gallery">
-                                <img src="https://images.unsplash.com/photo-1593081891731-f4d6c3a2e5e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="thumbnail active" alt="Vista 1" onclick="changeMainImage(this.src, this)">
-                                <img src="https://images.unsplash.com/photo-1591019052241-e4d95a2be5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="thumbnail" alt="Vista 2" onclick="changeMainImage(this.src, this)">
-                                <img src="https://images.unsplash.com/photo-1594736797933-d0d64d1fe48a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="thumbnail" alt="Vista 3" onclick="changeMainImage(this.src, this)">
-                                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="thumbnail" alt="Vista 4" onclick="changeMainImage(this.src, this)">
-                            </div>
-                        </div>
-                    </div>
+        <div class="row">
+            <!-- Imagen del producto -->
+            <div class="col-md-6 mb-4">
+                <div class="product-gallery bg-dark rounded p-4 border-gold">
+                    <img th:src="@{'/images/' + (producto.imagenUrl != null ? producto.imagenUrl : 'default-product.png')}" 
+                         class="product-main-img img-fluid w-100" 
+                         th:alt="${producto.nombre}"
+                         id="main-product-img"
+                         onerror="this.src='/images/default-product.png'">
                     
-                    <div class="col-lg-6">
-                        <div class="product-info">
-                            <h1 class="product-title">Proteína Whey Atlas Pro</h1>
-                            <span class="product-brand">ATLAS PRO · Suplementos Premium</span>
-                            
-                            <div class="product-rating">
-                                <div class="rating-stars">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                </div>
-                                <span class="text-white">4.5</span>
-                                <span class="rating-count">(248 reseñas)</span>
-                            </div>
-                            
-                            <div class="product-price">
-                                <span class="current-price">$39.99</span>
-                                <span class="original-price">$49.99</span>
-                                <span class="discount-percent">20% OFF</span>
-                            </div>
-                            
-                            <div class="stock-status">
-                                <span class="stock-badge in-stock">EN STOCK</span>
-                                <span class="stock-count">Quedan 45 unidades</span>
-                            </div>
-                            
-                            <div class="product-options">
-                                <div class="option-group">
-                                    <label class="option-label">Sabor</label>
-                                    <div class="option-buttons">
-                                        <button class="option-btn active" onclick="selectOption(this, 'chocolate')">Chocolate</button>
-                                        <button class="option-btn" onclick="selectOption(this, 'vainilla')">Vainilla</button>
-                                        <button class="option-btn" onclick="selectOption(this, 'fresa')">Fresa</button>
-                                        <button class="option-btn" onclick="selectOption(this, 'cookies')">Cookies & Cream</button>
-                                    </div>
-                                </div>
-                                
-                                <div class="option-group">
-                                    <label class="option-label">Tamaño</label>
-                                    <div class="option-buttons">
-                                        <button class="option-btn" onclick="selectOption(this, '2lb')">2 lbs ($29.99)</button>
-                                        <button class="option-btn active" onclick="selectOption(this, '5lb')">5 lbs ($39.99)</button>
-                                        <button class="option-btn" onclick="selectOption(this, '10lb')">10 lbs ($69.99)</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="quantity-selector">
-                                <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                                <input type="text" class="quantity-input" value="1" readonly id="quantityInput">
-                                <button class="quantity-btn" onclick="increaseQuantity()">+</button>
-                            </div>
-                            
-                            <div class="action-buttons">
-                                <button class="btn btn-gold btn-add-cart" onclick="addToCart()">
-                                    <i class="bi bi-cart-plus me-2"></i> AÑADIR AL CARRITO
-                                </button>
-                                <button class="btn btn-outline-gold btn-buy-now" onclick="buyNow()">
-                                    <i class="bi bi-bolt me-2"></i> COMPRAR AHORA
-                                </button>
-                            </div>
-                            
-                            <div class="shipping-info">
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="bi bi-truck text-gold me-2"></i>
-                                    <span class="text-white fw-bold">ENVÍO GRATIS</span>
-                                </div>
-                                <p class="text-white-50 mb-0">
-                                    Envío gratis a todo el país en pedidos mayores a $50. 
-                                    Entrega en 3-5 días hábiles.
-                                </p>
-                            </div>
-                            
-                            <div class="product-meta">
-                                <div class="meta-item">
-                                    <i class="bi bi-shield-check"></i>
-                                    <span>Garantía de 30 días</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="bi bi-arrow-return-left"></i>
-                                    <span>Devolución gratis</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="bi bi-truck"></i>
-                                    <span>Envío 24-48h</span>
-                                </div>
-                            </div>
-                            
-                            <div class="guarantee-badges">
-                                <span class="guarantee-badge">
-                                    <i class="bi bi-check-circle"></i> Calidad garantizada
-                                </span>
-                                <span class="guarantee-badge">
-                                    <i class="bi bi-award"></i> Certificado GMP
-                                </span>
-                                <span class="guarantee-badge">
-                                    <i class="bi bi-droplet"></i> Sin gluten
-                                </span>
-                            </div>
-                        </div>
+                    <!-- Thumbnails -->
+                    <div class="product-thumbnails">
+                        <img th:src="@{'/images/' + (producto.imagenUrl != null ? producto.imagenUrl : 'default-product.png')}" 
+                             class="product-thumbnail active" 
+                             th:alt="${producto.nombre}"
+                             onclick="changeMainImage(this.src)">
                     </div>
                 </div>
-                
-                <!-- Tabs de información -->
-                <div class="product-tabs">
-                    <div class="product-tab-buttons">
-                        <button class="product-tab-btn active" onclick="showProductTab('description')">
-                            Descripción
-                        </button>
-                        <button class="product-tab-btn" onclick="showProductTab('specs')">
-                            Especificaciones
-                        </button>
-                        <button class="product-tab-btn" onclick="showProductTab('reviews')">
-                            Reseñas (248)
-                        </button>
-                        <button class="product-tab-btn" onclick="showProductTab('usage')">
-                            Modo de Uso
-                        </button>
-                        <button class="product-tab-btn" onclick="showProductTab('faq')">
-                            Preguntas Frecuentes
-                        </button>
+            </div>
+            
+            <!-- Información del producto -->
+            <div class="col-md-6 mb-4">
+                <div class="bg-dark rounded p-4 border-gold h-100">
+                    <!-- Categoría y estado -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-gold text-black" th:text="${producto.categoria}">
+                            SUPLEMENTO
+                        </span>
+                        
+                        <span th:if="${producto.estaDisponible()}" 
+                              class="stock-badge bg-success text-white">
+                            <i class="bi bi-check-circle me-1"></i> En stock
+                        </span>
+                        <span th:unless="${producto.estaDisponible()}" 
+                              class="stock-badge bg-danger text-white">
+                            <i class="bi bi-x-circle me-1"></i> Agotado
+                        </span>
+                    </div>
+                    
+                    <!-- Nombre del producto -->
+                    <h1 class="text-white mb-3" th:text="${producto.nombre}">Proteína Whey Gold</h1>
+                    
+                    <!-- Precio -->
+                    <div class="mb-4">
+                        <h2 class="text-gold" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}">
+                            S/ 120.00
+                        </h2>
+                        <p class="text-white-50 mb-0">
+                            <small>Precio por unidad</small>
+                        </p>
                     </div>
                     
                     <!-- Descripción -->
-                    <div class="tab-content-section" id="tab-description">
-                        <h4 class="text-white mb-4">DESCRIPCIÓN DEL PRODUCTO</h4>
-                        
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <p class="text-white-50 mb-4">
-                                    La <strong class="text-gold">Proteína Whey Atlas Pro</strong> es un suplemento 
-                                    deportivo de alta calidad diseñado para atletas y entusiastas del fitness 
-                                    que buscan maximizar su recuperación y crecimiento muscular.
-                                </p>
-                                
-                                <h5 class="text-white mb-3">BENEFICIOS PRINCIPALES</h5>
-                                <ul class="text-white-50 mb-4">
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle-fill text-gold me-2"></i>
-                                        <strong>Aumenta la síntesis de proteína muscular:</strong> Proporciona 25g de 
-                                        proteína de alta calidad por servicio
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle-fill text-gold me-2"></i>
-                                        <strong>Recuperación acelerada:</strong> Reduce el tiempo de recuperación 
-                                        post-entrenamiento hasta en un 40%
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle-fill text-gold me-2"></i>
-                                        <strong>Mejora el rendimiento:</strong> Aumenta la fuerza y resistencia 
-                                        durante los entrenamientos
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle-fill text-gold me-2"></i>
-                                        <strong>Fórmula de absorción rápida:</strong> Tecnología Hydrolyzed para 
-                                        máxima biodisponibilidad
-                                    </li>
-                                    <li>
-                                        <i class="bi bi-check-circle-fill text-gold me-2"></i>
-                                        <strong>Sin ingredientes artificiales:</strong> Libre de colorantes, 
-                                        saborizantes y edulcorantes artificiales
-                                    </li>
-                                </ul>
-                                
-                                <h5 class="text-white mb-3">CARACTERÍSTICAS</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <ul class="text-white-50">
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                Concentrado de suero de leche
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                25g de proteína por servicio
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                Solo 2g de carbohidratos
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <ul class="text-white-50">
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                1g de grasa por servicio
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                Sin gluten ni lactosa
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="bi bi-check text-gold me-2"></i>
-                                                Sabor natural a chocolate
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="card card-gym p-4">
-                                    <h6 class="text-gold mb-3">
-                                        <i class="bi bi-info-circle me-2"></i>INFORMACIÓN NUTRICIONAL
-                                    </h6>
-                                    <table class="specs-table">
-                                        <tr>
-                                            <td>Tamaño del servicio</td>
-                                            <td>1 scoop (30g)</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Servicios por envase</td>
-                                            <td>75</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Calorías</td>
-                                            <td>120</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Proteína</td>
-                                            <td>25g</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Carbohidratos</td>
-                                            <td>2g</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Grasas</td>
-                                            <td>1g</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <h5 class="text-white mb-3">
+                            <i class="bi bi-info-circle text-gold me-2"></i>Descripción
+                        </h5>
+                        <p class="text-white-50" th:text="${producto.descripcion ?: 'Sin descripción disponible'}">
+                            Proteína de suero de leche de alta calidad para recuperación muscular.
+                        </p>
                     </div>
                     
-                    <!-- Especificaciones -->
-                    <div class="tab-content-section" id="tab-specs" style="display: none;">
-                        <h4 class="text-white mb-4">ESPECIFICACIONES TÉCNICAS</h4>
-                        
-                        <table class="specs-table">
-                            <tr>
-                                <td>Marca</td>
-                                <td>Atlas Pro</td>
-                            </tr>
-                            <tr>
-                                <td>Línea de producto</td>
-                                <td>Whey Protein Premium</td>
-                            </tr>
-                            <tr>
-                                <td>Tipo de proteína</td>
-                                <td>Concentrado de suero de leche</td>
-                            </tr>
-                            <tr>
-                                <td>Porcentaje de proteína</td>
-                                <td>83%</td>
-                            </tr>
-                            <tr>
-                                <td>Peso neto</td>
-                                <td>5 lbs (2.27 kg)</td>
-                            </tr>
-                            <tr>
-                                <td>Sabores disponibles</td>
-                                <td>Chocolate, Vainilla, Fresa, Cookies & Cream</td>
-                            </tr>
-                            <tr>
-                                <td>Origen</td>
-                                <td>Fabricado en EE.UU.</td>
-                            </tr>
-                            <tr>
-                                <td>Certificaciones</td>
-                                <td>GMP, NSF, Informed-Sport</td>
-                            </tr>
-                            <tr>
-                                <td>Vida útil</td>
-                                <td>24 meses</td>
-                            </tr>
-                            <tr>
-                                <td>Almacenamiento</td>
-                                <td>Lugar fresco y seco</td>
-                            </tr>
-                        </table>
+                    <!-- Características -->
+                    <div class="mb-4">
+                        <h5 class="text-white mb-3">
+                            <i class="bi bi-list-check text-gold me-2"></i>Características
+                        </h5>
+                        <ul class="product-features text-white-50">
+                            <li>
+                                <i class="bi bi-check-circle"></i>
+                                <span th:if="${producto.marca != null}" th:text="'Marca: ' + ${producto.marca}">
+                                    Marca: Idealía
+                                </span>
+                                <span th:unless="${producto.marca != null}">Marca: No especificada</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle"></i>
+                                <span th:if="${producto.subcategoria != null}" 
+                                      th:text="'Tipo: ' + ${producto.subcategoria}">
+                                    Tipo: Whey Protein
+                                </span>
+                                <span th:unless="${producto.subcategoria != null}">Tipo: General</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle"></i>
+                                <span th:text="'Stock disponible: ' + ${producto.stock}">
+                                    Stock disponible: 50 unidades
+                                </span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle"></i>
+                                <span>Envío gratis en compras mayores a S/ 200</span>
+                            </li>
+                        </ul>
                     </div>
                     
-                    <!-- Reseñas -->
-                    <div class="tab-content-section" id="tab-reviews" style="display: none;">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="card card-gym p-4 mb-4">
-                                    <h5 class="text-white mb-3">VALORACIÓN PROMEDIO</h5>
-                                    <div class="text-center mb-3">
-                                        <div class="display-4 fw-bold text-gold">4.5</div>
-                                        <div class="rating-stars">
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-half"></i>
-                                        </div>
-                                        <p class="text-white-50 mt-2">Basado en 248 reseñas</p>
-                                    </div>
-                                    
-                                    <div class="rating-bars">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <span class="text-white-50 me-2">5 estrellas</span>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-warning" style="width: 65%"></div>
-                                            </div>
-                                            <span class="text-white-50 ms-2">65%</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <span class="text-white-50 me-2">4 estrellas</span>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-warning" style="width: 22%"></div>
-                                            </div>
-                                            <span class="text-white-50 ms-2">22%</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <span class="text-white-50 me-2">3 estrellas</span>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-warning" style="width: 8%"></div>
-                                            </div>
-                                            <span class="text-white-50 ms-2">8%</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <span class="text-white-50 me-2">2 estrellas</span>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-warning" style="width: 3%"></div>
-                                            </div>
-                                            <span class="text-white-50 ms-2">3%</span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <span class="text-white-50 me-2">1 estrella</span>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-warning" style="width: 2%"></div>
-                                            </div>
-                                            <span class="text-white-50 ms-2">2%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-gold w-100" onclick="openReviewModal()">
-                                    <i class="bi bi-pencil-square me-2"></i> ESCRIBIR RESEÑA
-                                </button>
-                            </div>
+                    <!-- Formulario para agregar al carrito -->
+                    <div th:if="${producto.estaDisponible()}">
+                        <form th:action="@{/carrito/agregar}" method="post" id="add-to-cart-form">
+                            <input type="hidden" name="productoId" th:value="${producto.idProducto}">
+                            <input type="hidden" name="redirect" value="detalle">
+                            <input type="hidden" id="hidden-producto-id" th:value="${producto.idProducto}">
                             
-                            <div class="col-lg-8">
-                                <!-- Reseña 1 -->
-                                <div class="review-card">
-                                    <div class="review-header">
-                                        <div class="review-author">
-                                            <img src="https://randomuser.me/api/portraits/men/32.jpg" 
-                                                 class="review-avatar" alt="Carlos R.">
-                                            <div>
-                                                <h6 class="text-white mb-0">Carlos Rodríguez</h6>
-                                                <small class="text-white-50">Comprador verificado</small>
-                                            </div>
-                                        </div>
-                                        <div class="review-rating">
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                        </div>
+                            <div class="row align-items-center">
+                                <div class="col-md-5 mb-3">
+                                    <label for="cantidad" class="form-label text-white">Cantidad:</label>
+                                    <div class="input-group quantity-control">
+                                        <button class="btn btn-outline-gold" type="button" 
+                                                id="decrease-btn">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" 
+                                               name="cantidad" 
+                                               id="cantidad"
+                                               class="form-control bg-dark text-white border-gold text-center" 
+                                               value="1" 
+                                               min="1" 
+                                               th:max="${producto.stock}"
+                                               th:attr="data-max-stock=${producto.stock}">
+                                        <button class="btn btn-outline-gold" type="button" 
+                                                id="increase-btn">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
                                     </div>
-                                    <p class="text-white-50 mb-3">
-                                        "Excelente producto. El sabor a chocolate es increíble, no es 
-                                        demasiado dulce como otras marcas. Mezcla perfectamente sin grumos. 
-                                        En un mes he notado mejor recuperación y ganancias musculares."
-                                    </p>
-                                    <small class="text-white-50">Publicado el 15 Nov 2023</small>
+                                    <small class="text-white-50 d-block mt-1">
+                                        Máximo: <span id="max-stock-display" th:text="${producto.stock}">50</span> unidades
+                                    </small>
                                 </div>
-                                
-                                <!-- Reseña 2 -->
-                                <div class="review-card">
-                                    <div class="review-header">
-                                        <div class="review-author">
-                                            <img src="https://randomuser.me/api/portraits/women/44.jpg" 
-                                                 class="review-avatar" alt="Ana M.">
-                                            <div>
-                                                <h6 class="text-white mb-0">Ana Martínez</h6>
-                                                <small class="text-white-50">Compradora verificada</small>
-                                            </div>
-                                        </div>
-                                        <div class="review-rating">
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-fill"></i>
-                                            <i class="bi bi-star-half"></i>
-                                        </div>
-                                    </div>
-                                    <p class="text-white-50 mb-3">
-                                        "Buena relación calidad-precio. El sabor es aceptable, aunque 
-                                        prefiero la versión de vainilla. Lo que más me gusta es que no 
-                                        me causa malestar estomacal como otras proteínas."
-                                    </p>
-                                    <small class="text-white-50">Publicado el 10 Nov 2023</small>
+                                <div class="col-md-7 mb-3">
+                                    <button type="submit" 
+                                            class="btn btn-gold btn-lg w-100 py-3"
+                                            id="add-to-cart-btn">
+                                        <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
+                                    </button>
                                 </div>
                             </div>
+                        </form>
+                        
+                        <!-- Compra rápida -->
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-outline-gold w-100" 
+                                    id="comprar-ahora-btn"
+                                    th:if="${session.usuario != null}">
+                                <i class="bi bi-lightning-charge me-2"></i>Comprar ahora
+                            </button>
+                            <a th:href="@{/auth/login}" 
+                               class="btn btn-outline-gold w-100"
+                               th:unless="${session.usuario != null}">
+                                <i class="bi bi-lightning-charge me-2"></i>Iniciar sesión para comprar
+                            </a>
                         </div>
                     </div>
                     
-                    <!-- Modo de uso -->
-                    <div class="tab-content-section" id="tab-usage" style="display: none;">
-                        <h4 class="text-white mb-4">MODO DE USO RECOMENDADO</h4>
-                        
+                    <!-- Producto agotado -->
+                    <div th:unless="${producto.estaDisponible()}" class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Este producto está actualmente agotado. 
+                        <a th:href="@{/contacto}" class="alert-link text-dark">Contáctanos</a> para saber cuándo estará disponible.
+                    </div>
+                    
+                    <!-- Botones adicionales -->
+                    <div class="mt-4 pt-3 border-top border-secondary">
                         <div class="row">
-                            <div class="col-lg-6">
-                                <h5 class="text-white mb-3">
-                                    <i class="bi bi-cup-straw text-gold me-2"></i>PREPARACIÓN
-                                </h5>
-                                <ol class="text-white-50">
-                                    <li class="mb-2">
-                                        Agrega 1 scoop (30g) a 250-300ml de agua fría o leche
-                                    </li>
-                                    <li class="mb-2">
-                                        Agita vigorosamente durante 30 segundos en un shaker
-                                    </li>
-                                    <li class="mb-2">
-                                        También puedes mezclar en licuadora con frutas
-                                    </li>
-                                    <li>
-                                        Consumir inmediatamente después de preparar
-                                    </li>
-                                </ol>
+                            <div class="col-6">
+                                <a th:href="@{/productos}" class="btn btn-outline-gold w-100">
+                                    <i class="bi bi-arrow-left me-1"></i>Volver
+                                </a>
                             </div>
-                            <div class="col-lg-6">
-                                <h5 class="text-white mb-3">
-                                    <i class="bi bi-clock text-gold me-2"></i>DOSIS RECOMENDADA
-                                </h5>
-                                <ul class="text-white-50">
-                                    <li class="mb-2">
-                                        <strong>Post-entrenamiento:</strong> 1 scoop dentro de los 30 minutos 
-                                        después del ejercicio
-                                    </li>
-                                    <li class="mb-2">
-                                        <strong>Entre comidas:</strong> 1 scoop como merienda proteica
-                                    </strong>
-                                    <li>
-                                        <strong>Máximo diario:</strong> No exceder 3 scoops (75g de proteína) 
-                                        por día
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ -->
-                    <div class="tab-content-section" id="tab-faq" style="display: none;">
-                        <h4 class="text-white mb-4">PREGUNTAS FRECUENTES</h4>
-                        
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFAQ(this)">
-                                <span>¿Es apto para vegetarianos?</span>
-                                <i class="bi bi-chevron-down faq-icon"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p class="text-white-50">
-                                    No, la proteína whey es de origen animal (suero de leche). Para opciones 
-                                    vegetarianas, te recomendamos nuestra línea de proteína de guisante.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFAQ(this)">
-                                <span>¿Contiene gluten o lactosa?</span>
-                                <i class="bi bi-chevron-down faq-icon"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p class="text-white-50">
-                                    No, nuestro proceso de filtración elimina la mayoría de la lactosa. 
-                                    El producto es certificado sin gluten y bajo en lactosa.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFAQ(this)">
-                                <span>¿Cuánto tiempo dura un envase?</span>
-                                <i class="bi bi-chevron-down faq-icon"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p class="text-white-50">
-                                    Dependiendo del uso: con 1 scoop al día, un envase de 5 lbs (75 servicios) 
-                                    dura aproximadamente 2.5 meses.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Productos relacionados -->
-                <div class="related-products">
-                    <h4 class="text-white mb-4">
-                        <i class="bi bi-arrow-right-circle text-gold me-2"></i>PRODUCTOS RELACIONADOS
-                    </h4>
-                    
-                    <div class="row">
-                        <!-- Producto relacionado 1 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card card-gym product-card h-100">
-                                <img src="https://images.unsplash.com/photo-1591019052241-e4d95a2be5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="card-img-top product-img" alt="Creatina">
-                                <div class="card-body">
-                                    <h6 class="card-title text-white">Creatina Monohidrato</h6>
-                                    <p class="card-text text-white-50 small">300g, aumenta fuerza y potencia</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-gold fw-bold">$29.99</span>
-                                        <button class="btn btn-outline-gold btn-sm">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Producto relacionado 2 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card card-gym product-card h-100">
-                                <img src="https://images.unsplash.com/photo-1594736797933-d0d64d1fe48a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="card-img-top product-img" alt="BCAA">
-                                <div class="card-body">
-                                    <h6 class="card-title text-white">BCAA 2:1:1</h6>
-                                    <p class="card-text text-white-50 small">Aminoácidos esenciales, 300g</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-gold fw-bold">$24.99</span>
-                                        <button class="btn btn-outline-gold btn-sm">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Producto relacionado 3 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card card-gym product-card h-100">
-                                <img src="https://images.unsplash.com/photo-1552902865-b72c031ac5ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="card-img-top product-img" alt="Shaker">
-                                <div class="card-body">
-                                    <h6 class="card-title text-white">Shaker Atlas Pro</h6>
-                                    <p class="card-text text-white-50 small">750ml, compartimento para polvos</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-gold fw-bold">$12.99</span>
-                                        <button class="btn btn-outline-gold btn-sm">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Producto relacionado 4 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card card-gym product-card h-100">
-                                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                                     class="card-img-top product-img" alt="Pre-entreno">
-                                <div class="card-body">
-                                    <h6 class="card-title text-white">Pre-Workout Energy</h6>
-                                    <p class="card-text text-white-50 small">Aumenta energía y enfoque</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-gold fw-bold">$34.99</span>
-                                        <button class="btn btn-outline-gold btn-sm">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="col-6">
+                                <a th:href="@{/carrito}" class="btn btn-outline-gold w-100">
+                                    <i class="bi bi-cart3 me-1"></i>Ver Carrito
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- Productos relacionados -->
+        <div class="row mt-5" th:if="${relacionados != null and !relacionados.isEmpty()}">
+            <div class="col-12">
+                <h3 class="text-gold mb-4">
+                    <i class="bi bi-grid-3x3-gap text-gold me-2"></i>
+                    Productos Relacionados
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-3" th:each="relacionado : ${relacionados}">
+                        <div class="card card-gym product-card h-100">
+                            <img th:src="@{'/images/' + (relacionado.imagenUrl != null ? relacionado.imagenUrl : 'default-product.png')}" 
+                                 class="product-img card-img-top" 
+                                 th:alt="${relacionado.nombre}" 
+                                 style="height: 150px; object-fit: cover;"
+                                 onerror="this.src='/images/default-product.png'">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title text-white mb-2" th:text="${relacionado.nombre}">Producto</h6>
+                                <p class="text-gold fw-bold mb-2" 
+                                   th:text="'S/ ' + ${#numbers.formatDecimal(relacionado.precio, 1, 2)}">
+                                    S/ 120.00
+                                </p>
+                                <a th:href="@{/productos/{id}(id=${relacionado.idProducto})}" 
+                                   class="btn btn-outline-gold btn-sm mt-auto">
+                                    Ver Detalle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
-    
-    <div th:replace="base :: footer"></div>
-    
+
+    <!-- Footer -->
+    <footer th:replace="base :: footer"></footer>
+
+    <!-- Scripts -->
     <script>
-        // Variables
-        let selectedFlavor = 'chocolate';
-        let selectedSize = '5lb';
-        let quantity = 1;
-        let isInWishlist = false;
-        let currentPrice = 39.99;
+        // ============================================
+        // FUNCIONES BÁSICAS
+        // ============================================
         
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar eventos
-            setupEventListeners();
-        });
-        
-        function setupEventListeners() {
-            // Cerrar zoom al hacer clic fuera de la imagen
-            document.getElementById('zoomOverlay').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeZoom();
-                }
-            });
-            
-            // Cerrar zoom con Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeZoom();
-                }
-            });
-        }
-        
-        // Funciones de galería
-        function changeMainImage(src, element) {
-            // Cambiar imagen principal
-            document.querySelector('.main-image').src = src;
+        // Cambiar imagen principal
+        function changeMainImage(src) {
+            const mainImg = document.getElementById('main-product-img');
+            if (mainImg) {
+                mainImg.src = src;
+            }
             
             // Actualizar thumbnails activos
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
+            document.querySelectorAll('.product-thumbnail').forEach(thumb => {
                 thumb.classList.remove('active');
             });
-            
-            element.classList.add('active');
-        }
-        
-        function openZoom(src) {
-            document.getElementById('zoomImage').src = src;
-            document.getElementById('zoomOverlay').style.display = 'flex';
-        }
-        
-        function closeZoom() {
-            document.getElementById('zoomOverlay').style.display = 'none';
-        }
-        
-        // Funciones de opciones
-        function selectOption(element, value) {
-            const group = element.parentElement;
-            
-            // Remover active de todos los botones del grupo
-            group.querySelectorAll('.option-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Añadir active al botón clickeado
-            element.classList.add('active');
-            
-            // Actualizar variables según el grupo
-            if (group.parentElement.querySelector('.option-label').textContent === 'Sabor') {
-                selectedFlavor = value;
-            } else if (group.parentElement.querySelector('.option-label').textContent === 'Tamaño') {
-                selectedSize = value;
-                updatePrice();
-            }
-        }
-        
-        function updatePrice() {
-            let price = 39.99;
-            
-            switch(selectedSize) {
-                case '2lb':
-                    price = 29.99;
-                    break;
-                case '5lb':
-                    price = 39.99;
-                    break;
-                case '10lb':
-                    price = 69.99;
-                    break;
-            }
-            
-            currentPrice = price;
-            
-            // Actualizar precio en la interfaz
-            document.querySelector('.current-price').textContent = `$${price.toFixed(2)}`;
-            
-            // Actualizar precio original según descuento
-            const originalPrice = price / 0.8; // 20% de descuento
-            document.querySelector('.original-price').textContent = `$${originalPrice.toFixed(2)}`;
-        }
-        
-        // Funciones de cantidad
-        function increaseQuantity() {
-            if (quantity < 10) {
-                quantity++;
-                document.getElementById('quantityInput').value = quantity;
-            }
-        }
-        
-        function decreaseQuantity() {
-            if (quantity > 1) {
-                quantity--;
-                document.getElementById('quantityInput').value = quantity;
-            }
-        }
-        
-        // Funciones de wishlist
-        function toggleWishlist() {
-            const btn = document.getElementById('wishlistBtn');
-            const icon = btn.querySelector('i');
-            
-            isInWishlist = !isInWishlist;
-            
-            if (isInWishlist) {
-                btn.classList.add('active');
-                icon.classList.remove('bi-heart');
-                icon.classList.add('bi-heart-fill');
-                showNotification('Producto añadido a tu lista de deseos', 'success');
-            } else {
-                btn.classList.remove('active');
-                icon.classList.remove('bi-heart-fill');
-                icon.classList.add('bi-heart');
-                showNotification('Producto removido de tu lista de deseos', 'info');
-            }
-        }
-        
-        // Funciones de compra
-        function addToCart() {
-            const total = currentPrice * quantity;
-            
-            // Mostrar notificación
-            showNotification(
-                `¡Añadido al carrito! ${quantity}x Proteína Whey (${selectedFlavor}, ${selectedSize}) - $${total.toFixed(2)}`,
-                'success'
-            );
-            
-            // Actualizar badge del carrito
-            updateCartBadge();
-            
-            // Aquí iría la lógica para añadir al carrito
-            console.log('Añadiendo al carrito:', {
-                product: 'Proteína Whey Atlas Pro',
-                flavor: selectedFlavor,
-                size: selectedSize,
-                quantity: quantity,
-                price: currentPrice,
-                total: total
-            });
-        }
-        
-        function buyNow() {
-            const total = currentPrice * quantity;
-            
-            // Redirigir al checkout directamente
-            showNotification(`Redirigiendo al checkout - Total: $${total.toFixed(2)}`, 'info');
-            
-            setTimeout(() => {
-                window.location.href = '/carrito/checkout';
-            }, 1500);
-        }
-        
-        function updateCartBadge() {
-            const badge = document.querySelector('.navbar .badge');
-            if (badge) {
-                let count = parseInt(badge.textContent);
-                badge.textContent = count + quantity;
-            }
-        }
-        
-        // Funciones de pestañas
-        function showProductTab(tabId) {
-            // Ocultar todas las pestañas
-            document.querySelectorAll('.tab-content-section').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remover active de todas las pestañas
-            document.querySelectorAll('.product-tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Mostrar pestaña seleccionada
-            document.getElementById(`tab-${tabId}`).style.display = 'block';
-            
-            // Añadir clase active a la pestaña seleccionada
             event.target.classList.add('active');
         }
         
-        // Funciones de FAQ
-        function toggleFAQ(element) {
-            const faqItem = element.closest('.faq-item');
-            faqItem.classList.toggle('active');
+        // ============================================
+        // CONTROL DE CANTIDAD
+        // ============================================
+        
+        function initializeQuantityControl() {
+            const cantidadInput = document.getElementById('cantidad');
+            const decreaseBtn = document.getElementById('decrease-btn');
+            const increaseBtn = document.getElementById('increase-btn');
+            
+            if (!cantidadInput || !decreaseBtn || !increaseBtn) return;
+            
+            // Obtener stock máximo
+            const maxStock = parseInt(cantidadInput.getAttribute('data-max-stock') || 
+                                     document.getElementById('max-stock-display')?.textContent || 999);
+            
+            // Actualizar estado de botones
+            function updateButtons() {
+                const currentValue = parseInt(cantidadInput.value) || 1;
+                decreaseBtn.disabled = currentValue <= 1;
+                increaseBtn.disabled = currentValue >= maxStock;
+                
+                // Aplicar clases visuales
+                if (decreaseBtn.disabled) {
+                    decreaseBtn.classList.add('btn-disabled');
+                } else {
+                    decreaseBtn.classList.remove('btn-disabled');
+                }
+                
+                if (increaseBtn.disabled) {
+                    increaseBtn.classList.add('btn-disabled');
+                } else {
+                    increaseBtn.classList.remove('btn-disabled');
+                }
+            }
+            
+            // Disminuir cantidad
+            decreaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(cantidadInput.value) || 1;
+                if (currentValue > 1) {
+                    cantidadInput.value = currentValue - 1;
+                    updateButtons();
+                }
+            });
+            
+            // Aumentar cantidad
+            increaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(cantidadInput.value) || 1;
+                if (currentValue < maxStock) {
+                    cantidadInput.value = currentValue + 1;
+                    updateButtons();
+                }
+            });
+            
+            // Validar input manual
+            cantidadInput.addEventListener('change', function() {
+                let value = parseInt(this.value) || 1;
+                if (value < 1) {
+                    this.value = 1;
+                } else if (value > maxStock) {
+                    this.value = maxStock;
+                }
+                updateButtons();
+            });
+            
+            // Validar mientras se escribe
+            cantidadInput.addEventListener('input', function() {
+                let value = parseInt(this.value);
+                if (!isNaN(value) && value > maxStock) {
+                    this.value = maxStock;
+                }
+            });
+            
+            // Inicializar
+            updateButtons();
         }
         
-        function openReviewModal() {
-            // Aquí se abriría un modal para escribir una reseña
-            alert('Funcionalidad de reseñas - En desarrollo');
+        // ============================================
+        // AGREGAR AL CARRITO
+        // ============================================
+        
+        function initializeAddToCart() {
+            const addToCartForm = document.getElementById('add-to-cart-form');
+            if (!addToCartForm) return;
+            
+            addToCartForm.addEventListener('submit', function(e) {
+                const button = document.getElementById('add-to-cart-btn');
+                if (button) {
+                    // Guardar texto original
+                    const originalText = button.innerHTML;
+                    const originalClass = button.className;
+                    
+                    // Mostrar estado de carga
+                    button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Agregando...';
+                    button.classList.remove('btn-gold');
+                    button.classList.add('btn-secondary');
+                    button.disabled = true;
+                    
+                    // Restaurar después de 3 segundos (por si hay error)
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.className = originalClass;
+                        button.disabled = false;
+                    }, 3000);
+                }
+            });
         }
         
-        // Mostrar notificación
-        function showNotification(message, type) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
-            alertDiv.style.zIndex = '1050';
-            alertDiv.innerHTML = `
-                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill'} me-2"></i>
-                ${message}
+        // ============================================
+        // COMPRAR AHORA
+        // ============================================
+        
+        function initializeBuyNow() {
+            const comprarAhoraBtn = document.getElementById('comprar-ahora-btn');
+            if (!comprarAhoraBtn) return;
+            
+            comprarAhoraBtn.addEventListener('click', function() {
+                // Obtener datos del producto
+                const productoIdInput = document.getElementById('hidden-producto-id');
+                const cantidadInput = document.getElementById('cantidad');
+                
+                if (!productoIdInput || !cantidadInput) {
+                    alert('Error: No se pudo obtener la información del producto');
+                    return;
+                }
+                
+                const productoId = productoIdInput.value;
+                const cantidad = cantidadInput.value || 1;
+                
+                // Mostrar confirmación
+                if (confirm(`¿Comprar ${cantidad} unidad(es) de este producto ahora?`)) {
+                    // Crear formulario para compra directa
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/carrito/comprar-ahora'; // Necesitarás crear este endpoint
+                    
+                    // Agregar campos
+                    const productoIdField = document.createElement('input');
+                    productoIdField.type = 'hidden';
+                    productoIdField.name = 'productoId';
+                    productoIdField.value = productoId;
+                    form.appendChild(productoIdField);
+                    
+                    const cantidadField = document.createElement('input');
+                    cantidadField.type = 'hidden';
+                    cantidadField.name = 'cantidad';
+                    cantidadField.value = cantidad;
+                    form.appendChild(cantidadField);
+                    
+                    const redirectField = document.createElement('input');
+                    redirectField.type = 'hidden';
+                    redirectField.name = 'redirect';
+                    redirectField.value = 'checkout';
+                    form.appendChild(redirectField);
+                    
+                    // Agregar token CSRF si existe
+                    const csrfToken = document.querySelector('input[name="_csrf"]');
+                    if (csrfToken) {
+                        const csrfClone = csrfToken.cloneNode(true);
+                        csrfClone.style.display = 'none';
+                        form.appendChild(csrfClone);
+                    }
+                    
+                    // Enviar formulario
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+        
+        // ============================================
+        // MANEJO DE LOGIN
+        // ============================================
+        
+        function initializeLoginRedirect() {
+            const loginButtons = document.querySelectorAll('a[href*="/auth/login"]');
+            loginButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Guardar URL actual para redirigir después del login
+                    const currentUrl = window.location.href;
+                    localStorage.setItem('redirectAfterLogin', currentUrl);
+                });
+            });
+        }
+        
+        // ============================================
+        // MANEJO DE MENSAJES
+        // ============================================
+        
+        function showMessage(type, text) {
+            // Crear elemento de mensaje
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+            messageDiv.innerHTML = `
+                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+                ${text}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
-            document.body.appendChild(alertDiv);
             
+            // Insertar después del primer elemento del main
+            const main = document.querySelector('main .container');
+            if (main && main.firstChild) {
+                main.insertBefore(messageDiv, main.children[1]);
+            }
+            
+            // Auto-eliminar después de 5 segundos
             setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
+                if (messageDiv.parentNode) {
+                    const bsAlert = new bootstrap.Alert(messageDiv);
+                    bsAlert.close();
                 }
-            }, 3000);
+            }, 5000);
+        }
+        
+        function checkUrlForMessages() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+            
+            if (success) {
+                showMessage('success', decodeURIComponent(success));
+            }
+            
+            if (error) {
+                showMessage('danger', decodeURIComponent(error));
+            }
+        }
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar controles
+            initializeQuantityControl();
+            initializeAddToCart();
+            initializeBuyNow();
+            initializeLoginRedirect();
+            
+            // Verificar mensajes en la URL
+            checkUrlForMessages();
+            
+            // Configurar imágenes con fallback
+            const images = document.querySelectorAll('img[onerror]');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    if (this.src !== '/images/default-product.png') {
+                        this.src = '/images/default-product.png';
+                    }
+                });
+            });
+        });
+        
+        // ============================================
+        // FUNCIONES DE AYUDA
+        // ============================================
+        
+        // Validar que un número esté en rango
+        function clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+        
+        // Formatear precio
+        function formatPrice(price) {
+            return 'S/ ' + parseFloat(price).toFixed(2);
         }
     </script>
 </body>

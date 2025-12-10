@@ -115,7 +115,6 @@ public class AuthService {
             usuario.setTokenExpira(LocalDateTime.now().plusHours(24));
             usuarioRepository.save(usuario);
             
-            // TODO: Implementar envío de email
             System.out.println("Token para " + email + ": " + token);
         });
     }

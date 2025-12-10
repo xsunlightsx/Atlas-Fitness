@@ -1,12 +1,9 @@
 package com.example.ATLAS.FITNESS.service;
 
-import com.example.ATLAS.FITNESS.model.Carrito;
-import com.example.ATLAS.FITNESS.model.Cliente;
-import com.example.ATLAS.FITNESS.model.Producto;
-import com.example.ATLAS.FITNESS.repository.CarritoRepository;
-import com.example.ATLAS.FITNESS.repository.ProductoRepository;
+import com.example.ATLAS.FITNESS.model.*;
+import com.example.ATLAS.FITNESS.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -15,109 +12,123 @@ import java.util.Optional;
 public class CarritoService {
     
     private final CarritoRepository carritoRepository;
+    private final CarritoDetalleRepository detalleRepository;
     private final ProductoRepository productoRepository;
-    private final ClienteService clienteService;
+    private final ClienteRepository clienteRepository;
     
     public CarritoService(CarritoRepository carritoRepository,
+                         CarritoDetalleRepository detalleRepository,
                          ProductoRepository productoRepository,
-                         ClienteService clienteService) {
+                         ClienteRepository clienteRepository) {
         this.carritoRepository = carritoRepository;
+        this.detalleRepository = detalleRepository;
         this.productoRepository = productoRepository;
-        this.clienteService = clienteService;
+        this.clienteRepository = clienteRepository;
     }
     
-    public Optional<Carrito> obtenerCarritoCliente(Long idCliente) {
-        // CORREGIDO: Cambiar findByClienteIdCliente a findByClienteClienteId
-        return carritoRepository.findByClienteClienteId(idCliente);
+    public Optional<Carrito> obtenerCarritoCliente(Long clienteId) {
+        return carritoRepository.findByClienteClienteId(clienteId);
     }
     
     @Transactional
-    public Carrito obtenerOCrearCarrito(Long idCliente) {
-        // CORREGIDO: Cambiar findByClienteIdCliente a findByClienteClienteId
-        return carritoRepository.findByClienteClienteId(idCliente)
+    public Carrito obtenerOCrearCarrito(Long clienteId) {
+        return carritoRepository.findByClienteClienteId(clienteId)
                 .orElseGet(() -> {
-                    Cliente cliente = clienteService.buscarPorId(idCliente)
+                    Cliente cliente = clienteRepository.findById(clienteId)
                             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-                    Carrito nuevoCarrito = new Carrito(cliente);
+                    Carrito nuevoCarrito = new Carrito();
+                    nuevoCarrito.setCliente(cliente);
+                    nuevoCarrito.setEstado("ACTIVO");
                     return carritoRepository.save(nuevoCarrito);
                 });
     }
     
     @Transactional
-    public Carrito agregarProducto(Long idCliente, Long idProducto, Integer cantidad) {
-        Carrito carrito = obtenerOCrearCarrito(idCliente);
-        Producto producto = productoRepository.findById(idProducto)
+    public void agregarProducto(Long clienteId, Long productoId, Integer cantidad) {
+        if (cantidad <= 0) {
+            throw new RuntimeException("La cantidad debe ser mayor a 0");
+        }
+        
+        Carrito carrito = obtenerOCrearCarrito(clienteId);
+        Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         
         if (!producto.estaDisponible()) {
             throw new RuntimeException("Producto no disponible");
         }
         
-        if (producto.getStock() < cantidad) {
-            throw new RuntimeException("Stock insuficiente");
-        }
+        // LÍNEA 62 CORREGIDA:
+        Optional<CarritoDetalle> detalleExistente = detalleRepository
+                .findByCarritoCarritoIdAndProductoIdProducto(carrito.getCarritoId(), productoId);
         
-        carrito.agregarItem(producto, cantidad);
-        return carritoRepository.save(carrito);
+        if (detalleExistente.isPresent()) {
+            // Actualizar cantidad
+            CarritoDetalle detalle = detalleExistente.get();
+            detalle.setCantidad(detalle.getCantidad() + cantidad);
+            detalleRepository.save(detalle);
+        } else {
+            // Crear nuevo detalle
+            CarritoDetalle nuevoDetalle = new CarritoDetalle();
+            nuevoDetalle.setCarrito(carrito);
+            nuevoDetalle.setProducto(producto);
+            nuevoDetalle.setCantidad(cantidad);
+            nuevoDetalle.setPrecioUnitario(producto.getPrecio());
+            detalleRepository.save(nuevoDetalle);
+        }
     }
     
     @Transactional
-    public Carrito actualizarCantidad(Long idCliente, Long idProducto, Integer cantidad) {
-        Carrito carrito = obtenerCarritoCliente(idCliente)
+    public void actualizarCantidad(Long clienteId, Long productoId, Integer cantidad) {
+        Carrito carrito = obtenerCarritoCliente(clienteId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         
         if (cantidad <= 0) {
-            carrito.eliminarItem(idProducto);
-        } else {
-            Producto producto = productoRepository.findById(idProducto)
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
-            if (producto.getStock() < cantidad) {
-                throw new RuntimeException("Stock insuficiente");
-            }
-            
-            carrito.actualizarCantidad(idProducto, cantidad);
+            eliminarProducto(clienteId, productoId);
+            return;
         }
         
-        return carritoRepository.save(carrito);
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        
+        // LÍNEA 94 CORREGIDA:
+        CarritoDetalle detalle = detalleRepository
+                .findByCarritoCarritoIdAndProductoIdProducto(carrito.getCarritoId(), productoId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado en el carrito"));
+        
+        detalle.setCantidad(cantidad);
+        detalleRepository.save(detalle);
     }
     
     @Transactional
-    public Carrito eliminarProducto(Long idCliente, Long idProducto) {
-        Carrito carrito = obtenerCarritoCliente(idCliente)
+    public void eliminarProducto(Long clienteId, Long productoId) {
+        Carrito carrito = obtenerCarritoCliente(clienteId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         
-        carrito.eliminarItem(idProducto);
-        return carritoRepository.save(carrito);
+        // LÍNEA 107 CORREGIDA:
+        CarritoDetalle detalle = detalleRepository
+                .findByCarritoCarritoIdAndProductoIdProducto(carrito.getCarritoId(), productoId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado en el carrito"));
+        
+        detalleRepository.delete(detalle);
     }
     
     @Transactional
-    public void vaciarCarrito(Long idCliente) {
-        Carrito carrito = obtenerCarritoCliente(idCliente)
+    public void vaciarCarrito(Long clienteId) {
+        Carrito carrito = obtenerCarritoCliente(clienteId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         
-        carrito.vaciar();
-        carritoRepository.save(carrito);
+        detalleRepository.deleteByCarritoCarritoId(carrito.getCarritoId());
     }
     
-    @Transactional
-    public BigDecimal calcularTotal(Long idCliente) {
-        // CORREGIDO: getTotal() retorna BigDecimal, orElse debe devolver BigDecimal
-        return obtenerCarritoCliente(idCliente)
-                .map(Carrito::getTotal)
-                .orElse(BigDecimal.ZERO); // Usar BigDecimal.ZERO en lugar de 0.0
-    }
-    
-    // Opcional: Método para obtener como Double si lo necesitas
-    public Double calcularTotalDouble(Long idCliente) {
-        return obtenerCarritoCliente(idCliente)
-                .map(carrito -> carrito.getTotal().doubleValue())
-                .orElse(0.0);
-    }
-    
-    public Integer contarItems(Long idCliente) {
-        return obtenerCarritoCliente(idCliente)
-                .map(Carrito::getTotalItems)
+    public Integer contarItems(Long clienteId) {
+        return obtenerCarritoCliente(clienteId)
+                .map(carrito -> detalleRepository.sumCantidadByCarritoId(carrito.getCarritoId()))
                 .orElse(0);
+    }
+    
+    public BigDecimal calcularTotal(Long clienteId) {
+        return obtenerCarritoCliente(clienteId)
+                .map(Carrito::calcularSubtotal)
+                .orElse(BigDecimal.ZERO);
     }
 }

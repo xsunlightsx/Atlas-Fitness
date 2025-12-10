@@ -2,10 +2,15 @@ package com.example.ATLAS.FITNESS.controller;
 
 import com.example.ATLAS.FITNESS.model.Producto;
 import com.example.ATLAS.FITNESS.service.ProductoService;
+import com.example.ATLAS.FITNESS.service.CarritoService;
+import com.example.ATLAS.FITNESS.model.Cliente;
+import com.example.ATLAS.FITNESS.model.Usuario;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -13,44 +18,68 @@ import java.util.List;
 public class ProductoController {
     
     private final ProductoService productoService;
+    private final CarritoService carritoService;
     
-    public ProductoController(ProductoService productoService) {
+    public ProductoController(ProductoService productoService, CarritoService carritoService) {
         this.productoService = productoService;
+        this.carritoService = carritoService;
     }
     
     @GetMapping
-    public String listarProductos(@RequestParam(required = false) String categoria,
+    public String listarProductos(@RequestParam(required = false) Long categoriaId,
                                  @RequestParam(required = false) String busqueda,
+                                 HttpSession session,
                                  Model model) {
+        
         List<Producto> productos;
         
         if (busqueda != null && !busqueda.isEmpty()) {
             productos = productoService.buscarProductos(busqueda);
             model.addAttribute("busqueda", busqueda);
-        } else if (categoria != null && !categoria.isEmpty()) {
-            try {
-                Producto.Categoria cat = Producto.Categoria.valueOf(categoria.toUpperCase());
-                productos = productoService.listarPorCategoria(cat);
-                model.addAttribute("categoriaSeleccionada", cat);
-            } catch (IllegalArgumentException e) {
-                productos = productoService.listarProductosDisponibles();
-            }
+        } else if (categoriaId != null) {
+            productos = productoService.listarPorCategoriaId(categoriaId);
+            model.addAttribute("categoriaSeleccionada", categoriaId);
         } else {
             productos = productoService.listarProductosDisponibles();
         }
         
+        // Obtener contador del carrito si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario != null) {
+            Cliente cliente = (Cliente) session.getAttribute("cliente");
+            if (cliente != null) {
+                Integer totalItems = carritoService.contarItems(cliente.getClienteId());
+                model.addAttribute("totalItemsCarrito", totalItems);
+            }
+        }
+        
         model.addAttribute("productos", productos);
-        model.addAttribute("categorias", Producto.Categoria.values());
+        model.addAttribute("categorias", Arrays.asList(
+            new CategoriaInfo(1L, "SUPLEMENTO"),
+            new CategoriaInfo(2L, "ACCESORIO"),
+            new CategoriaInfo(3L, "ROPA"),
+            new CategoriaInfo(4L, "EQUIPO")
+        ));
         return "productos/catalogo";
     }
     
     @GetMapping("/{id}")
-    public String verDetalleProducto(@PathVariable Long id, Model model) {
+    public String verDetalleProducto(@PathVariable Long id, Model model, HttpSession session) {
         Producto producto = productoService.buscarPorId(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         
+        // Obtener contador del carrito si el usuario está logueado
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario != null) {
+            Cliente cliente = (Cliente) session.getAttribute("cliente");
+            if (cliente != null) {
+                Integer totalItems = carritoService.contarItems(cliente.getClienteId());
+                model.addAttribute("totalItemsCarrito", totalItems);
+            }
+        }
+        
         // Productos relacionados (misma categoría)
-        List<Producto> relacionados = productoService.listarPorCategoria(producto.getCategoria())
+        List<Producto> relacionados = productoService.listarPorCategoriaId(producto.getCategoriaId())
                 .stream()
                 .filter(p -> !p.getIdProducto().equals(id) && p.estaDisponible())
                 .limit(4)
@@ -61,41 +90,17 @@ public class ProductoController {
         return "productos/detalle";
     }
     
-    @GetMapping("/suplementos")
-    public String listarSuplementos(Model model) {
-        List<Producto> suplementos = productoService.listarSuplementos();
-        model.addAttribute("productos", suplementos);
-        model.addAttribute("titulo", "Suplementos");
-        model.addAttribute("categoria", Producto.Categoria.SUPLEMENTO);
-        return "productos/catalogo";
-    }
-    
-    @GetMapping("/accesorios")
-    public String listarAccesorios(Model model) {
-        List<Producto> accesorios = productoService.listarAccesorios();
-        model.addAttribute("productos", accesorios);
-        model.addAttribute("titulo", "Accesorios");
-        model.addAttribute("categoria", Producto.Categoria.ACCESORIO);
-        return "productos/catalogo";
-    }
-    
-    @GetMapping("/ropa")
-    public String listarRopa(Model model) {
-        List<Producto> productos = productoService.listarPorCategoria(Producto.Categoria.ROPA)
-                .stream()
-                .filter(Producto::estaDisponible)
-                .toList();
-        model.addAttribute("productos", productos);
-        model.addAttribute("titulo", "Ropa Deportiva");
-        model.addAttribute("categoria", Producto.Categoria.ROPA);
-        return "productos/catalogo";
-    }
-    
-    @GetMapping("/destacados")
-    public String listarDestacados(Model model) {
-        List<Producto> destacados = productoService.listarProductosDestacados();
-        model.addAttribute("productos", destacados);
-        model.addAttribute("titulo", "Productos Destacados");
-        return "productos/catalogo";
+    // Clase auxiliar para manejar categorías
+    private static class CategoriaInfo {
+        private Long id;
+        private String nombre;
+        
+        public CategoriaInfo(Long id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+        }
+        
+        public Long getId() { return id; }
+        public String getNombre() { return nombre; }
     }
 }

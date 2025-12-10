@@ -134,9 +134,9 @@ public class DetalleVenta {
     
     public String getCodigoItem() {
         if (tipoItem == TipoItem.PRODUCTO && producto != null) {
-            return producto.getCodigo();
+            return producto.getCodigo() != null ? producto.getCodigo() : "";
         } else if (tipoItem == TipoItem.SERVICIO && servicio != null) {
-            return servicio.getCodigo();
+            return servicio.getCodigo() != null ? servicio.getCodigo() : "";
         }
         return "";
     }

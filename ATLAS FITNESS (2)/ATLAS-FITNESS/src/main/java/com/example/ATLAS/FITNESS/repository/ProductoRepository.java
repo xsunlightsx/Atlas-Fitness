@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Optional<Producto> findByCodigo(String codigo);
-    List<Producto> findByCategoria(Producto.Categoria categoria);
+    List<Producto> findByCategoriaId(Long categoriaId);
     List<Producto> findByEstado(Producto.Estado estado);
     List<Producto> findByStockLessThan(Integer stock);
     
@@ -19,12 +19,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     
     @Query("SELECT p FROM Producto p WHERE " +
            "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.marca) LIKE LOWER(CONCAT('%', :query, '%'))")
+           "LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Producto> buscarProductos(String query);
     
-    @Query("SELECT p FROM Producto p WHERE p.stock <= p.stockMinimo")
+    @Query("SELECT p FROM Producto p WHERE p.stock <= 5") // Stock mínimo de 5
     List<Producto> findProductosStockBajo();
     
+    @Query("SELECT p FROM Producto p WHERE p.precio BETWEEN :precioMin AND :precioMax")
     List<Producto> findByPrecioBetween(Double precioMin, Double precioMax);
 }

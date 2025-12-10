@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="base :: head('Catálogo', ~{}, ~{})">
+<head th:replace="base :: head('Catálogo de Productos', ~{}, ~{})">
 </head>
 <body>
     <!-- Header -->
@@ -15,171 +15,117 @@
                 <p class="text-white-50">Encuentra los mejores productos para tu entrenamiento</p>
             </div>
             <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" class="form-control bg-dark text-white border-gold" 
-                           placeholder="Buscar productos...">
-                    <button class="btn btn-gold" type="button">
+                <form th:action="@{/productos}" method="get" class="input-group">
+                    <input type="text" name="busqueda" class="form-control bg-dark text-white border-gold" 
+                           placeholder="Buscar productos..." th:value="${busqueda}">
+                    <button class="btn btn-gold" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
-                </div>
+                </form>
             </div>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros por categoría -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex flex-wrap gap-2">
-                    <button class="btn btn-outline-gold active">Todos</button>
-                    <button class="btn btn-outline-gold">Proteínas</button>
-                    <button class="btn btn-outline-gold">Vitaminas</button>
-                    <button class="btn btn-outline-gold">Accesorios</button>
-                    <button class="btn btn-outline-gold">Ropa</button>
-                    <button class="btn btn-outline-gold">Equipamiento</button>
+                    <a th:href="@{/productos}" 
+                       class="btn" 
+                       th:class="${categoriaSeleccionada == null} ? 'btn-gold' : 'btn-outline-gold'">
+                        Todos
+                    </a>
+                    <a th:each="categoria : ${categorias}" 
+                       th:href="@{/productos(categoria=${categoria.name})}" 
+                       class="btn" 
+                       th:class="${categoriaSeleccionada == categoria} ? 'btn-gold' : 'btn-outline-gold'"
+                       th:text="${categoria}">
+                        Categoría
+                    </a>
                 </div>
             </div>
+        </div>
+
+        <!-- Mensajes de éxito/error -->
+        <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${param.success}">Producto agregado al carrito</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${param.error != null}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${param.error}">Error al agregar producto</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
         <!-- Productos -->
-        <div class="row g-4">
-            <!-- Producto 1 -->
-            <div class="col-md-4 col-lg-3">
+        <div class="row g-4" th:if="${!productos.isEmpty()}">
+            <!-- Producto dinámico -->
+            <div class="col-md-4 col-lg-3" th:each="producto : ${productos}">
                 <div class="card card-gym product-card h-100">
-                    <img th:src="@{/images/proteina-whey.jpg}" class="product-img card-img-top" 
-                         alt="Proteína Whey" style="height: 200px; object-fit: cover;">
+                    <img th:src="@{'/images/' + (producto.imagenUrl != null ? producto.imagenUrl : 'default-product.png')}" 
+                         class="product-img card-img-top" 
+                         th:alt="${producto.nombre}" 
+                         style="height: 200px; object-fit: cover;">
                     <div class="card-body d-flex flex-column">
                         <div class="mb-2">
-                            <span class="badge bg-gold text-black">PROTEÍNAS</span>
+                            <span class="badge" 
+                                  th:class="${producto.estaDisponible()} ? 'bg-gold text-black' : 'bg-danger text-white'"
+                                  th:text="${producto.categoria}">
+                                PROTEÍNAS
+                            </span>
                         </div>
-                        <h5 class="card-title text-white">Proteína Whey Gold</h5>
-                        <p class="text-white-50 flex-grow-1">
-                            Proteína de suero de leche de alta calidad para recuperación muscular.
+                        <h5 class="card-title text-white" th:text="${producto.nombre}">Proteína Whey Gold</h5>
+                        <p class="text-white-50 flex-grow-1" style="font-size: 0.9rem;">
+                            <span th:text="${producto.descripcion != null ? producto.descripcion.substring(0, math.min(producto.descripcion.length(), 80)) + '...' : 'Sin descripción'}">
+                                Proteína de suero de leche de alta calidad para recuperación muscular.
+                            </span>
                         </p>
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div>
-                                <span class="text-gold fw-bold h5">S/ 120.00</span>
+                                <span class="text-gold fw-bold h5" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 2)}">
+                                    S/ 120.00
+                                </span>
                                 <br>
                                 <small class="text-white-50">
-                                    <i class="bi bi-star-fill text-warning"></i> 4.8 (125)
+                                    <span th:if="${producto.estaDisponible()}" class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>En stock
+                                    </span>
+                                    <span th:unless="${producto.estaDisponible()}" class="text-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Agotado
+                                    </span>
                                 </small>
                             </div>
-                            <a href="#" class="btn btn-gold btn-sm">
-                                <i class="bi bi-cart-plus"></i>
-                            </a>
+                            <div>
+                                <form th:action="@{/carrito/agregar}" method="post" th:if="${producto.estaDisponible()}">
+                                    <input type="hidden" name="productoId" th:value="${producto.idProducto}">
+                                    <input type="hidden" name="cantidad" value="1">
+                                    <input type="hidden" name="redirect" value="catalogo">
+                                    <button type="submit" class="btn btn-gold btn-sm">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                                <a th:href="@{/productos/{id}(id=${producto.idProducto})}" 
+                                   class="btn btn-outline-gold btn-sm" 
+                                   th:unless="${producto.estaDisponible()}">
+                                    Ver
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Producto 2 -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card card-gym product-card h-100">
-                    <img th:src="@{/images/creatina.jpg}" class="product-img card-img-top" 
-                         alt="Creatina" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <div class="mb-2">
-                            <span class="badge bg-gold text-black">SUPLEMENTOS</span>
-                        </div>
-                        <h5 class="card-title text-white">Creatina Monohidratada</h5>
-                        <p class="text-white-50 flex-grow-1">
-                            Aumenta fuerza y potencia muscular. 300g puro.
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div>
-                                <span class="text-gold fw-bold h5">S/ 85.00</span>
-                                <br>
-                                <small class="text-white-50">
-                                    <i class="bi bi-star-fill text-warning"></i> 4.9 (98)
-                                </small>
-                            </div>
-                            <a href="#" class="btn btn-gold btn-sm">
-                                <i class="bi bi-cart-plus"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 3 -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card card-gym product-card h-100">
-                    <img th:src="@{/images/aminoacidos.jpg}" class="product-img card-img-top" 
-                         alt="Aminoácidos" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <div class="mb-2">
-                            <span class="badge bg-gold text-black">AMINOÁCIDOS</span>
-                        </div>
-                        <h5 class="card-title text-white">BCAA 2:1:1</h5>
-                        <p class="text-white-50 flex-grow-1">
-                            Aminoácidos ramificados para reducir fatiga y mejorar recuperación.
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div>
-                                <span class="text-gold fw-bold h5">S/ 95.00</span>
-                                <br>
-                                <small class="text-white-50">
-                                    <i class="bi bi-star-fill text-warning"></i> 4.7 (76)
-                                </small>
-                            </div>
-                            <a href="#" class="btn btn-gold btn-sm">
-                                <i class="bi bi-cart-plus"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 4 -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card card-gym product-card h-100">
-                    <img th:src="@{/images/guantes.jpg}" class="product-img card-img-top" 
-                         alt="Guantes" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <div class="mb-2">
-                            <span class="badge bg-gold text-black">ACCESORIOS</span>
-                        </div>
-                        <h5 class="card-title text-white">Guantes de Gimnasio</h5>
-                        <p class="text-white-50 flex-grow-1">
-                            Protección para manos con agarre antideslizante. Tallas S-XL.
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div>
-                                <span class="text-gold fw-bold h5">S/ 45.00</span>
-                                <br>
-                                <small class="text-white-50">
-                                    <i class="bi bi-star-fill text-warning"></i> 4.5 (210)
-                                </small>
-                            </div>
-                            <a href="#" class="btn btn-gold btn-sm">
-                                <i class="bi bi-cart-plus"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Más productos... -->
         </div>
 
-        <!-- Paginación -->
-        <nav class="mt-5" aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link bg-dark text-white border-gold" href="#">Anterior</a>
-                </li>
-                <li class="page-item active">
-                    <a class="page-link bg-gold text-black border-gold" href="#">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link bg-dark text-white border-gold" href="#">2</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link bg-dark text-white border-gold" href="#">3</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link bg-dark text-white border-gold" href="#">Siguiente</a>
-                </li>
-            </ul>
-        </nav>
+        <!-- Sin resultados -->
+        <div class="text-center py-5" th:if="${productos.isEmpty()}">
+            <i class="bi bi-search text-gold icon-large mb-3"></i>
+            <h4 class="text-white mb-3">No se encontraron productos</h4>
+            <p class="text-white-50 mb-4">Intenta con otros términos de búsqueda</p>
+            <a th:href="@{/productos}" class="btn btn-gold">
+                <i class="bi bi-arrow-clockwise me-2"></i>Ver todos los productos
+            </a>
+        </div>
 
         <!-- Información adicional -->
         <div class="row mt-5">
@@ -212,18 +158,21 @@
 
     <!-- Scripts -->
     <script>
-        // Filtro de productos
+        // Animación al agregar al carrito
         document.addEventListener('DOMContentLoaded', function() {
-            const filterButtons = document.querySelectorAll('.btn-outline-gold');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Remover clase active de todos los botones
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    // Agregar clase active al botón clickeado
-                    this.classList.add('active');
+            const addToCartButtons = document.querySelectorAll('.btn-gold[type="submit"]');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Animación visual
+                    this.innerHTML = '<i class="bi bi-check"></i>';
+                    this.classList.remove('btn-gold');
+                    this.classList.add('btn-success');
                     
-                    // Aquí iría la lógica para filtrar productos
-                    console.log('Filtrar por:', this.textContent);
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-cart-plus"></i>';
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-gold');
+                    }, 1000);
                 });
             });
         });

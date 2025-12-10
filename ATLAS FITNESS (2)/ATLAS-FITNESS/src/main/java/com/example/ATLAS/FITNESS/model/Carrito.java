@@ -7,26 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "carrito")
+@Table(name = "Carrito")
 public class Carrito {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "carrito_id")
-    private Long idCarrito;
+    private Long carritoId;
     
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
     
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CarritoItem> items = new ArrayList<>();
-    
     @Column(name = "fecha_creacion")
-    private LocalDateTime fechaCreacion = LocalDateTime.now();
+    private LocalDateTime fechaCreacion;
     
-    @Column(length = 20)
+    @Column(name = "estado")
     private String estado = "ACTIVO";
+    
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<CarritoDetalle> detalles = new ArrayList<>();
     
     // Constructores
     public Carrito() {}
@@ -38,14 +38,11 @@ public class Carrito {
     }
     
     // Getters y Setters
-    public Long getIdCarrito() { return idCarrito; }
-    public void setIdCarrito(Long idCarrito) { this.idCarrito = idCarrito; }
+    public Long getCarritoId() { return carritoId; }
+    public void setCarritoId(Long carritoId) { this.carritoId = carritoId; }
     
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
-    
-    public List<CarritoItem> getItems() { return items; }
-    public void setItems(List<CarritoItem> items) { this.items = items; }
     
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
@@ -53,55 +50,55 @@ public class Carrito {
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
     
-    // Métodos utilitarios
-    public boolean estaActivo() {
-        return "ACTIVO".equals(estado);
+    public List<CarritoDetalle> getDetalles() { return detalles; }
+    public void setDetalles(List<CarritoDetalle> detalles) { this.detalles = detalles; }
+    
+    // Métodos de negocio
+    public BigDecimal calcularSubtotal() {
+        return detalles.stream()
+            .map(CarritoDetalle::calcularSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     
-    public void agregarItem(Producto producto, Integer cantidad) {
-        // Buscar si el producto ya está en el carrito
-        for (CarritoItem item : items) {
-            if (item.getProducto().getIdProducto().equals(producto.getIdProducto())) {
-                item.setCantidad(item.getCantidad() + cantidad);
+    public Integer getTotalItems() {
+        return detalles.stream()
+            .mapToInt(CarritoDetalle::getCantidad)
+            .sum();
+    }
+    
+    public void agregarDetalle(Producto producto, Integer cantidad) {
+        // Buscar si ya existe el producto en el carrito
+        for (CarritoDetalle detalle : detalles) {
+            if (detalle.getProducto() != null && 
+                detalle.getProducto().getIdProducto().equals(producto.getIdProducto())) {
+                detalle.setCantidad(detalle.getCantidad() + cantidad);
                 return;
             }
         }
         
-        // Si no existe, crear nuevo item
-        CarritoItem nuevoItem = new CarritoItem();
-        nuevoItem.setCarrito(this);
-        nuevoItem.setProducto(producto);
-        nuevoItem.setCantidad(cantidad);
-        nuevoItem.setPrecioUnitario(producto.getPrecio());
-        items.add(nuevoItem);
+        // Si no existe, crear nuevo detalle
+        CarritoDetalle nuevoDetalle = new CarritoDetalle();
+        nuevoDetalle.setCarrito(this);
+        nuevoDetalle.setProducto(producto);
+        nuevoDetalle.setCantidad(cantidad);
+        nuevoDetalle.setPrecioUnitario(producto.getPrecio());
+        detalles.add(nuevoDetalle);
     }
     
-    public void actualizarCantidad(Long productoId, Integer cantidad) {
-        for (CarritoItem item : items) {
-            if (item.getProducto().getIdProducto().equals(productoId)) {
-                item.setCantidad(cantidad);
-                return;
-            }
+    @PrePersist
+    protected void onCreate() {
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDateTime.now();
         }
     }
     
-    public void eliminarItem(Long productoId) {
-        items.removeIf(item -> item.getProducto().getIdProducto().equals(productoId));
-    }
-    
-    public void vaciar() {
-        items.clear();
-    }
-    
-    public Integer getTotalItems() {
-        return items.stream()
-                .mapToInt(CarritoItem::getCantidad)
-                .sum();
-    }
-    
-    public BigDecimal getTotal() {
-        return items.stream()
-                .map(CarritoItem::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    @Override
+    public String toString() {
+        return "Carrito{" +
+                "carritoId=" + carritoId +
+                ", cliente=" + (cliente != null ? cliente.getNombreCompleto() : "null") +
+                ", totalItems=" + getTotalItems() +
+                ", subtotal=" + calcularSubtotal() +
+                '}';
     }
 }

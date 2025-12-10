@@ -10,71 +10,61 @@ public class Producto {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "producto_id")
     private Long idProducto;
     
-    @Column(unique = true, nullable = false, length = 20)
-    private String codigo;
-    
-    @Column(nullable = false, length = 200)
+    @Column(name = "nombre", nullable = false, length = 200)
     private String nombre;
     
-    @Column(length = 1000)
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Categoria categoria = Categoria.SUPLEMENTO;
+    @Column(name = "categoria_id")
+    private Long categoriaId;
     
-    private String subcategoria;
-    private String marca;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
     
-    @Column(precision = 10, scale = 2)
-    private BigDecimal precioCompra;
+    @Column(name = "precio_oferta", precision = 10, scale = 2)
+    private BigDecimal precioOferta;
     
+    @Column(name = "sku", unique = true, length = 50)
+    private String sku;
+    
+    @Column(name = "codigo", length = 50)
+    private String codigo;
+    
+    @Column(name = "stock")
     private Integer stock = 0;
-    private Integer stockMinimo = 5;
-    private Integer stockMaximo = 100;
-    
-    @Column(length = 500)
-    private String imagenUrl = "default-product.png";
     
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "estado", length = 20)
     private Estado estado = Estado.DISPONIBLE;
     
-    @Column(nullable = false)
+    @Column(name = "fecha_creacion")
     private LocalDateTime fechaRegistro = LocalDateTime.now();
     
-    private LocalDateTime fechaActualizacion = LocalDateTime.now();
-    
-    // Enums
-    public enum Categoria {
-        SUPLEMENTO, ACCESORIO, ROPA, EQUIPO, NUTRICION
-    }
-    
+    // Enum de estado
     public enum Estado {
-        DISPONIBLE, AGOTADO, DESCONTINUADO, EN_PEDIDO
+        DISPONIBLE,
+        AGOTADO,
+        DESCONTINUADO
     }
     
     // Constructores
     public Producto() {}
     
-    public Producto(String codigo, String nombre, BigDecimal precio, Categoria categoria) {
-        this.codigo = codigo;
+    public Producto(String nombre, BigDecimal precio, Long categoriaId) {
         this.nombre = nombre;
         this.precio = precio;
-        this.categoria = categoria;
+        this.categoriaId = categoriaId;
+        this.estado = Estado.DISPONIBLE;
+        this.fechaRegistro = LocalDateTime.now();
     }
     
     // Getters y Setters
     public Long getIdProducto() { return idProducto; }
     public void setIdProducto(Long idProducto) { this.idProducto = idProducto; }
-    
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
     
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -82,32 +72,23 @@ public class Producto {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     
-    public Categoria getCategoria() { return categoria; }
-    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
-    
-    public String getSubcategoria() { return subcategoria; }
-    public void setSubcategoria(String subcategoria) { this.subcategoria = subcategoria; }
-    
-    public String getMarca() { return marca; }
-    public void setMarca(String marca) { this.marca = marca; }
+    public Long getCategoriaId() { return categoriaId; }
+    public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
     
     public BigDecimal getPrecio() { return precio; }
     public void setPrecio(BigDecimal precio) { this.precio = precio; }
     
-    public BigDecimal getPrecioCompra() { return precioCompra; }
-    public void setPrecioCompra(BigDecimal precioCompra) { this.precioCompra = precioCompra; }
+    public BigDecimal getPrecioOferta() { return precioOferta; }
+    public void setPrecioOferta(BigDecimal precioOferta) { this.precioOferta = precioOferta; }
+    
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
+    
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
     
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
-    
-    public Integer getStockMinimo() { return stockMinimo; }
-    public void setStockMinimo(Integer stockMinimo) { this.stockMinimo = stockMinimo; }
-    
-    public Integer getStockMaximo() { return stockMaximo; }
-    public void setStockMaximo(Integer stockMaximo) { this.stockMaximo = stockMaximo; }
-    
-    public String getImagenUrl() { return imagenUrl; }
-    public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
     
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
@@ -115,15 +96,20 @@ public class Producto {
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
     
-    public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
-    public void setFechaActualizacion(LocalDateTime fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
-    
     // Métodos auxiliares
     public boolean estaDisponible() {
         return estado == Estado.DISPONIBLE && stock > 0;
     }
     
-    public boolean stockBajo() {
-        return stock <= stockMinimo;
+    public String getCategoria() {
+        // Devuelve un string basado en el ID de categoría
+        if (categoriaId == null) return "SIN_CATEGORIA";
+        switch (categoriaId.intValue()) {
+            case 1: return "SUPLEMENTO";
+            case 2: return "ACCESORIO";
+            case 3: return "ROPA";
+            case 4: return "EQUIPO";
+            default: return "OTRO";
+        }
     }
 }
