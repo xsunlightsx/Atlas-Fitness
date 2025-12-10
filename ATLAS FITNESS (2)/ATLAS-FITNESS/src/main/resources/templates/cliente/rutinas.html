@@ -1,521 +1,944 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<th:block th:fragment="content">
-    <div class="container mt-4">
-        <!-- Título -->
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="text-yellow fw-bold">
-                    <i class="bi bi-activity me-2"></i>Mis Rutinas
-                </h1>
-                <p class="text-white">Planifica y registra tu entrenamiento</p>
-            </div>
-        </div>
-
-        <!-- Estadísticas rápidas -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="card bg-black text-white text-center">
-                    <div class="card-body">
-                        <i class="bi bi-calendar-week fs-1 text-yellow"></i>
-                        <h3 class="mt-2">4/5</h3>
-                        <p class="mb-0">Días esta semana</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card bg-black text-white text-center">
-                    <div class="card-body">
-                        <i class="bi bi-fire fs-1 text-yellow"></i>
-                        <h3 class="mt-2">2,450</h3>
-                        <p class="mb-0">Calorías hoy</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card bg-black text-white text-center">
-                    <div class="card-body">
-                        <i class="bi bi-clock-history fs-1 text-yellow"></i>
-                        <h3 class="mt-2">1h 30m</h3>
-                        <p class="mb-0">Tiempo promedio</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card bg-black text-white text-center">
-                    <div class="card-body">
-                        <i class="bi bi-trophy fs-1 text-yellow"></i>
-                        <h3 class="mt-2">85%</h3>
-                        <p class="mb-0">Objetivo semanal</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Panel izquierdo: Rutina actual -->
-            <div class="col-lg-8">
-                <!-- Rutina del día -->
-                <div class="card card-yellow mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-calendar-day me-2"></i>Rutina de Hoy
-                            <small class="text-white ms-2">(Miércoles - Piernas)</small>
-                        </h5>
-                        <span class="badge bg-yellow text-black">EN PROGRESO</span>
-                    </div>
-                    <div class="card-body">
-                        <!-- Progreso del día -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold">Progreso diario</span>
-                                <span>60%</span>
-                            </div>
-                            <div class="progress" style="height: 15px;">
-                                <div class="progress-bar bg-yellow" style="width: 60%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Ejercicios -->
-                        <div class="accordion" id="rutinaAccordion">
-                            <!-- Ejercicio 1 -->
-                            <div class="accordion-item border-yellow mb-2">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ejercicio1">
-                                        <div class="d-flex w-100 align-items-center">
-                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                            <span class="fw-bold">Sentadillas con Barra</span>
-                                            <span class="badge bg-yellow text-black ms-auto me-2">4x10</span>
-                                        </div>
-                                    </button>
-                                </h2>
-                                <div id="ejercicio1" class="accordion-collapse collapse show">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold">Detalles:</h6>
-                                                <p><strong>Peso:</strong> 80 kg</p>
-                                                <p><strong>Descanso:</strong> 90 segundos</p>
-                                                <p><strong>Notas:</strong> Mantener espalda recta</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold">Registro:</h6>
-                                                <div class="mb-2">
-                                                    <label class="form-label">Peso realizado (kg)</label>
-                                                    <input type="number" class="form-control" value="80">
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label">Repeticiones</label>
-                                                    <input type="number" class="form-control" value="10">
-                                                </div>
-                                                <button class="btn btn-sm btn-yellow">
-                                                    <i class="bi bi-save me-1"></i>Guardar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Ejercicio 2 -->
-                            <div class="accordion-item border-yellow mb-2">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ejercicio2">
-                                        <div class="d-flex w-100 align-items-center">
-                                            <i class="bi bi-check-circle text-yellow me-2"></i>
-                                            <span class="fw-bold">Prensa de Piernas</span>
-                                            <span class="badge bg-yellow text-black ms-auto me-2">3x12</span>
-                                        </div>
-                                    </button>
-                                </h2>
-                                <div id="ejercicio2" class="accordion-collapse collapse">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold">Detalles:</h6>
-                                                <p><strong>Peso:</strong> 120 kg</p>
-                                                <p><strong>Descanso:</strong> 60 segundos</p>
-                                                <p><strong>Notas:</strong> Controlar movimiento</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6 class="fw-bold">Registro:</h6>
-                                                <div class="mb-2">
-                                                    <label class="form-label">Peso realizado (kg)</label>
-                                                    <input type="number" class="form-control" value="">
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label">Repeticiones</label>
-                                                    <input type="number" class="form-control" value="">
-                                                </div>
-                                                <button class="btn btn-sm btn-yellow">
-                                                    <i class="bi bi-save me-1"></i>Guardar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Acciones -->
-                        <div class="mt-4 d-flex justify-content-between">
-                            <button class="btn btn-yellow" onclick="completarRutina()">
-                                <i class="bi bi-check-circle me-1"></i>Completar Rutina
+<head th:replace="base :: head('Mis Rutinas', ~{::style}, ~{::script})">
+    <style>
+        /* Estilos específicos para rutinas */
+        .routine-hero {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
+                        url('https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 40px;
+        }
+        
+        .routine-filters {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .filter-tag {
+            background-color: #000;
+            border: 1px solid #333;
+            color: #ccc;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .filter-tag:hover {
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+        
+        .filter-tag.active {
+            background-color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .routine-card {
+            background-color: #111;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .routine-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-yellow);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.1);
+        }
+        
+        .routine-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .routine-level {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .routine-duration {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--primary-yellow);
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .routine-content {
+            padding: 20px;
+        }
+        
+        .routine-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .routine-tag {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: var(--primary-yellow);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+        }
+        
+        .routine-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-yellow);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .progress-container {
+            margin-top: 10px;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar-gym {
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-yellow);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .workout-schedule {
+            background-color: #111;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+            border: 1px solid #333;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-day {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calendar-day:hover {
+            background-color: #222;
+        }
+        
+        .calendar-day.active {
+            background-color: var(--primary-yellow);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .calendar-day.workout-day {
+            position: relative;
+        }
+        
+        .calendar-day.workout-day::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary-yellow);
+            border-radius: 50%;
+        }
+        
+        .day-name {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .workout-detail {
+            background-color: #000;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-yellow);
+        }
+        
+        .workout-time {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: var(--primary-yellow);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .workout-exercises {
+            margin-top: 15px;
+        }
+        
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #111;
+            border-radius: 8px;
+        }
+        
+        .exercise-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-yellow);
+        }
+        
+        .exercise-details {
+            flex: 1;
+        }
+        
+        .exercise-sets {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .completed-check {
+            color: #28a745;
+            font-size: 1.2rem;
+        }
+        
+        .routine-tabs {
+            border-bottom: 2px solid #333;
+            margin-bottom: 30px;
+        }
+        
+        .routine-tab {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 10px 20px;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .routine-tab:hover {
+            color: var(--primary-yellow);
+        }
+        
+        .routine-tab.active {
+            color: var(--primary-yellow);
+            border-bottom-color: var(--primary-yellow);
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .achievement-icon-small {
+            color: var(--primary-yellow);
+            margin-right: 8px;
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-bar input {
+            padding-right: 40px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    
+    <main th:fragment="content">
+        <!-- Hero -->
+        <section class="routine-hero">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-5 fw-bold text-white mb-3">
+                            MIS <span class="text-gold">RUTINAS</span>
+                        </h1>
+                        <p class="lead text-white-50 mb-4">
+                            Planifica, sigue y mejora tus entrenamientos con nuestras rutinas personalizadas
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <button class="btn btn-gold" onclick="startNewRoutine()">
+                                <i class="bi bi-plus-circle me-2"></i> NUEVA RUTINA
                             </button>
-                            <button class="btn btn-outline-yellow" onclick="omitirRutina()">
-                                <i class="bi bi-skip-forward me-1"></i>Omitir Hoy
-                            </button>
-                            <button class="btn btn-outline-black" data-bs-toggle="modal" data-bs-target="#agregarEjercicioModal">
-                                <i class="bi bi-plus-circle me-1"></i>Agregar Ejercicio
+                            <button class="btn btn-outline-gold" onclick="showCalendar()">
+                                <i class="bi bi-calendar-week me-2"></i> VER CALENDARIO
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Calendario semanal -->
-                <div class="card card-yellow">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-calendar-week me-2"></i>Semana de Entrenamiento
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-center">
-                                <thead>
-                                    <tr>
-                                        <th class="bg-black text-yellow">Lunes</th>
-                                        <th class="bg-black text-yellow">Martes</th>
-                                        <th class="bg-black text-yellow">Miércoles</th>
-                                        <th class="bg-black text-yellow">Jueves</th>
-                                        <th class="bg-black text-yellow">Viernes</th>
-                                        <th class="bg-black text-yellow">Sábado</th>
-                                        <th class="bg-black text-yellow">Domingo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Pecho/Tríceps</strong>
-                                                <br>
-                                                <small class="text-success">✓ Completado</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Espalda/Bíceps</strong>
-                                                <br>
-                                                <small class="text-success">✓ Completado</small>
-                                            </div>
-                                        </td>
-                                        <td class="bg-yellow text-black">
-                                            <div class="p-2">
-                                                <strong>Piernas</strong>
-                                                <br>
-                                                <small>En progreso</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Descanso</strong>
-                                                <br>
-                                                <small class="text-muted">Programado</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Hombros</strong>
-                                                <br>
-                                                <small class="text-muted">Pendiente</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Cardio</strong>
-                                                <br>
-                                                <small class="text-muted">Pendiente</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="p-2">
-                                                <strong>Descanso</strong>
-                                                <br>
-                                                <small class="text-muted">Programado</small>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="col-lg-4 text-center">
+                        <div class="bg-dark p-4 rounded-3">
+                            <div class="stat-number mb-2">78%</div>
+                            <div class="stat-label">COMPLETADO ESTA SEMANA</div>
+                            <div class="progress-bar-gym mt-3">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Panel derecho: Progreso y herramientas -->
-            <div class="col-lg-4">
-                <!-- Progreso mensual -->
-                <div class="card card-yellow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Progreso Mensual
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <div class="display-4 text-yellow fw-bold">85%</div>
-                            <p class="text-muted">Objetivo del mes</p>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Asistencia</span>
-                                <span>90%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-yellow" style="width: 90%;"></div>
+        <!-- Contenido principal -->
+        <section class="py-4">
+            <div class="container">
+                <!-- Filtros y búsqueda -->
+                <div class="routine-filters">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="search-bar">
+                                <input type="text" class="form-control form-control-gym" placeholder="Buscar rutinas...">
+                                <i class="bi bi-search"></i>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Intensidad</span>
-                                <span>75%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-yellow" style="width: 75%;"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Consistencia</span>
-                                <span>80%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-yellow" style="width: 80%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objetivos -->
-                <div class="card card-yellow mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-bullseye me-2"></i>Mis Objetivos
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Perder 5kg</span>
-                                <span>60%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-yellow" style="width: 60%;"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Aumentar Press 10kg</span>
-                                <span>40%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-yellow" style="width: 40%;"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Correr 10km</span>
-                                <span>75%</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-yellow" style="width: 75%;"></div>
-                            </div>
-                        </div>
-                        <button class="btn btn-outline-yellow w-100 mt-2" data-bs-toggle="modal" data-bs-target="#nuevoObjetivoModal">
-                            <i class="bi bi-plus-circle me-1"></i>Nuevo Objetivo
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Herramientas rápidas -->
-                <div class="card card-yellow">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-tools me-2"></i>Herramientas
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#calculadoraModal">
-                                <i class="bi bi-calculator me-1"></i>Calculadora de Calorías
-                            </button>
-                            <button class="btn btn-outline-yellow" onclick="generarNuevaRutina()">
-                                <i class="bi bi-magic me-1"></i>Generar Nueva Rutina
-                            </button>
-                            <button class="btn btn-outline-yellow" onclick="verProgresoGrafico()">
-                                <i class="bi bi-bar-chart me-1"></i>Ver Gráficos
-                            </button>
-                            <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#notasModal">
-                                <i class="bi bi-journal-text me-1"></i>Agregar Notas
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modales -->
-    <!-- Agregar Ejercicio -->
-    <div class="modal fade" id="agregarEjercicioModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-black text-yellow">
-                    <h5 class="modal-title">
-                        <i class="bi bi-plus-circle me-2"></i>Agregar Ejercicio
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEjercicio">
-                        <div class="mb-3">
-                            <label class="form-label">Nombre del Ejercicio</label>
-                            <input type="text" class="form-control" placeholder="Ej: Press Banca" required>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="form-label">Series</label>
-                                <input type="number" class="form-control" value="3" min="1">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Repeticiones</label>
-                                <input type="number" class="form-control" value="10" min="1">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Peso (kg)</label>
-                                <input type="number" class="form-control" value="0" step="0.5">
-                            </div>
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="form-label">Notas</label>
-                            <textarea class="form-control" rows="2" placeholder="Observaciones..."></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-yellow" onclick="agregarEjercicio()">Agregar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Nuevo Objetivo -->
-    <div class="modal fade" id="nuevoObjetivoModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-black text-yellow">
-                    <h5 class="modal-title">
-                        <i class="bi bi-bullseye me-2"></i>Nuevo Objetivo
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formObjetivo">
-                        <div class="mb-3">
-                            <label class="form-label">Descripción del Objetivo</label>
-                            <input type="text" class="form-control" placeholder="Ej: Perder 5kg en 3 meses" required>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha Inicio</label>
-                                <input type="date" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha Meta</label>
-                                <input type="date" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="form-label">Prioridad</label>
-                            <select class="form-select">
-                                <option value="ALTA">Alta</option>
-                                <option value="MEDIA" selected>Media</option>
-                                <option value="BAJA">Baja</option>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <select class="form-select form-control-gym d-inline-block w-auto">
+                                <option>Ordenar por: Popularidad</option>
+                                <option>Dificultad: Baja a Alta</option>
+                                <option>Dificultad: Alta a Baja</option>
+                                <option>Duración: Corta a Larga</option>
+                                <option>Fecha: Más reciente</option>
                             </select>
                         </div>
-                    </form>
+                    </div>
+                    
+                    <div class="filter-tags">
+                        <span class="filter-tag active" onclick="filterRoutines('all')">Todas</span>
+                        <span class="filter-tag" onclick="filterRoutines('strength')">Fuerza</span>
+                        <span class="filter-tag" onclick="filterRoutines('cardio')">Cardio</span>
+                        <span class="filter-tag" onclick="filterRoutines('hiit')">HIIT</span>
+                        <span class="filter-tag" onclick="filterRoutines('yoga')">Yoga</span>
+                        <span class="filter-tag" onclick="filterRoutines('beginner')">Principiante</span>
+                        <span class="filter-tag" onclick="filterRoutines('intermediate')">Intermedio</span>
+                        <span class="filter-tag" onclick="filterRoutines('advanced')">Avanzado</span>
+                        <span class="filter-tag" onclick="filterRoutines('custom')">Personalizadas</span>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-yellow" onclick="crearObjetivo()">Crear Objetivo</button>
+
+                <!-- Pestañas -->
+                <div class="routine-tabs">
+                    <button class="routine-tab active" onclick="showTab('my-routines')">
+                        Mis Rutinas Activas
+                    </button>
+                    <button class="routine-tab" onclick="showTab('recommended')">
+                        Recomendadas
+                    </button>
+                    <button class="routine-tab" onclick="showTab('completed')">
+                        Completadas
+                    </button>
+                    <button class="routine-tab" onclick="showTab('saved')">
+                        Guardadas
+                    </button>
+                </div>
+
+                <!-- Rutinas activas -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="my-routines">
+                        <div class="row">
+                            <!-- Rutina 1 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="routine-card">
+                                    <div class="position-relative">
+                                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                             class="routine-image" alt="Fuerza Superior">
+                                        <span class="routine-level">Intermedio</span>
+                                        <span class="routine-duration">45 min</span>
+                                    </div>
+                                    <div class="routine-content">
+                                        <div class="routine-tags">
+                                            <span class="routine-tag">Fuerza</span>
+                                            <span class="routine-tag">Pesas</span>
+                                            <span class="routine-tag">Gimnasio</span>
+                                        </div>
+                                        <h5 class="text-white mb-3">Fuerza Superior - Día A</h5>
+                                        <p class="text-white-50 mb-0">
+                                            Enfoque en pecho, hombros y tríceps. Incluye press de banca, press militar y extensiones.
+                                        </p>
+                                        
+                                        <div class="routine-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-number">12</div>
+                                                <div class="stat-label">Ejercicios</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">4</div>
+                                                <div class="stat-label">Series</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">65%</div>
+                                                <div class="stat-label">Progreso</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="progress-container">
+                                            <div class="progress-text">
+                                                <span class="text-white-50">Progreso semanal</span>
+                                                <span class="text-gold">65%</span>
+                                            </div>
+                                            <div class="progress-bar-gym">
+                                                <div class="progress-fill" style="width: 65%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2 mt-3">
+                                            <button class="btn btn-gold btn-sm" onclick="startWorkout(1)">
+                                                <i class="bi bi-play-fill me-2"></i> COMENZAR
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Rutina 2 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="routine-card">
+                                    <div class="position-relative">
+                                        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                             class="routine-image" alt="Cardio Intenso">
+                                        <span class="routine-level">Principiante</span>
+                                        <span class="routine-duration">30 min</span>
+                                    </div>
+                                    <div class="routine-content">
+                                        <div class="routine-tags">
+                                            <span class="routine-tag">Cardio</span>
+                                            <span class="routine-tag">HIIT</span>
+                                            <span class="routine-tag">Casa</span>
+                                        </div>
+                                        <h5 class="text-white mb-3">Cardio Quemagrasa</h5>
+                                        <p class="text-white-50 mb-0">
+                                            Intervalos de alta intensidad para maximizar quema de calorías. Sin equipo necesario.
+                                        </p>
+                                        
+                                        <div class="routine-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-number">8</div>
+                                                <div class="stat-label">Ejercicios</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">3</div>
+                                                <div class="stat-label">Series</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">90%</div>
+                                                <div class="stat-label">Progreso</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="progress-container">
+                                            <div class="progress-text">
+                                                <span class="text-white-50">Progreso semanal</span>
+                                                <span class="text-gold">90%</span>
+                                            </div>
+                                            <div class="progress-bar-gym">
+                                                <div class="progress-fill" style="width: 90%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2 mt-3">
+                                            <button class="btn btn-gold btn-sm" onclick="startWorkout(2)">
+                                                <i class="bi bi-play-fill me-2"></i> COMENZAR
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Rutina 3 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="routine-card">
+                                    <div class="position-relative">
+                                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                             class="routine-image" alt="Yoga Matutino">
+                                        <span class="routine-level">Todos los niveles</span>
+                                        <span class="routine-duration">60 min</span>
+                                    </div>
+                                    <div class="routine-content">
+                                        <div class="routine-tags">
+                                            <span class="routine-tag">Yoga</span>
+                                            <span class="routine-tag">Flexibilidad</span>
+                                            <span class="routine-tag">Relajación</span>
+                                        </div>
+                                        <h5 class="text-white mb-3">Yoga Matutino Energizante</h5>
+                                        <p class="text-white-50 mb-0">
+                                            Secuencia de saludo al sol y posturas energizantes para comenzar el día con vitalidad.
+                                        </p>
+                                        
+                                        <div class="routine-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-number">15</div>
+                                                <div class="stat-label">Posturas</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">1</div>
+                                                <div class="stat-label">Serie</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-number">45%</div>
+                                                <div class="stat-label">Progreso</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="progress-container">
+                                            <div class="progress-text">
+                                                <span class="text-white-50">Progreso semanal</span>
+                                                <span class="text-gold">45%</span>
+                                            </div>
+                                            <div class="progress-bar-gym">
+                                                <div class="progress-fill" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2 mt-3">
+                                            <button class="btn btn-gold btn-sm" onclick="startWorkout(3)">
+                                                <i class="bi bi-play-fill me-2"></i> COMENZAR
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Otras pestañas (ocultas por defecto) -->
+                    <div class="tab-pane" id="recommended" style="display: none;">
+                        <div class="row">
+                            <!-- Contenido de recomendadas -->
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="completed" style="display: none;">
+                        <div class="row">
+                            <!-- Contenido de completadas -->
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="saved" style="display: none;">
+                        <div class="row">
+                            <!-- Contenido de guardadas -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendario de entrenamientos -->
+                <div class="workout-schedule" id="calendarSection" style="display: none;">
+                    <div class="calendar-header">
+                        <h4 class="text-white mb-0">
+                            <i class="bi bi-calendar-week me-2 text-gold"></i>CALENDARIO DE ENTRENAMIENTOS
+                        </h4>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="prevWeek()">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="text-white fw-bold" id="currentWeek">Semana 45, 2023</span>
+                            <button class="btn btn-outline-secondary btn-sm ms-2" onclick="nextWeek()">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-week">
+                        <!-- Los días se generarán dinámicamente con JavaScript -->
+                    </div>
+                    
+                    <div id="workoutDetails">
+                        <h5 class="text-white mb-3">Entrenamientos para hoy</h5>
+                        
+                        <div class="workout-detail">
+                            <span class="workout-time">09:00 AM - 45 min</span>
+                            <h6 class="text-white mb-2">Fuerza Superior - Día A</h6>
+                            <p class="text-white-50 mb-3">
+                                Entrenamiento enfocado en pecho, hombros y tríceps.
+                            </p>
+                            
+                            <div class="workout-exercises">
+                                <div class="exercise-item">
+                                    <div class="exercise-icon">
+                                        <i class="bi bi-activity"></i>
+                                    </div>
+                                    <div class="exercise-details">
+                                        <div class="text-white">Press de Banca</div>
+                                        <div class="exercise-sets">4 series × 8-12 repeticiones</div>
+                                    </div>
+                                    <div class="completed-check">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="exercise-item">
+                                    <div class="exercise-icon">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                    </div>
+                                    <div class="exercise-details">
+                                        <div class="text-white">Press Militar</div>
+                                        <div class="exercise-sets">3 series × 10-15 repeticiones</div>
+                                    </div>
+                                    <div class="completed-check">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="exercise-item">
+                                    <div class="exercise-icon">
+                                        <i class="bi bi-droplet"></i>
+                                    </div>
+                                    <div class="exercise-details">
+                                        <div class="text-white">Extensiones de Tríceps</div>
+                                        <div class="exercise-sets">3 series × 12-15 repeticiones</div>
+                                    </div>
+                                    <div class="completed-check">
+                                        <i class="bi bi-circle"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end mt-3">
+                                <button class="btn btn-gold btn-sm">
+                                    <i class="bi bi-play-fill me-2"></i> CONTINUAR
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logros y estadísticas -->
+                <div class="row mt-5">
+                    <div class="col-lg-8">
+                        <div class="card card-gym p-4">
+                            <h4 class="text-white mb-4">
+                                <i class="bi bi-trophy me-2 text-gold"></i>LOGROS RECIENTES
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="achievement-badge">
+                                        <i class="bi bi-lightning-charge-fill achievement-icon-small"></i>
+                                        <span>Entrenamiento consistente (30 días)</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="achievement-badge">
+                                        <i class="bi bi-heart-fill achievement-icon-small"></i>
+                                        <span>Cardio Master (20 sesiones)</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="achievement-badge">
+                                        <i class="bi bi-droplet-fill achievement-icon-small"></i>
+                                        <span>Hidratación Perfecta</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="achievement-badge">
+                                        <i class="bi bi-star-fill achievement-icon-small"></i>
+                                        <span>Rutina Personalizada Creada</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card card-gym p-4 h-100">
+                            <h4 class="text-white mb-4">
+                                <i class="bi bi-graph-up me-2 text-gold"></i>ESTADÍSTICAS
+                            </h4>
+                            
+                            <div class="stat-item mb-4">
+                                <div class="stat-number">156</div>
+                                <div class="stat-label">Minutos esta semana</div>
+                                <div class="progress-bar-gym mt-2">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item mb-4">
+                                <div class="stat-number">2,450</div>
+                                <div class="stat-label">Calorías quemadas</div>
+                                <div class="progress-bar-gym mt-2">
+                                    <div class="progress-fill" style="width: 82%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-number">18/22</div>
+                                <div class="stat-label">Días entrenados (este mes)</div>
+                                <div class="progress-bar-gym mt-2">
+                                    <div class="progress-fill" style="width: 82%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</th:block>
-
-<th:block th:fragment="pageScripts">
+        </section>
+    </main>
+    
+    <div th:replace="base :: footer"></div>
+    
     <script>
-        function completarRutina() {
-            showNotification('¡Rutina completada exitosamente!', 'success');
-            // Aquí iría la lógica para marcar como completada
-        }
+        // Variables globales
+        let currentWeek = 45;
+        let currentYear = 2023;
         
-        function omitirRutina() {
-            if (confirm('¿Estás seguro de que quieres omitir la rutina de hoy?')) {
-                showNotification('Rutina omitida', 'warning');
-                // Aquí iría la lógica para omitir
-            }
-        }
-        
-        function agregarEjercicio() {
-            const form = document.getElementById('formEjercicio');
-            if (form.checkValidity()) {
-                showNotification('Ejercicio agregado a la rutina', 'success');
-                $('#agregarEjercicioModal').modal('hide');
-                form.reset();
-            } else {
-                form.reportValidity();
-            }
-        }
-        
-        function crearObjetivo() {
-            const form = document.getElementById('formObjetivo');
-            if (form.checkValidity()) {
-                showNotification('Nuevo objetivo creado', 'success');
-                $('#nuevoObjetivoModal').modal('hide');
-                form.reset();
-            } else {
-                form.reportValidity();
-            }
-        }
-        
-        function generarNuevaRutina() {
-            showNotification('Generando nueva rutina personalizada...', 'info');
-            // Simular proceso
-            setTimeout(() => {
-                showNotification('¡Nueva rutina generada! Revisa tu calendario.', 'success');
-            }, 2000);
-        }
-        
-        function verProgresoGrafico() {
-            showNotification('Mostrando gráficos de progreso...', 'info');
-            // Aquí iría la lógica para mostrar gráficos
-        }
-        
-        // Inicializar accordion
+        // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            const accordions = document.querySelectorAll('.accordion-button');
-            accordions.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const icon = this.querySelector('i');
-                    if (icon.classList.contains('bi-check-circle')) {
-                        icon.classList.remove('bi-check-circle');
-                        icon.classList.add('bi-check-circle-fill', 'text-success');
-                    }
+            // Generar calendario
+            generateCalendar();
+            
+            // Configurar búsqueda
+            const searchInput = document.querySelector('.search-bar input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    searchRoutines(this.value);
                 });
-            });
+            }
         });
+        
+        // Funciones de pestañas
+        function showTab(tabId) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.style.display = 'none';
+            });
+            
+            // Remover clase active de todas las pestañas
+            document.querySelectorAll('.routine-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar pestaña seleccionada
+            document.getElementById(tabId).style.display = 'block';
+            
+            // Añadir clase active a la pestaña seleccionada
+            event.target.classList.add('active');
+        }
+        
+        // Funciones de filtro
+        function filterRoutines(filter) {
+            // Remover active de todos los filtros
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            
+            // Añadir active al filtro seleccionado
+            event.target.classList.add('active');
+            
+            // Aquí iría la lógica para filtrar las rutinas
+            console.log('Filtrando por:', filter);
+        }
+        
+        function searchRoutines(query) {
+            // Aquí iría la lógica de búsqueda
+            console.log('Buscando:', query);
+        }
+        
+        // Funciones de calendario
+        function showCalendar() {
+            const calendarSection = document.getElementById('calendarSection');
+            if (calendarSection.style.display === 'none') {
+                calendarSection.style.display = 'block';
+            } else {
+                calendarSection.style.display = 'none';
+            }
+        }
+        
+        function generateCalendar() {
+            const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            const calendarWeek = document.querySelector('.calendar-week');
+            
+            if (!calendarWeek) return;
+            
+            calendarWeek.innerHTML = '';
+            
+            // Generar días del 6 al 12 de noviembre (ejemplo)
+            const startDay = 6;
+            const workoutDays = [6, 8, 10, 11]; // Días con entrenamiento
+            
+            days.forEach((dayName, index) => {
+                const dayNumber = startDay + index;
+                const isWorkoutDay = workoutDays.includes(dayNumber);
+                const isToday = dayNumber === 10; // Suponiendo que hoy es 10
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = `calendar-day ${isWorkoutDay ? 'workout-day' : ''} ${isToday ? 'active' : ''}`;
+                dayElement.innerHTML = `
+                    <div class="day-name">${dayName}</div>
+                    <div class="day-number">${dayNumber}</div>
+                `;
+                
+                dayElement.addEventListener('click', function() {
+                    // Remover active de todos los días
+                    document.querySelectorAll('.calendar-day').forEach(d => {
+                        d.classList.remove('active');
+                    });
+                    
+                    // Añadir active al día clickeado
+                    this.classList.add('active');
+                    
+                    // Mostrar entrenamientos de ese día
+                    showWorkoutsForDay(dayNumber);
+                });
+                
+                calendarWeek.appendChild(dayElement);
+            });
+            
+            // Actualizar texto de la semana
+            document.getElementById('currentWeek').textContent = `Semana ${currentWeek}, ${currentYear}`;
+        }
+        
+        function prevWeek() {
+            currentWeek--;
+            if (currentWeek < 1) {
+                currentWeek = 52;
+                currentYear--;
+            }
+            generateCalendar();
+        }
+        
+        function nextWeek() {
+            currentWeek++;
+            if (currentWeek > 52) {
+                currentWeek = 1;
+                currentYear++;
+            }
+            generateCalendar();
+        }
+        
+        function showWorkoutsForDay(day) {
+            // Aquí iría la lógica para cargar los entrenamientos del día seleccionado
+            console.log('Mostrando entrenamientos para el día:', day);
+        }
+        
+        // Funciones de rutinas
+        function startNewRoutine() {
+            // Aquí iría la lógica para crear una nueva rutina
+            alert('Funcionalidad para crear nueva rutina - En desarrollo');
+        }
+        
+        function startWorkout(routineId) {
+            // Aquí iría la lógica para comenzar un entrenamiento
+            alert(`Comenzando rutina ${routineId} - Serás redirigido al modo entrenamiento`);
+            
+            // En una implementación real, redirigiría a la página de entrenamiento en vivo
+            // window.location.href = `/entrenamiento/en-vivo/${routineId}`;
+        }
+        
+        // Simular notificaciones
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
     </script>
-</th:block>
+</body>
+</html>

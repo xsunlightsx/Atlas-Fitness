@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="base :: head('Inicio', ~{::style}, ~{::script})">
+    <style>
+        /* Estilos específicos para la página de inicio */
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .testimonial-card {
+            background-color: #111111;
+            border-left: 4px solid var(--primary-yellow);
+            padding: 20px;
+        }
+        
+        .membership-card {
+            border: 2px solid var(--primary-yellow);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .membership-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .membership-header {
+            background-color: var(--primary-yellow);
+            color: var(--primary-black);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .membership-popular {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .membership-popular::before {
+            content: "POPULAR";
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background-color: #ff0000;
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .stats-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-yellow);
+        }
+        
+        .class-card {
+            overflow: hidden;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .class-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .class-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    
+    <main th:fragment="content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold text-white mb-4">
+                            TRANSFORMA TU <span class="text-gold">CUERPO</span><br>
+                            TRANSFORMA TU <span class="text-gold">VIDA</span>
+                        </h1>
+                        <p class="lead mb-4">
+                            En ATLAS FITNESS no solo construimos músculos, construimos confianza, 
+                            disciplina y resultados duraderos. Únete a nuestra comunidad de fitness.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a th:href="@{/auth/registro}" class="btn btn-gold btn-lg">
+                                <i class="bi bi-person-plus me-2"></i> ÚNETE AHORA
+                            </a>
+                            <a th:href="@{/cliente/membresia}" class="btn btn-outline-gold btn-lg">
+                                <i class="bi bi-info-circle me-2"></i> VER PLANES
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             class="img-fluid rounded-3 shadow-lg" alt="Entrenamiento en Atlas Fitness">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-number">500+</div>
+                        <p class="text-white-50">MIEMBROS ACTIVOS</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-number">15</div>
+                        <p class="text-white-50">ENTRENADORES CERTIFICADOS</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-number">50+</div>
+                        <p class="text-white-50">CLASES SEMANALES</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-number">24/7</div>
+                        <p class="text-white-50">HORARIO DE ATENCIÓN</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Características -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row text-center mb-5">
+                    <div class="col-12">
+                        <h2 class="fw-bold text-white">
+                            POR QUÉ ELEGIR <span class="text-gold">ATLAS FITNESS</span>
+                        </h2>
+                        <p class="text-white-50">Ofrecemos más que solo un gimnasio, ofrecemos una experiencia transformadora</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card card-gym h-100 p-4 text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-activity text-gold icon-large"></i>
+                            </div>
+                            <h5 class="text-white mb-3">Equipo de Primera</h5>
+                            <p class="text-white-50">Máquinas de última generación y equipo de calidad profesional.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card card-gym h-100 p-4 text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-people text-gold icon-large"></i>
+                            </div>
+                            <h5 class="text-white mb-3">Entrenadores Expertos</h5>
+                            <p class="text-white-50">Certificados y con experiencia para guiarte en tu transformación.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card card-gym h-100 p-4 text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-calendar-check text-gold icon-large"></i>
+                            </div>
+                            <h5 class="text-white mb-3">Clases Variadas</h5>
+                            <p class="text-white-50">Desde yoga hasta HIIT, tenemos clases para todos los niveles.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card card-gym h-100 p-4 text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-shield-check text-gold icon-large"></i>
+                            </div>
+                            <h5 class="text-white mb-3">Comunidad Segura</h5>
+                            <p class="text-white-50">Un ambiente inclusivo donde todos se sienten bienvenidos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Membresías Destacadas -->
+        <section class="py-5 bg-dark-gray">
+            <div class="container">
+                <div class="row text-center mb-5">
+                    <div class="col-12">
+                        <h2 class="fw-bold text-white">
+                            NUESTROS <span class="text-gold">PLANES</span>
+                        </h2>
+                        <p class="text-white-50">Elige el plan que mejor se adapte a tus metas y presupuesto</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4 justify-content-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="membership-card h-100">
+                            <div class="membership-header">
+                                <h4 class="fw-bold mb-0">BÁSICO</h4>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-center mb-4">
+                                    <span class="text-gold fw-bold" style="font-size: 2.5rem;">$29</span>
+                                    <span class="text-white-50">/mes</span>
+                                </div>
+                                <ul class="list-unstyled text-white-50 mb-4">
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Acceso a zona de pesas</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Uso de vestidores</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle text-secondary me-2"></i> Clases grupales</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle text-secondary me-2"></i> Entrenador personal</li>
+                                    <li><i class="bi bi-x-circle text-secondary me-2"></i> Suplementos mensuales</li>
+                                </ul>
+                                <div class="text-center">
+                                    <a th:href="@{/auth/registro}" class="btn btn-outline-gold w-100">ELEGIR PLAN</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="membership-card membership-popular h-100">
+                            <div class="membership-header">
+                                <h4 class="fw-bold mb-0">PRO</h4>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-center mb-4">
+                                    <span class="text-gold fw-bold" style="font-size: 2.5rem;">$49</span>
+                                    <span class="text-white-50">/mes</span>
+                                </div>
+                                <ul class="list-unstyled text-white-50 mb-4">
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Todo del plan Básico</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Clases grupales ilimitadas</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> 2 sesiones con entrenador</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Acceso 24/7</li>
+                                    <li><i class="bi bi-x-circle text-secondary me-2"></i> Suplementos mensuales</li>
+                                </ul>
+                                <div class="text-center">
+                                    <a th:href="@{/auth/registro}" class="btn btn-gold w-100">ELEGIR PLAN</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="membership-card h-100">
+                            <div class="membership-header">
+                                <h4 class="fw-bold mb-0">PREMIUM</h4>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-center mb-4">
+                                    <span class="text-gold fw-bold" style="font-size: 2.5rem;">$79</span>
+                                    <span class="text-white-50">/mes</span>
+                                </div>
+                                <ul class="list-unstyled text-white-50 mb-4">
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Todo del plan Pro</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Entrenador personal 4x/mes</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Suplementos mensuales</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-gold me-2"></i> Plan nutricional personalizado</li>
+                                    <li><i class="bi bi-check-circle-fill text-gold me-2"></i> Acceso a eventos exclusivos</li>
+                                </ul>
+                                <div class="text-center">
+                                    <a th:href="@{/auth/registro}" class="btn btn-outline-gold w-100">ELEGIR PLAN</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clases Destacadas -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row text-center mb-5">
+                    <div class="col-12">
+                        <h2 class="fw-bold text-white">
+                            CLASES <span class="text-gold">DESTACADAS</span>
+                        </h2>
+                        <p class="text-white-50">Descubre nuestras clases más populares</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="class-card position-relative">
+                            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                 class="img-fluid w-100" alt="CrossFit" style="height: 250px; object-fit: cover;">
+                            <div class="class-overlay">
+                                <h5 class="text-white fw-bold">CROSSFIT</h5>
+                                <p class="text-white-50 mb-0">Lunes, Miércoles, Viernes - 7:00 AM</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="class-card position-relative">
+                            <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                 class="img-fluid w-100" alt="Yoga" style="height: 250px; object-fit: cover;">
+                            <div class="class-overlay">
+                                <h5 class="text-white fw-bold">YOGA</h5>
+                                <p class="text-white-50 mb-0">Martes, Jueves - 6:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="class-card position-relative">
+                            <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                 class="img-fluid w-100" alt="Spinning" style="height: 250px; object-fit: cover;">
+                            <div class="class-overlay">
+                                <h5 class="text-white fw-bold">SPINNING</h5>
+                                <p class="text-white-50 mb-0">Lunes a Viernes - Varios horarios</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonios -->
+        <section class="py-5 bg-dark-gray">
+            <div class="container">
+                <div class="row text-center mb-5">
+                    <div class="col-12">
+                        <h2 class="fw-bold text-white">
+                            LO QUE DICEN <span class="text-gold">NUESTROS MIEMBROS</span>
+                        </h2>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="testimonial-card h-100">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" 
+                                     class="rounded-circle me-3" width="60" height="60" alt="Testimonio">
+                                <div>
+                                    <h6 class="text-white mb-0">Carlos Rodríguez</h6>
+                                    <small class="text-gold">Miembro desde 2020</small>
+                                </div>
+                            </div>
+                            <p class="text-white-50">
+                                "He perdido 15 kg en 6 meses gracias a los entrenadores de Atlas. 
+                                No solo es un gimnasio, es una familia que te apoya."
+                            </p>
+                            <div class="text-gold">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="testimonial-card h-100">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" 
+                                     class="rounded-circle me-3" width="60" height="60" alt="Testimonio">
+                                <div>
+                                    <h6 class="text-white mb-0">Ana Martínez</h6>
+                                    <small class="text-gold">Miembro desde 2021</small>
+                                </div>
+                            </div>
+                            <p class="text-white-50">
+                                "Las clases de yoga han cambiado mi vida. Los instructores son increíbles 
+                                y el ambiente es tan positivo. ¡Recomiendo Atlas a todos!"
+                            </p>
+                            <div class="text-gold">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="testimonial-card h-100">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://randomuser.me/api/portraits/men/67.jpg" 
+                                     class="rounded-circle me-3" width="60" height="60" alt="Testimonio">
+                                <div>
+                                    <h6 class="text-white mb-0">Miguel Torres</h6>
+                                    <small class="text-gold">Miembro desde 2022</small>
+                                </div>
+                            </div>
+                            <p class="text-white-50">
+                                "El equipo de última generación y los entrenadores expertos hacen la diferencia. 
+                                He logrado mis objetivos más rápido de lo esperado."
+                            </p>
+                            <div class="text-gold">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Final -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="fw-bold text-white mb-4">
+                            ¿LISTO PARA <span class="text-gold">TRANSFORMARTE</span>?
+                        </h2>
+                        <p class="lead text-white-50 mb-4">
+                            Únete a la familia Atlas Fitness hoy mismo y comienza tu viaje hacia una 
+                            versión más fuerte y saludable de ti mismo.
+                        </p>
+                        <a th:href="@{/auth/registro}" class="btn btn-gold btn-lg px-5">
+                            <i class="bi bi-lightning-charge-fill me-2"></i> EMPIEZA AHORA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div th:replace="base :: footer"></div>
+    
+    <script>
+        // Script específico para la página de inicio
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación para las tarjetas de membresía al hacer scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observar elementos para animaciones
+            document.querySelectorAll('.membership-card, .class-card, .testimonial-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // Después de 100ms, hacer visible para la animación
+            setTimeout(() => {
+                document.querySelectorAll('.membership-card, .class-card, .testimonial-card').forEach(card => {
+                    if (card.getBoundingClientRect().top < window.innerHeight) {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

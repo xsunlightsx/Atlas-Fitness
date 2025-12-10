@@ -1,319 +1,37 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<th:block th:fragment="content">
-    <div class="container mt-4">
-        <!-- Título -->
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="text-yellow fw-bold">
-                    <i class="bi bi-person-circle me-2"></i>Mi Perfil
-                </h1>
-                <p class="text-white">Gestiona tu información personal y preferencias</p>
-            </div>
-        </div>
-        
-        <div class="row">
-            <!-- Información del perfil -->
-            <div class="col-lg-4 mb-4">
-                <div class="card card-yellow">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-person-badge me-2"></i>Información Personal
-                        </h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <!-- Avatar -->
-                        <div class="mb-3">
-                            <div class="avatar-circle bg-yellow text-black rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                                 style="width: 120px; height: 120px; font-size: 3rem;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <button class="btn btn-sm btn-outline-yellow">
-                                <i class="bi bi-camera me-1"></i>Cambiar Foto
-                            </button>
-                        </div>
-                        
-                        <!-- Información -->
-                        <h4 th:text="${cliente.nombre} + ' ' + ${cliente.apellido}">Nombre Apellido</h4>
-                        <p class="text-muted mb-2">
-                            <i class="bi bi-envelope text-yellow me-1"></i>
-                            <span th:text="${cliente.email}">email@ejemplo.com</span>
-                        </p>
-                        <p class="text-muted mb-2">
-                            <i class="bi bi-telephone text-yellow me-1"></i>
-                            <span th:text="${cliente.telefono} ?: 'No especificado'">Teléfono</span>
-                        </p>
-                        <p class="text-muted">
-                            <i class="bi bi-calendar text-yellow me-1"></i>
-                            Miembro desde: 
-                            <span th:text="${#dates.format(cliente.fechaRegistro, 'dd/MM/yyyy')}">Fecha</span>
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Métricas rápidas -->
-                <div class="card card-yellow mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Mi Progreso
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="text-yellow fw-bold fs-3">12</div>
-                                <small class="text-muted">Sesiones</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="text-yellow fw-bold fs-3">85%</div>
-                                <small class="text-muted">Asistencia</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="text-yellow fw-bold fs-3">5kg</div>
-                                <small class="text-muted">Logro</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Formulario de edición -->
-            <div class="col-lg-8">
-                <div class="card card-yellow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-pencil-square me-2"></i>Editar Perfil
-                        </h5>
-                        <span class="badge bg-yellow text-black">ACTIVO</span>
-                    </div>
-                    <div class="card-body">
-                        <form th:action="@{/cliente/perfil/actualizar}" method="post">
-                            <!-- Mensajes -->
-                            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                <span th:text="${success}"></span>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                            
-                            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                <span th:text="${error}"></span>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                            
-                            <div class="row g-3">
-                                <!-- Información básica -->
-                                <div class="col-md-6">
-                                    <label for="nombre" class="form-label fw-bold">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre"
-                                           th:value="${cliente.nombre}" required>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="apellido" class="form-label fw-bold">Apellido</label>
-                                    <input type="text" class="form-control" id="apellido" name="apellido"
-                                           th:value="${cliente.apellido}" required>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="email" class="form-label fw-bold">
-                                        <i class="bi bi-envelope me-1"></i>Email
-                                    </label>
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           th:value="${cliente.email}" required>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="telefono" class="form-label fw-bold">
-                                        <i class="bi bi-telephone me-1"></i>Teléfono
-                                    </label>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono"
-                                           th:value="${cliente.telefono}">
-                                </div>
-                                
-                                <!-- Información adicional -->
-                                <div class="col-12">
-                                    <hr class="my-3">
-                                    <h6 class="text-yellow fw-bold mb-3">
-                                        <i class="bi bi-info-circle me-2"></i>Información Adicional
-                                    </h6>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <label for="fechaNacimiento" class="form-label fw-bold">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento"
-                                           th:value="${cliente.fechaNacimiento}">
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <label for="genero" class="form-label fw-bold">Género</label>
-                                    <select class="form-select" id="genero" name="genero">
-                                        <option value="">Seleccionar</option>
-                                        <option value="MASCULINO" th:selected="${cliente.genero == 'MASCULINO'}">Masculino</option>
-                                        <option value="FEMENINO" th:selected="${cliente.genero == 'FEMENINO'}">Femenino</option>
-                                        <option value="OTRO" th:selected="${cliente.genero == 'OTRO'}">Otro</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <label for="altura" class="form-label fw-bold">Altura (cm)</label>
-                                    <input type="number" class="form-control" id="altura" name="altura"
-                                           th:value="${cliente.altura}" min="100" max="250">
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="peso" class="form-label fw-bold">Peso (kg)</label>
-                                    <input type="number" class="form-control" id="peso" name="peso"
-                                           th:value="${cliente.peso}" step="0.1" min="30" max="300">
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="objetivo" class="form-label fw-bold">Objetivo</label>
-                                    <select class="form-select" id="objetivo" name="objetivo">
-                                        <option value="">Seleccionar</option>
-                                        <option value="PERDIDA_PESO" th:selected="${cliente.objetivo == 'PERDIDA_PESO'}">Pérdida de peso</option>
-                                        <option value="GANANCIA_MUSCULAR" th:selected="${cliente.objetivo == 'GANANCIA_MUSCULAR'}">Ganancia muscular</option>
-                                        <option value="TONIFICACION" th:selected="${cliente.objetivo == 'TONIFICACION'}">Tonificación</option>
-                                        <option value="MANTENIMIENTO" th:selected="${cliente.objetivo == 'MANTENIMIENTO'}">Mantenimiento</option>
-                                        <option value="SALUD" th:selected="${cliente.objetivo == 'SALUD'}">Mejorar salud</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Preferencias -->
-                                <div class="col-12">
-                                    <hr class="my-3">
-                                    <h6 class="text-yellow fw-bold mb-3">
-                                        <i class="bi bi-heart me-2"></i>Preferencias
-                                    </h6>
-                                </div>
-                                
-                                <div class="col-12">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="notificacionesEmail" name="notificacionesEmail"
-                                               th:checked="${cliente.notificacionesEmail}">
-                                        <label class="form-check-label" for="notificacionesEmail">
-                                            Recibir notificaciones por email
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="notificacionesSMS" name="notificacionesSMS"
-                                               th:checked="${cliente.notificacionesSMS}">
-                                        <label class="form-check-label" for="notificacionesSMS">
-                                            Recibir notificaciones por SMS
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="compartirDatos" name="compartirDatos"
-                                               th:checked="${cliente.compartirDatos}">
-                                        <label class="form-check-label" for="compartirDatos">
-                                            Compartir datos anónimos para mejorar servicios
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <!-- Botones -->
-                                <div class="col-12 mt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <a th:href="@{/cliente}" class="btn btn-outline-yellow">
-                                            <i class="bi bi-arrow-left me-1"></i>Cancelar
-                                        </a>
-                                        <div>
-                                            <button type="reset" class="btn btn-outline-black me-2">
-                                                <i class="bi bi-arrow-clockwise me-1"></i>Restablecer
-                                            </button>
-                                            <button type="submit" class="btn btn-yellow">
-                                                <i class="bi bi-save me-1"></i>Guardar Cambios
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Seguridad -->
-                <div class="card card-yellow mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-shield-lock me-2"></i>Seguridad
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h6 class="fw-bold mb-1">Contraseña</h6>
-                                <p class="text-muted mb-0">Último cambio: 15/11/2023</p>
-                            </div>
-                            <button class="btn btn-outline-yellow" data-bs-toggle="modal" data-bs-target="#cambiarPasswordModal">
-                                <i class="bi bi-key me-1"></i>Cambiar Contraseña
-                            </button>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="fw-bold mb-1">Sesiones Activas</h6>
-                                <p class="text-muted mb-0">1 dispositivo conectado</p>
-                            </div>
-                            <button class="btn btn-outline-black">
-                                <i class="bi bi-laptop me-1"></i>Gestionar Sesiones
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Cambiar Contraseña -->
-    <div class="modal fade" id="cambiarPasswordModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-black text-yellow">
-                    <h5 class="modal-title">
-                        <i class="bi bi-key me-2"></i>Cambiar Contraseña
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form th:action="@{/cliente/cambiar-password}" method="post">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="currentPassword" class="form-label">Contraseña Actual</label>
-                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newPassword" class="form-label">Nueva Contraseña</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmNewPassword" class="form-label">Confirmar Nueva Contraseña</label>
-                            <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-black" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-yellow">Cambiar Contraseña</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</th:block>
+<th:block th:replace="layout :: content">
 
-<th:block th:fragment="pageScripts">
-    <script>
-        // Validación de formulario
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (!validateForm(this.id)) {
-                        e.preventDefault();
-                    }
-                });
-            }
-        });
-    </script>
+<div class="container mt-4">
+    <div class="row">
+        
+        <!-- Menú lateral -->
+        <div class="col-md-3 profile-sidebar text-center">
+            <img th:src="@{/img/user-default.jpg}" class="profile-avatar rounded-circle mb-3">
+            <h4 th:text="${usuario.nombre}">Nombre Usuario</h4>
+
+            <ul class="list-group mt-4">
+                <a th:href="@{/cliente/perfil}" class="list-group-item bg-dark-gray text-white">Información</a>
+                <a th:href="@{/cliente/historial}" class="list-group-item bg-dark-gray text-white">Historial</a>
+                <a th:href="@{/cliente/membresia}" class="list-group-item bg-dark-gray text-white">Membresía</a>
+            </ul>
+        </div>
+
+        <!-- Contenido -->
+        <div class="col-md-9">
+            <h3 class="text-gold">Información Personal</h3>
+            
+            <div class="mt-4">
+                <p><strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${usuario.email}"></span></p>
+                <p><strong>Teléfono:</strong> <span th:text="${usuario.telefono}"></span></p>
+            </div>
+
+            <a th:href="@{/cliente/editar}" class="btn btn-outline-gold mt-3">Editar Datos</a>
+        </div>
+
+    </div>
+</div>
+
 </th:block>
+</html>

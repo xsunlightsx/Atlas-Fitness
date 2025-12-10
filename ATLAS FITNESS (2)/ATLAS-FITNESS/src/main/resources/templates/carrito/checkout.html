@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="base :: head('Checkout - Pago', ~{::style}, ~{::script})">
+    <style>
+        /* Estilos específicos para checkout */
+        .checkout-container {
+            background: linear-gradient(135deg, #000, #111);
+            border-radius: 15px;
+            border: 2px solid var(--primary-yellow);
+            overflow: hidden;
+        }
+        
+        .checkout-header {
+            background: var(--primary-black);
+            color: var(--primary-yellow);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-yellow);
+        }
+        
+        .checkout-body {
+            padding: 2rem;
+        }
+        
+        .step-indicator-checkout {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step-indicator-checkout::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background-color: #333;
+            z-index: 1;
+        }
+        
+        .step-checkout {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-circle-checkout {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+        
+        .step-checkout.completed .step-circle-checkout {
+            background-color: var(--primary-yellow);
+            color: var(--primary-black);
+            border-color: var(--primary-yellow);
+        }
+        
+        .step-checkout.active .step-circle-checkout {
+            background-color: transparent;
+            color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+        }
+        
+        .step-checkout.active .step-text-checkout {
+            color: var(--primary-yellow);
+        }
+        
+        .step-text-checkout {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .checkout-section {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+        
+        .checkout-section-title {
+            color: var(--primary-yellow);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkout-section-title i {
+            margin-right: 10px;
+        }
+        
+        .payment-method {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 215, 0, 0.05);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .payment-icon {
+            font-size: 1.5rem;
+            color: var(--primary-yellow);
+            margin-right: 10px;
+        }
+        
+        .card-input-group {
+            position: relative;
+        }
+        
+        .card-input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .card-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+        
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-chip i {
+            color: #000;
+            font-size: 1.2rem;
+        }
+        
+        .card-number {
+            font-family: monospace;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+        }
+        
+        .expiry-cvv {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .order-summary {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #333;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .order-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-yellow);
+        }
+        
+        .secure-checkout {
+            background-color: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .gift-card-input {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .save-info {
+            background-color: rgba(255, 215, 0, 0.05);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+        }
+        
+        .form-check-label {
+            color: #ccc;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid #333;
+            border-top-color: var(--primary-yellow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-animation {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .success-icon-checkout {
+            font-size: 5rem;
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            animation: bounce 0.5s;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            80% { transform: translateY(-10px); }
+        }
+        
+        .order-confirmation {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid var(--primary-yellow);
+        }
+        
+        .confirmation-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .confirmation-detail {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .confirmation-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .confirmation-value {
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    
+    <main th:fragment="content">
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <h4 class="text-white mt-3">Procesando tu pago...</h4>
+            <p class="text-white-50">Por favor, no cierres esta ventana</p>
+        </div>
+
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="checkout-container">
+                        <!-- Header -->
+                        <div class="checkout-header">
+                            <i class="bi bi-cart-check fitness-icon" style="font-size: 3rem;"></i>
+                            <h1 class="h3 mb-3 fw-bold">CHECKOUT</h1>
+                            <p class="mb-0">Finaliza tu compra de manera segura</p>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="checkout-body">
+                            <!-- Indicador de pasos -->
+                            <div class="step-indicator-checkout">
+                                <div class="step-checkout completed" data-step="1">
+                                    <div class="step-circle-checkout">
+                                        <i class="bi bi-check"></i>
+                                    </div>
+                                    <div class="step-text-checkout">Carrito</div>
+                                </div>
+                                <div class="step-checkout active" data-step="2">
+                                    <div class="step-circle-checkout">2</div>
+                                    <div class="step-text-checkout">Información</div>
+                                </div>
+                                <div class="step-checkout" data-step="3">
+                                    <div class="step-circle-checkout">3</div>
+                                    <div class="step-text-checkout">Pago</div>
+                                </div>
+                                <div class="step-checkout" data-step="4">
+                                    <div class="step-circle-checkout">4</div>
+                                    <div class="step-text-checkout">Confirmación</div>
+                                </div>
+                            </div>
+
+                            <!-- Formulario de checkout -->
+                            <form id="checkoutForm">
+                                <!-- Información de envío -->
+                                <div class="checkout-section" id="shippingSection">
+                                    <div class="checkout-section-title">
+                                        <i class="bi bi-truck"></i> INFORMACIÓN DE ENVÍO
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Nombre *</label>
+                                            <input type="text" class="form-control form-control-gym" id="shippingFirstName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Apellido *</label>
+                                            <input type="text" class="form-control form-control-gym" id="shippingLastName" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label-gym">Dirección *</label>
+                                        <input type="text" class="form-control form-control-gym" id="shippingAddress" required>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Ciudad *</label>
+                                            <input type="text" class="form-control form-control-gym" id="shippingCity" required>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label-gym">Estado *</label>
+                                            <select class="form-control form-control-gym" id="shippingState" required>
+                                                <option value="">Seleccionar</option>
+                                                <option value="DF">Distrito Federal</option>
+                                                <option value="EDOMEX">Estado de México</option>
+                                                <option value="JAL">Jalisco</option>
+                                                <option value="NL">Nuevo León</option>
+                                                <option value="PUE">Puebla</option>
+                                                <option value="VER">Veracruz</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label-gym">Código Postal *</label>
+                                            <input type="text" class="form-control form-control-gym" id="shippingZip" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Email *</label>
+                                            <input type="email" class="form-control form-control-gym" id="shippingEmail" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Teléfono *</label>
+                                            <input type="tel" class="form-control form-control-gym" id="shippingPhone" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="save-info">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="saveShippingInfo">
+                                            <label class="form-check-label" for="saveShippingInfo">
+                                                Guardar esta información para futuras compras
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button type="button" class="btn btn-register" onclick="goToPayment()">
+                                            CONTINUAR AL PAGO <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Información de pago -->
+                                <div class="checkout-section" id="paymentSection" style="display: none;">
+                                    <div class="checkout-section-title">
+                                        <i class="bi bi-credit-card"></i> MÉTODO DE PAGO
+                                    </div>
+                                    
+                                    <!-- Métodos de pago -->
+                                    <div class="mb-4">
+                                        <div class="payment-method selected" onclick="selectPaymentMethod('card')" id="cardMethod">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-credit-card-2-front payment-icon"></i>
+                                                <div>
+                                                    <h6 class="text-white mb-1">Tarjeta de crédito/débito</h6>
+                                                    <p class="text-white-50 mb-0">Pago seguro con encriptación SSL</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="payment-method" onclick="selectPaymentMethod('paypal')" id="paypalMethod">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-paypal payment-icon"></i>
+                                                <div>
+                                                    <h6 class="text-white mb-1">PayPal</h6>
+                                                    <p class="text-white-50 mb-0">Paga con tu cuenta PayPal</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="payment-method" onclick="selectPaymentMethod('oxxo')" id="oxxoMethod">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-cash-stack payment-icon"></i>
+                                                <div>
+                                                    <h6 class="text-white mb-1">Pago en OXXO</h6>
+                                                    <p class="text-white-50 mb-0">Paga en efectivo en cualquier OXXO</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="payment-method" onclick="selectPaymentMethod('giftcard')" id="giftcardMethod">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-gift payment-icon"></i>
+                                                <div>
+                                                    <h6 class="text-white mb-1">Tarjeta de regalo</h6>
+                                                    <p class="text-white-50 mb-0">Usa una tarjeta de regalo Atlas Fitness</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Formulario de tarjeta -->
+                                    <div id="cardForm">
+                                        <div class="mb-3">
+                                            <label class="form-label-gym">Número de tarjeta *</label>
+                                            <div class="card-input-group">
+                                                <input type="text" class="form-control form-control-gym" id="cardNumber" 
+                                                       placeholder="1234 5678 9012 3456" maxlength="19">
+                                                <i class="bi bi-credit-card"></i>
+                                            </div>
+                                            <div class="card-preview" id="cardPreview" style="display: none;">
+                                                <div class="card-chip">
+                                                    <i class="bi bi-cpu"></i>
+                                                </div>
+                                                <div class="card-number" id="cardNumberPreview">**** **** **** ****</div>
+                                                <div class="text-white-50">
+                                                    <i class="bi bi-shield-check text-gold"></i> Seguro
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label-gym">Nombre en la tarjeta *</label>
+                                                <input type="text" class="form-control form-control-gym" id="cardName" 
+                                                       placeholder="Como aparece en la tarjeta">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label-gym">Fecha de vencimiento *</label>
+                                                <div class="expiry-cvv">
+                                                    <select class="form-control form-control-gym" id="cardMonth">
+                                                        <option value="">Mes</option>
+                                                        <option value="01">01 - Enero</option>
+                                                        <option value="02">02 - Febrero</option>
+                                                        <option value="03">03 - Marzo</option>
+                                                        <option value="04">04 - Abril</option>
+                                                        <option value="05">05 - Mayo</option>
+                                                        <option value="06">06 - Junio</option>
+                                                        <option value="07">07 - Julio</option>
+                                                        <option value="08">08 - Agosto</option>
+                                                        <option value="09">09 - Septiembre</option>
+                                                        <option value="10">10 - Octubre</option>
+                                                        <option value="11">11 - Noviembre</option>
+                                                        <option value="12">12 - Diciembre</option>
+                                                    </select>
+                                                    <select class="form-control form-control-gym" id="cardYear">
+                                                        <option value="">Año</option>
+                                                        <option value="2023">2023</option>
+                                                        <option value="2024">2024</option>
+                                                        <option value="2025">2025</option>
+                                                        <option value="2026">2026</option>
+                                                        <option value="2027">2027</option>
+                                                        <option value="2028">2028</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label-gym">Código de seguridad (CVV) *</label>
+                                                <div class="card-input-group">
+                                                    <input type="text" class="form-control form-control-gym" id="cardCVV" 
+                                                           placeholder="123" maxlength="4">
+                                                    <i class="bi bi-shield-lock"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="saveCardInfo">
+                                                    <label class="form-check-label" for="saveCardInfo">
+                                                        Guardar tarjeta para futuras compras
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Formulario PayPal -->
+                                    <div id="paypalForm" style="display: none;">
+                                        <div class="alert alert-dark border-gold">
+                                            <i class="bi bi-info-circle-fill text-gold me-2"></i>
+                                            <span class="text-white">Serás redirigido a PayPal para completar tu pago de manera segura.</span>
+                                        </div>
+                                        <div class="text-center py-4">
+                                            <i class="bi bi-paypal" style="font-size: 3rem; color: #003087;"></i>
+                                            <p class="text-white-50 mt-3">Haz clic en "Pagar con PayPal" para continuar</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Formulario OXXO -->
+                                    <div id="oxxoForm" style="display: none;">
+                                        <div class="alert alert-dark border-gold">
+                                            <i class="bi bi-info-circle-fill text-gold me-2"></i>
+                                            <span class="text-white">Generaremos una referencia para que pagues en cualquier tienda OXXO. Tienes 72 horas para realizar el pago.</span>
+                                        </div>
+                                        <div class="text-center py-4">
+                                            <div class="bg-white p-3 rounded d-inline-block mb-3">
+                                                <span class="text-dark fw-bold" style="font-size: 1.5rem;" id="oxxoReference">1234 5678 9012</span>
+                                            </div>
+                                            <p class="text-white-50">Presenta esta referencia en cualquier OXXO</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Formulario Tarjeta de Regalo -->
+                                    <div id="giftcardForm" style="display: none;">
+                                        <div class="mb-3">
+                                            <label class="form-label-gym">Código de tarjeta de regalo</label>
+                                            <input type="text" class="form-control form-control-gym" id="giftcardCode" 
+                                                   placeholder="ATLAS-XXXX-XXXX-XXXX">
+                                            <button type="button" class="btn btn-outline-gold mt-2" onclick="applyGiftcard()">
+                                                <i class="bi bi-check-circle me-2"></i> APLICAR TARJETA
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="secure-checkout">
+                                        <i class="bi bi-shield-check text-gold me-2"></i>
+                                        <span class="text-white">Pago 100% seguro · Encriptación SSL de 256-bit · No almacenamos datos de tarjetas</span>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-gold" onclick="goBackToShipping()">
+                                            <i class="bi bi-arrow-left me-2"></i> VOLVER A ENVÍO
+                                        </button>
+                                        <button type="button" class="btn btn-register" onclick="processPayment()">
+                                            <i class="bi bi-lock-fill me-2"></i> PAGAR $140.76
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Confirmación -->
+                                <div class="checkout-section" id="confirmationSection" style="display: none;">
+                                    <div class="success-animation" id="successAnimation">
+                                        <div class="success-icon-checkout">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                        <h3 class="text-white mb-3">¡PAGO EXITOSO!</h3>
+                                        <p class="text-white-50 mb-4">Tu pedido ha sido procesado correctamente</p>
+                                        
+                                        <div class="order-confirmation">
+                                            <h5 class="text-gold mb-3">
+                                                <i class="bi bi-receipt me-2"></i>ORDEN #ATLAS-2023-001245
+                                            </h5>
+                                            
+                                            <div class="confirmation-details">
+                                                <div class="confirmation-detail">
+                                                    <div class="confirmation-label">Fecha</div>
+                                                    <div class="confirmation-value" id="confirmationDate"></div>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <div class="confirmation-label">Total</div>
+                                                    <div class="confirmation-value">$140.76</div>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <div class="confirmation-label">Método de Pago</div>
+                                                    <div class="confirmation-value" id="confirmationMethod"></div>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <div class="confirmation-label">Estado</div>
+                                                    <div class="confirmation-value text-success">Completado</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-4">
+                                                <h6 class="text-white mb-2">Detalles de envío</h6>
+                                                <p class="text-white-50 mb-1" id="confirmationShipping"></p>
+                                                <p class="text-white-50">Llegada estimada: 3-5 días hábiles</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2 mt-4">
+                                            <a th:href="@{/cliente/historial}" class="btn btn-outline-gold">
+                                                <i class="bi bi-clock-history me-2"></i> VER HISTORIAL
+                                            </a>
+                                            <a th:href="@{/productos/catalogo}" class="btn btn-register">
+                                                <i class="bi bi-shop me-2"></i> SEGUIR COMPRANDO
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen del pedido -->
+                <div class="col-lg-4">
+                    <div class="order-summary">
+                        <h4 class="text-white mb-4">
+                            <i class="bi bi-receipt me-2 text-gold"></i>RESUMEN DEL PEDIDO
+                        </h4>
+                        
+                        <!-- Productos -->
+                        <div class="order-item">
+                            <div class="d-flex">
+                                <img src="https://images.unsplash.com/photo-1593081891731-f4d6c3a2e5e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                     class="order-item-image" alt="Proteína">
+                                <div>
+                                    <h6 class="text-white mb-1">Proteína Whey Atlas Pro</h6>
+                                    <p class="text-white-50 mb-1">Cantidad: 2</p>
+                                    <p class="text-gold mb-0">$79.98</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-item">
+                            <div class="d-flex">
+                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                     class="order-item-image" alt="Camiseta">
+                                <div>
+                                    <h6 class="text-white mb-1">Camiseta Atlas Fitness</h6>
+                                    <p class="text-white-50 mb-1">Cantidad: 1</p>
+                                    <p class="text-gold mb-0">$24.99</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-item">
+                            <div class="d-flex">
+                                <img src="https://images.unsplash.com/photo-1594736797933-d0d64d1fe48a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                                     class="order-item-image" alt="Creatina">
+                                <div>
+                                    <h6 class="text-white mb-1">Creatina Monohidrato</h6>
+                                    <p class="text-white-50 mb-1">Cantidad: 1</p>
+                                    <p class="text-gold mb-0">$29.99</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Totales -->
+                        <div class="mt-4 pt-3 border-top border-secondary">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-white-50">Subtotal</span>
+                                <span class="text-white">$134.96</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-white-50">Envío</span>
+                                <span class="text-success">GRATIS</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-white-50">Descuento</span>
+                                <span class="text-success">-$5.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-white-50">Impuestos</span>
+                                <span class="text-white">$10.80</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between pt-3 border-top border-secondary">
+                                <span class="text-white fw-bold">TOTAL</span>
+                                <span class="order-total">$140.76</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Información adicional -->
+                        <div class="mt-4">
+                            <h6 class="text-white mb-3">
+                                <i class="bi bi-info-circle me-2 text-gold"></i>INFORMACIÓN IMPORTANTE
+                            </h6>
+                            <ul class="text-white-50 small ps-3">
+                                <li class="mb-2">Todos los precios incluyen IVA</li>
+                                <li class="mb-2">Envío gratis en pedidos mayores a $50</li>
+                                <li class="mb-2">Política de devolución de 30 días</li>
+                                <li>Garantía de satisfacción del 100%</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Soporte -->
+                        <div class="mt-4 pt-3 border-top border-secondary">
+                            <p class="text-white-50 small">
+                                <i class="bi bi-headset me-2 text-gold"></i>
+                                ¿Necesitas ayuda? 
+                                <a href="#" class="link-yellow">Contáctanos</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="base :: footer"></div>
+    
+    <script>
+        // Variables globales
+        let currentStep = 1;
+        let selectedPaymentMethod = 'card';
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar máscara de tarjeta
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', formatCardNumber);
+                cardNumberInput.addEventListener('focus', showCardPreview);
+                cardNumberInput.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        hideCardPreview();
+                    }
+                });
+            }
+            
+            // Configurar CVV
+            const cvvInput = document.getElementById('cardCVV');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/\D/g, '');
+                });
+            }
+            
+            // Configurar fecha actual para confirmación
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('confirmationDate').textContent = formattedDate;
+        });
+        
+        // Navegación entre pasos
+        function goToPayment() {
+            if (!validateShippingInfo()) {
+                return;
+            }
+            
+            document.getElementById('shippingSection').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+            currentStep = 2;
+            updateStepIndicator();
+        }
+        
+        function goBackToShipping() {
+            document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('shippingSection').style.display = 'block';
+            currentStep = 1;
+            updateStepIndicator();
+        }
+        
+        function updateStepIndicator() {
+            document.querySelectorAll('.step-checkout').forEach(step => {
+                step.classList.remove('active', 'completed');
+                const stepNumber = parseInt(step.dataset.step);
+                
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+        
+        // Validación de información de envío
+        function validateShippingInfo() {
+            const requiredFields = [
+                'shippingFirstName',
+                'shippingLastName',
+                'shippingAddress',
+                'shippingCity',
+                'shippingState',
+                'shippingZip',
+                'shippingEmail',
+                'shippingPhone'
+            ];
+            
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validación específica de email
+            const emailField = document.getElementById('shippingEmail');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailField.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                showNotification('Por favor, completa todos los campos requeridos', 'warning');
+            }
+            
+            return isValid;
+        }
+        
+        // Selección de método de pago
+        function selectPaymentMethod(method) {
+            // Remover selección anterior
+            document.querySelectorAll('.payment-method').forEach(pm => {
+                pm.classList.remove('selected');
+            });
+            
+            // Añadir selección nueva
+            document.getElementById(`${method}Method`).classList.add('selected');
+            selectedPaymentMethod = method;
+            
+            // Mostrar formulario correspondiente
+            document.querySelectorAll('#cardForm, #paypalForm, #oxxoForm, #giftcardForm').forEach(form => {
+                form.style.display = 'none';
+            });
+            
+            document.getElementById(`${method}Form`).style.display = 'block';
+            
+            // Actualizar método en confirmación
+            let methodText = '';
+            switch(method) {
+                case 'card': methodText = 'Tarjeta de crédito'; break;
+                case 'paypal': methodText = 'PayPal'; break;
+                case 'oxxo': methodText = 'Pago en OXXO'; break;
+                case 'giftcard': methodText = 'Tarjeta de regalo'; break;
+            }
+            document.getElementById('confirmationMethod').textContent = methodText;
+            
+            // Generar referencia OXXO si es necesario
+            if (method === 'oxxo') {
+                generateOxxoReference();
+            }
+            
+            // Actualizar detalles de envío en confirmación
+            updateShippingConfirmation();
+        }
+        
+        // Formatear número de tarjeta
+        function formatCardNumber() {
+            let cardNumber = this.value.replace(/\D/g, '');
+            cardNumber = cardNumber.substring(0, 16);
+            
+            // Agrupar en bloques de 4
+            let formatted = '';
+            for (let i = 0; i < cardNumber.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += cardNumber[i];
+            }
+            
+            this.value = formatted;
+            
+            // Actualizar vista previa
+            updateCardPreview(cardNumber);
+        }
+        
+        function showCardPreview() {
+            document.getElementById('cardPreview').style.display = 'flex';
+        }
+        
+        function hideCardPreview() {
+            document.getElementById('cardPreview').style.display = 'none';
+        }
+        
+        function updateCardPreview(cardNumber) {
+            const preview = document.getElementById('cardNumberPreview');
+            let masked = cardNumber.substring(0, 4) + ' **** **** ' + cardNumber.substring(12);
+            preview.textContent = masked.replace(/(.{4})/g, '$1 ');
+        }
+        
+        // Generar referencia OXXO
+        function generateOxxoReference() {
+            const reference = Math.random().toString().substring(2, 14);
+            const formatted = reference.replace(/(.{4})/g, '$1 ');
+            document.getElementById('oxxoReference').textContent = formatted;
+        }
+        
+        // Aplicar tarjeta de regalo
+        function applyGiftcard() {
+            const code = document.getElementById('giftcardCode').value;
+            if (code && code.length >= 10) {
+                showNotification('Tarjeta de regalo aplicada correctamente', 'success');
+            } else {
+                showNotification('Código de tarjeta inválido', 'warning');
+            }
+        }
+        
+        // Procesar pago
+        function processPayment() {
+            // Validar según el método de pago
+            if (selectedPaymentMethod === 'card' && !validateCardInfo()) {
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Simular procesamiento de pago
+            setTimeout(() => {
+                // Ocultar loading
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Mostrar confirmación
+                document.getElementById('paymentSection').style.display = 'none';
+                document.getElementById('confirmationSection').style.display = 'block';
+                document.getElementById('successAnimation').style.display = 'block';
+                
+                currentStep = 3;
+                updateStepIndicator();
+                
+                // Vaciar carrito
+                updateCartBadge(0);
+            }, 2000);
+        }
+        
+        // Validar información de tarjeta
+        function validateCardInfo() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardName = document.getElementById('cardName').value;
+            const cardMonth = document.getElementById('cardMonth').value;
+            const cardYear = document.getElementById('cardYear').value;
+            const cardCVV = document.getElementById('cardCVV').value;
+            
+            let isValid = true;
+            
+            // Validar número de tarjeta (simplificado)
+            if (cardNumber.length < 16) {
+                document.getElementById('cardNumber').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('cardNumber').classList.remove('is-invalid');
+            }
+            
+            // Validar nombre
+            if (!cardName.trim()) {
+                document.getElementById('cardName').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('cardName').classList.remove('is-invalid');
+            }
+            
+            // Validar fecha
+            if (!cardMonth || !cardYear) {
+                document.getElementById('cardMonth').classList.add('is-invalid');
+                document.getElementById('cardYear').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('cardMonth').classList.remove('is-invalid');
+                document.getElementById('cardYear').classList.remove('is-invalid');
+            }
+            
+            // Validar CVV
+            if (cardCVV.length < 3) {
+                document.getElementById('cardCVV').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('cardCVV').classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                showNotification('Por favor, completa todos los campos de la tarjeta', 'warning');
+            }
+            
+            return isValid;
+        }
+        
+        // Actualizar detalles de envío en confirmación
+        function updateShippingConfirmation() {
+            const firstName = document.getElementById('shippingFirstName').value;
+            const lastName = document.getElementById('shippingLastName').value;
+            const address = document.getElementById('shippingAddress').value;
+            const city = document.getElementById('shippingCity').value;
+            const state = document.getElementById('shippingState').value;
+            
+            const shippingInfo = `${firstName} ${lastName}, ${address}, ${city}, ${state}`;
+            document.getElementById('confirmationShipping').textContent = shippingInfo;
+        }
+        
+        // Actualizar badge del carrito
+        function updateCartBadge(count) {
+            const badge = document.querySelector('.navbar .badge');
+            if (badge) {
+                badge.textContent = count;
+            }
+        }
+        
+        // Mostrar notificación
+        function showNotification(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+    </script>
+    
+    <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        
+        .is-invalid:focus {
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+    </style>
+</body>
+</html>

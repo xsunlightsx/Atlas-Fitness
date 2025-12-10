@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(pageTitle, pageStyles, pageScripts)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - ATLAS FITNESS'">ATLAS FITNESS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-yellow: #FFD700;
+            --primary-white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--primary-black);
+            color: var(--primary-white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: var(--primary-white) !important;
+            font-weight: 500;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-yellow) !important;
+        }
+        
+        .navbar-toggler {
+            border-color: var(--primary-yellow);
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 215, 0, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Main Content */
+        main {
+            flex: 1;
+            padding-top: 20px;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: #111111;
+            border-top: 2px solid var(--primary-yellow);
+        }
+        
+        .footer-links a {
+            color: var(--primary-white);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-yellow);
+        }
+        
+        /* Botones personalizados */
+        .btn-gold {
+            background-color: var(--primary-yellow);
+            color: var(--primary-black);
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-gold:hover {
+            background-color: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-outline-gold {
+            border: 2px solid var(--primary-yellow);
+            color: var(--primary-yellow);
+            background-color: transparent;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-gold:hover {
+            background-color: var(--primary-yellow);
+            color: var(--primary-black);
+        }
+        
+        /* Utilidades */
+        .bg-dark-gray {
+            background-color: var(--dark-gray) !important;
+        }
+        
+        .text-gold {
+            color: var(--primary-yellow) !important;
+        }
+        
+        .bg-gold {
+            background-color: var(--primary-yellow) !important;
+        }
+        
+        .border-gold {
+            border-color: var(--primary-yellow) !important;
+        }
+        
+        .card-gym {
+            background-color: #111111;
+            border: 1px solid #333333;
+            border-radius: 10px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .card-gym:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-yellow);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 40px;
+        }
+        
+        /* Estilos de iconos */
+        .icon-large {
+            font-size: 2.5rem;
+        }
+        
+        /* Productos */
+        .product-card {
+            overflow: hidden;
+        }
+        
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+        
+        /* Perfil de usuario */
+        .profile-sidebar {
+            border-right: 2px solid var(--primary-yellow);
+        }
+        
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 4px solid var(--primary-yellow);
+        }
+        
+        /* Carrito */
+        .cart-item {
+            border-bottom: 1px solid #333;
+            padding: 15px 0;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .profile-sidebar {
+                border-right: none;
+                border-bottom: 2px solid var(--primary-yellow);
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+            }
+        }
+    </style>
+    
+    <!-- Estilos específicos de cada página -->
+    <th:block th:replace="${pageStyles} ?: ~{}"></th:block>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header th:fragment="header">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-black);">
+            <div class="container">
+                <a class="navbar-brand text-gold" th:href="@{/}">
+                    <i class="bi bi-activity me-2"></i>ATLAS FITNESS
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="bi bi-house-door me-1"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/productos/catalogo}">
+                                <i class="bi bi-shop me-1"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/cliente/rutinas}">
+                                <i class="bi bi-calendar-check me-1"></i> Rutinas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/cliente/membresia}">
+                                <i class="bi bi-award me-1"></i> Membresía
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center">
+                        <a th:href="@{/carrito/carrito}" class="btn btn-outline-gold me-3 position-relative">
+                            <i class="bi bi-cart3"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
+                        </a>
+                        
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle icon-large me-2 text-gold"></i>
+                                <span>Cuenta</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/cliente/perfil}">
+                                        <i class="bi bi-person me-2"></i> Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/cliente/historial}">
+                                        <i class="bi bi-clock-history me-2"></i> Historial
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/auth/login}">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/auth/registro}">
+                                        <i class="bi bi-person-plus me-2"></i> Registrarse
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal (varía en cada página) -->
+    <main>
+        <!-- Este contenido será reemplazado por cada página -->
+    </main>
+
+    <!-- Footer -->
+    <footer th:fragment="footer" class="py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="text-gold">
+                        <i class="bi bi-activity me-2"></i>ATLAS FITNESS
+                    </h5>
+                    <p class="text-white-50">
+                        Tu fuerza, nuestro compromiso. Transformamos vidas a través del fitness y la disciplina.
+                    </p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook icon-large"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram icon-large"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter icon-large"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-youtube icon-large"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4 footer-links">
+                    <h6 class="text-gold">Enlaces Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li><a th:href="@{/productos/catalogo}">Productos</a></li>
+                        <li><a th:href="@{/cliente/rutinas}">Rutinas</a></li>
+                        <li><a th:href="@{/cliente/membresia}">Membresías</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4 footer-links">
+                    <h6 class="text-gold">Mi Cuenta</h6>
+                    <ul class="list-unstyled">
+                        <li><a th:href="@{/cliente/perfil}">Mi Perfil</a></li>
+                        <li><a th:href="@{/cliente/historial}">Historial</a></li>
+                        <li><a th:href="@{/carrito/carrito}">Carrito</a></li>
+                        <li><a th:href="@{/carrito/checkout}">Checkout</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-gold">Contacto</h6>
+                    <p class="text-white-50 mb-1">
+                        <i class="bi bi-geo-alt-fill text-gold me-2"></i> Av. Fitness 123, Ciudad
+                    </p>
+                    <p class="text-white-50 mb-1">
+                        <i class="bi bi-telephone-fill text-gold me-2"></i> (123) 456-7890
+                    </p>
+                    <p class="text-white-50">
+                        <i class="bi bi-envelope-fill text-gold me-2"></i> info@atlasfitness.com
+                    </p>
+                </div>
+            </div>
+            
+            <hr class="bg-secondary">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-white-50">
+                        &copy; 2023 ATLAS FITNESS. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white-50 me-3">Política de Privacidad</a>
+                    <a href="#" class="text-white-50">Términos y Condiciones</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts específicos de cada página -->
+    <th:block th:replace="${pageScripts} ?: ~{}"></th:block>
+</body>
+</html>

@@ -1,36 +1,16 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATLAS FITNESS - Registro</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<head th:replace="base :: head('Registro', ~{::style}, ~{::script})">
     <style>
-        :root {
-            --primary-black: #000000;
-            --primary-yellow: #FFD700;
-            --primary-white: #FFFFFF;
-            --light-gray: #F5F5F5;
-            --dark-gray: #333333;
-        }
-        
-        body {
-            background-color: var(--primary-black);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            font-family: 'Arial', sans-serif;
-        }
+        /* Estilos específicos para registro */
         .register-container {
-            background: var(--primary-white);
+            background: linear-gradient(135deg, #000, #111);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
             border: 2px solid var(--primary-yellow);
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
         }
+        
         .register-header {
             background: var(--primary-black);
             color: var(--primary-yellow);
@@ -38,327 +18,894 @@
             text-align: center;
             border-bottom: 3px solid var(--primary-yellow);
         }
+        
         .register-body {
             padding: 2rem;
-            background: var(--light-gray);
+            background: #111;
         }
-        .form-control {
+        
+        .step-indicator-register {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step-indicator-register::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background-color: #333;
+            z-index: 1;
+        }
+        
+        .step-register {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-circle-register {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+        }
+        
+        .step-register.active .step-circle-register {
+            background-color: var(--primary-yellow);
+            color: var(--primary-black);
+        }
+        
+        .step-register.active .step-text-register {
+            color: var(--primary-yellow);
+        }
+        
+        .step-text-register {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-control-gym {
+            background-color: #000;
+            border: 2px solid #333;
+            color: white;
             border-radius: 8px;
-            padding: 12px 15px;
-            border: 2px solid var(--dark-gray);
+            padding: 12px;
             transition: all 0.3s;
-            background: var(--primary-white);
         }
-        .form-control:focus {
+        
+        .form-control-gym:focus {
+            background-color: #000;
             border-color: var(--primary-yellow);
+            color: white;
             box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
         }
+        
+        .form-label-gym {
+            color: var(--primary-yellow);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-gym .form-check-input:checked {
+            background-color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+        }
+        
+        .checkbox-gym .form-check-label {
+            color: #ccc;
+        }
+        
         .btn-register {
             background: var(--primary-black);
             border: 2px solid var(--primary-yellow);
             color: var(--primary-yellow);
-            padding: 12px;
+            padding: 12px 30px;
             border-radius: 8px;
             font-weight: bold;
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        
         .btn-register:hover {
             background: var(--primary-yellow);
             color: var(--primary-black);
             border-color: var(--primary-black);
             transform: translateY(-2px);
         }
+        
         .password-strength {
             height: 5px;
-            border-radius: 5px;
+            background-color: #333;
+            border-radius: 3px;
             margin-top: 5px;
-            background: var(--dark-gray);
+            overflow: hidden;
         }
-        .strength-meter {
+        
+        .password-strength-bar {
             height: 100%;
-            border-radius: 5px;
-            background: var(--primary-yellow);
             width: 0%;
+            border-radius: 3px;
             transition: width 0.3s;
         }
-        .fitness-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--primary-yellow);
-        }
-        .password-toggle {
-            cursor: pointer;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--dark-gray);
-        }
-        .text-yellow {
-            color: var(--primary-yellow) !important;
-        }
-        .text-black {
-            color: var(--primary-black) !important;
-        }
-        .link-yellow {
-            color: var(--primary-yellow);
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .link-yellow:hover {
-            color: var(--primary-black);
-            text-decoration: underline;
-        }
+        
+        .strength-weak { background-color: #dc3545; }
+        .strength-medium { background-color: #ffc107; }
+        .strength-strong { background-color: #28a745; }
+        
         .requirements-list {
             list-style: none;
-            padding-left: 0;
-            font-size: 0.9rem;
+            padding: 0;
+            margin-top: 10px;
         }
+        
         .requirements-list li {
+            color: #666;
+            font-size: 0.85rem;
             margin-bottom: 5px;
         }
+        
         .requirements-list li.valid {
-            color: #198754;
+            color: #28a745;
         }
-        .requirements-list li.invalid {
-            color: #dc3545;
+        
+        .requirements-list li.valid::before {
+            content: '✓ ';
         }
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
+        
+        .membership-option {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .step-indicator::before {
-            content: "";
-            position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--dark-gray);
-            z-index: 1;
+        
+        .membership-option:hover {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 215, 0, 0.05);
         }
-        .step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--dark-gray);
-            color: var(--primary-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        .membership-option.selected {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .membership-price {
+            font-size: 2rem;
             font-weight: bold;
-            position: relative;
-            z-index: 2;
+            color: var(--primary-yellow);
         }
-        .step.active {
-            background: var(--primary-yellow);
-            color: var(--primary-black);
+        
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .benefits-list li {
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .benefits-list li i {
+            color: var(--primary-yellow);
+            margin-right: 10px;
+        }
+        
+        .fitness-goal-card {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .fitness-goal-card:hover {
+            border-color: var(--primary-yellow);
+            transform: translateY(-5px);
+        }
+        
+        .fitness-goal-card.selected {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .goal-icon {
+            font-size: 2.5rem;
+            color: var(--primary-yellow);
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-group-text-gym {
+            background-color: #000;
+            border: 2px solid #333;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-7">
-                <div class="register-container">
-                    <!-- Header -->
-                    <div class="register-header">
-                        <i class="bi bi-person-plus-fill fitness-icon"></i>
-                        <h1 class="h3 mb-3 fw-bold">CREAR CUENTA</h1>
-                        <p class="mb-0">Únete a la familia ATLAS FITNESS</p>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="register-body">
-                        <!-- Mensajes -->
-                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <span th:text="${error}"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        
-                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            <span th:text="${success}"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div th:replace="base :: header"></div>
+    
+    <main th:fragment="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="register-container">
+                        <!-- Header -->
+                        <div class="register-header">
+                            <i class="bi bi-person-plus-fill fitness-icon" style="font-size: 3rem;"></i>
+                            <h1 class="h3 mb-3 fw-bold">CREA TU CUENTA</h1>
+                            <p class="mb-0">Únete a ATLAS FITNESS y comienza tu transformación</p>
                         </div>
 
-                        <!-- Formulario -->
-                        <form th:action="@{/auth/registro}" method="post" id="registerForm">
-                            <div class="row g-3">
-                                <!-- Columna Izquierda -->
-                                <div class="col-md-6">
-                                    <h5 class="fw-bold text-black mb-3 border-bottom pb-2">
-                                        <i class="bi bi-person-badge text-yellow me-2"></i>Información Personal
-                                    </h5>
-                                    
-                                    <div class="mb-3">
-                                        <label for="nombre" class="form-label fw-bold text-black">
-                                            Nombre Completo *
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="nombre" 
-                                               name="nombre"
-                                               placeholder="Ej: Juan Pérez"
-                                               required>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label fw-bold text-black">
-                                            <i class="bi bi-envelope-fill text-yellow me-2"></i>Email *
-                                        </label>
-                                        <input type="email" 
-                                               class="form-control" 
-                                               id="email" 
-                                               name="email"
-                                               placeholder="tucorreo@ejemplo.com"
-                                               required>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="telefono" class="form-label fw-bold text-black">
-                                            <i class="bi bi-telephone-fill text-yellow me-2"></i>Teléfono
-                                        </label>
-                                        <input type="tel" 
-                                               class="form-control" 
-                                               id="telefono" 
-                                               name="telefono"
-                                               placeholder="+52 123 456 7890">
-                                    </div>
+                        <!-- Body -->
+                        <div class="register-body">
+                            <!-- Indicador de pasos -->
+                            <div class="step-indicator-register">
+                                <div class="step-register active" data-step="1">
+                                    <div class="step-circle-register">1</div>
+                                    <div class="step-text-register">Datos Personales</div>
                                 </div>
-                                
-                                <!-- Columna Derecha -->
-                                <div class="col-md-6">
-                                    <h5 class="fw-bold text-black mb-3 border-bottom pb-2">
-                                        <i class="bi bi-shield-lock text-yellow me-2"></i>Seguridad
-                                    </h5>
+                                <div class="step-register" data-step="2">
+                                    <div class="step-circle-register">2</div>
+                                    <div class="step-text-register">Membresía</div>
+                                </div>
+                                <div class="step-register" data-step="3">
+                                    <div class="step-circle-register">3</div>
+                                    <div class="step-text-register">Metas</div>
+                                </div>
+                                <div class="step-register" data-step="4">
+                                    <div class="step-circle-register">4</div>
+                                    <div class="step-text-register">Confirmación</div>
+                                </div>
+                            </div>
+
+                            <!-- Formulario -->
+                            <form id="registerForm" th:action="@{/auth/registro}" method="post">
+                                <!-- Paso 1: Datos Personales -->
+                                <div class="form-step active" id="step1">
+                                    <h4 class="text-white mb-4">
+                                        <i class="bi bi-person-lines-fill me-2 text-gold"></i>INFORMACIÓN PERSONAL
+                                    </h4>
                                     
-                                    <div class="mb-3">
-                                        <label for="username" class="form-label fw-bold text-black">
-                                            <i class="bi bi-person-fill text-yellow me-2"></i>Nombre de Usuario *
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="username" 
-                                               name="username"
-                                               placeholder="Elige un nombre de usuario"
-                                               required>
-                                    </div>
-                                    
-                                    <div class="mb-3 position-relative">
-                                        <label for="password" class="form-label fw-bold text-black">
-                                            <i class="bi bi-lock-fill text-yellow me-2"></i>Contraseña *
-                                        </label>
-                                        <input type="password" 
-                                               class="form-control" 
-                                               id="password" 
-                                               name="password"
-                                               placeholder="Mínimo 8 caracteres"
-                                               required
-                                               onkeyup="checkPasswordStrength()">
-                                        <span class="password-toggle" onclick="togglePassword('password')">
-                                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
-                                        </span>
-                                        <div class="password-strength">
-                                            <div class="strength-meter" id="passwordStrength"></div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Nombre *</label>
+                                            <input type="text" class="form-control form-control-gym" id="firstName" required>
+                                            <div class="error-message" id="firstNameError"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Apellido *</label>
+                                            <input type="text" class="form-control form-control-gym" id="lastName" required>
+                                            <div class="error-message" id="lastNameError"></div>
                                         </div>
                                     </div>
                                     
-                                    <div class="mb-3 position-relative">
-                                        <label for="confirmPassword" class="form-label fw-bold text-black">
-                                            <i class="bi bi-lock-fill text-yellow me-2"></i>Confirmar Contraseña *
-                                        </label>
-                                        <input type="password" 
-                                               class="form-control" 
-                                               id="confirmPassword" 
-                                               name="confirmPassword"
-                                               placeholder="Repite tu contraseña"
-                                               required
-                                               onkeyup="checkPasswordMatch()">
-                                        <span class="password-toggle" onclick="togglePassword('confirmPassword')">
-                                            <i class="bi bi-eye" id="toggleConfirmIcon"></i>
-                                        </span>
-                                        <div class="mt-1" id="passwordMatch"></div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Email *</label>
+                                            <input type="email" class="form-control form-control-gym" id="email" required>
+                                            <div class="error-message" id="emailError"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Teléfono</label>
+                                            <input type="tel" class="form-control form-control-gym" id="phone">
+                                        </div>
                                     </div>
                                     
-                                    <!-- Requisitos de contraseña -->
-                                    <div class="card border-yellow mb-3">
-                                        <div class="card-body p-2">
-                                            <small class="text-black fw-bold">La contraseña debe contener:</small>
-                                            <ul class="requirements-list mt-2 mb-0">
-                                                <li id="req-length" class="invalid">
-                                                    <i class="bi bi-x-circle me-1"></i>Mínimo 8 caracteres
-                                                </li>
-                                                <li id="req-uppercase" class="invalid">
-                                                    <i class="bi bi-x-circle me-1"></i>Una mayúscula
-                                                </li>
-                                                <li id="req-lowercase" class="invalid">
-                                                    <i class="bi bi-x-circle me-1"></i>Una minúscula
-                                                </li>
-                                                <li id="req-number" class="invalid">
-                                                    <i class="bi bi-x-circle me-1"></i>Un número
-                                                </li>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Fecha de Nacimiento *</label>
+                                            <input type="date" class="form-control form-control-gym" id="birthDate" required>
+                                            <div class="error-message" id="birthDateError"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Género</label>
+                                            <select class="form-control form-control-gym" id="gender">
+                                                <option value="">Seleccionar</option>
+                                                <option value="male">Masculino</option>
+                                                <option value="female">Femenino</option>
+                                                <option value="other">Otro</option>
+                                                <option value="prefer-not">Prefiero no decirlo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Contraseña *</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control form-control-gym" id="password" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="password-strength">
+                                                <div class="password-strength-bar" id="passwordStrength"></div>
+                                            </div>
+                                            <ul class="requirements-list" id="passwordRequirements">
+                                                <li id="reqLength">Mínimo 8 caracteres</li>
+                                                <li id="reqUpper">Al menos una mayúscula</li>
+                                                <li id="reqNumber">Al menos un número</li>
+                                                <li id="reqSpecial">Al menos un carácter especial</li>
                                             </ul>
+                                            <div class="error-message" id="passwordError"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label-gym">Confirmar Contraseña *</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control form-control-gym" id="confirmPassword" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="error-message" id="confirmPasswordError"></div>
                                         </div>
                                     </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <div></div> <!-- Espaciador -->
+                                        <button type="button" class="btn btn-register" onclick="nextStep(2)">
+                                            Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Términos y condiciones -->
-                            <div class="mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" 
-                                           type="checkbox" 
-                                           id="terms" 
-                                           name="terms"
-                                           required>
-                                    <label class="form-check-label text-black" for="terms">
-                                        Acepto los 
-                                        <a href="#" class="link-yellow">Términos y Condiciones</a> 
-                                        y la 
-                                        <a href="#" class="link-yellow">Política de Privacidad</a>
-                                    </label>
+
+                                <!-- Paso 2: Membresía -->
+                                <div class="form-step" id="step2">
+                                    <h4 class="text-white mb-4">
+                                        <i class="bi bi-award me-2 text-gold"></i>SELECCIONA TU MEMBRESÍA
+                                    </h4>
+                                    
+                                    <p class="text-white-50 mb-4">
+                                        Elige el plan que mejor se adapte a tus necesidades. Puedes cambiar en cualquier momento.
+                                    </p>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="membership-option" onclick="selectMembership('basic')">
+                                                <h5 class="text-white">BÁSICO</h5>
+                                                <div class="membership-price">$29</div>
+                                                <small class="text-white-50">/mes</small>
+                                                
+                                                <ul class="benefits-list">
+                                                    <li><i class="bi bi-check-circle"></i> Acceso a zona de pesas</li>
+                                                    <li><i class="bi bi-check-circle"></i> Uso de vestidores</li>
+                                                    <li><i class="bi bi-x-circle text-secondary"></i> Clases grupales</li>
+                                                    <li><i class="bi bi-x-circle text-secondary"></i> Entrenador personal</li>
+                                                </ul>
+                                                
+                                                <div class="text-center">
+                                                    <span class="badge bg-secondary">POPULAR PARA PRINCIPIANTES</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="membership-option selected" onclick="selectMembership('pro')" id="proMembership">
+                                                <h5 class="text-white">PRO</h5>
+                                                <div class="membership-price">$49</div>
+                                                <small class="text-white-50">/mes</small>
+                                                
+                                                <ul class="benefits-list">
+                                                    <li><i class="bi bi-check-circle"></i> Todo del plan Básico</li>
+                                                    <li><i class="bi bi-check-circle"></i> Clases grupales ilimitadas</li>
+                                                    <li><i class="bi bi-check-circle"></i> 2 sesiones con entrenador</li>
+                                                    <li><i class="bi bi-check-circle"></i> Acceso 24/7</li>
+                                                </ul>
+                                                
+                                                <div class="text-center">
+                                                    <span class="badge bg-warning text-dark">MÁS POPULAR</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="membership-option" onclick="selectMembership('premium')">
+                                                <h5 class="text-white">PREMIUM</h5>
+                                                <div class="membership-price">$79</div>
+                                                <small class="text-white-50">/mes</small>
+                                                
+                                                <ul class="benefits-list">
+                                                    <li><i class="bi bi-check-circle"></i> Todo del plan Pro</li>
+                                                    <li><i class="bi bi-check-circle"></i> Entrenador personal 4x/mes</li>
+                                                    <li><i class="bi bi-check-circle"></i> Suplementos mensuales</li>
+                                                    <li><i class="bi bi-check-circle"></i> Plan nutricional</li>
+                                                </ul>
+                                                
+                                                <div class="text-center">
+                                                    <span class="badge bg-gold text-black">RECOMENDADO</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" id="selectedMembership" value="pro">
+                                    
+                                    <div class="mt-4">
+                                        <div class="form-check checkbox-gym">
+                                            <input class="form-check-input" type="checkbox" id="autoRenewal" checked>
+                                            <label class="form-check-label" for="autoRenewal">
+                                                Renovación automática mensual
+                                            </label>
+                                        </div>
+                                        <small class="text-white-50">Puedes cancelar en cualquier momento desde tu perfil.</small>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-gold" onclick="prevStep(1)">
+                                            <i class="bi bi-arrow-left me-2"></i> Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-register" onclick="nextStep(3)">
+                                            Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <!-- Paso 3: Metas de Fitness -->
+                                <div class="form-step" id="step3">
+                                    <h4 class="text-white mb-4">
+                                        <i class="bi bi-bullseye me-2 text-gold"></i>TUS METAS DE FITNESS
+                                    </h4>
+                                    
+                                    <p class="text-white-50 mb-4">
+                                        Ayúdanos a personalizar tu experiencia según tus objetivos
+                                    </p>
+                                    
+                                    <div class="row mb-4">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Nivel de Experiencia</label>
+                                            <select class="form-control form-control-gym" id="experienceLevel">
+                                                <option value="">Seleccionar</option>
+                                                <option value="beginner">Principiante (0-6 meses)</option>
+                                                <option value="intermediate" selected>Intermedio (6 meses - 2 años)</option>
+                                                <option value="advanced">Avanzado (2+ años)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label-gym">Frecuencia Semanal</label>
+                                            <select class="form-control form-control-gym" id="frequency">
+                                                <option value="">Seleccionar</option>
+                                                <option value="1-2">1-2 días por semana</option>
+                                                <option value="3-4" selected>3-4 días por semana</option>
+                                                <option value="5+">5+ días por semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <h5 class="text-white mb-3">Selecciona tus objetivos principales</h5>
+                                    
+                                    <div class="row mb-4">
+                                        <div class="col-md-3 col-6 mb-3">
+                                            <div class="fitness-goal-card" onclick="selectGoal(this, 'weightLoss')">
+                                                <div class="goal-icon">
+                                                    <i class="bi bi-arrow-down-circle-fill"></i>
+                                                </div>
+                                                <h6 class="text-white">Perder Peso</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6 mb-3">
+                                            <div class="fitness-goal-card selected" onclick="selectGoal(this, 'muscleGain')" id="muscleGoal">
+                                                <div class="goal-icon">
+                                                    <i class="bi bi-arrow-up-circle-fill"></i>
+                                                </div>
+                                                <h6 class="text-white">Ganar Músculo</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6 mb-3">
+                                            <div class="fitness-goal-card" onclick="selectGoal(this, 'strength')">
+                                                <div class="goal-icon">
+                                                    <i class="bi bi-lightning-charge-fill"></i>
+                                                </div>
+                                                <h6 class="text-white">Más Fuerza</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-6 mb-3">
+                                            <div class="fitness-goal-card" onclick="selectGoal(this, 'endurance')">
+                                                <div class="goal-icon">
+                                                    <i class="bi bi-heart-pulse-fill"></i>
+                                                </div>
+                                                <h6 class="text-white">Resistencia</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" id="selectedGoals" value="muscleGain">
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label-gym">¿Alguna lesión o condición médica que debamos conocer?</label>
+                                        <textarea class="form-control form-control-gym" id="medicalInfo" rows="3" placeholder="Opcional"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-check checkbox-gym mb-4">
+                                        <input class="form-check-input" type="checkbox" id="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            Acepto los <a href="#" class="link-yellow">Términos y Condiciones</a> y la <a href="#" class="link-yellow">Política de Privacidad</a> *
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check checkbox-gym mb-4">
+                                        <input class="form-check-input" type="checkbox" id="newsletter" checked>
+                                        <label class="form-check-label" for="newsletter">
+                                            Deseo recibir ofertas especiales y consejos de fitness por email
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-gold" onclick="prevStep(2)">
+                                            <i class="bi bi-arrow-left me-2"></i> Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-register" onclick="nextStep(4)">
+                                            Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Paso 4: Confirmación -->
+                                <div class="form-step" id="step4">
+                                    <h4 class="text-white mb-4">
+                                        <i class="bi bi-check-circle-fill me-2 text-gold"></i>CONFIRMA TU REGISTRO
+                                    </h4>
+                                    
+                                    <div class="card card-gym p-4 mb-4">
+                                        <h5 class="text-white mb-3">Resumen de tu registro</h5>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="text-gold">Información Personal</h6>
+                                                <p class="text-white-50 mb-1" id="summaryName"></p>
+                                                <p class="text-white-50 mb-1" id="summaryEmail"></p>
+                                                <p class="text-white-50" id="summaryPhone"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-gold">Membresía</h6>
+                                                <p class="text-white-50 mb-1" id="summaryMembership"></p>
+                                                <p class="text-white-50" id="summaryRenewal"></p>
+                                            </div>
+                                        </div>
+                                        
+                                        <hr class="border-secondary my-3">
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="text-gold">Metas de Fitness</h6>
+                                                <p class="text-white-50 mb-1" id="summaryExperience"></p>
+                                                <p class="text-white-50 mb-1" id="summaryFrequency"></p>
+                                                <p class="text-white-50" id="summaryGoals"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-gold">Detalles de Pago</h6>
+                                                <p class="text-white-50 mb-1">Pago mensual: <span id="summaryPrice" class="text-white fw-bold"></span></p>
+                                                <p class="text-white-50">Primer cargo: Hoy</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert alert-dark border-gold mb-4">
+                                        <i class="bi bi-info-circle-fill text-gold me-2"></i>
+                                        <span class="text-white">Al hacer clic en "Completar Registro", serás redirigido a nuestra pasarela de pago segura para procesar tu primer pago.</span>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-gold" onclick="prevStep(3)">
+                                            <i class="bi bi-arrow-left me-2"></i> Anterior
+                                        </button>
+                                        <button type="submit" class="btn btn-register">
+                                            <i class="bi bi-check-circle me-2"></i> COMPLETAR REGISTRO
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                             
-                            <!-- Botones -->
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-register">
-                                    <i class="bi bi-person-plus-fill me-2"></i>CREAR CUENTA
-                                </button>
-                                
-                                <a th:href="@{/auth/login}" class="btn btn-outline-dark">
-                                    <i class="bi bi-arrow-left me-2"></i>Ya tengo cuenta
-                                </a>
+                            <!-- Enlace a inicio de sesión -->
+                            <div class="text-center mt-4 pt-3 border-top border-secondary">
+                                <p class="text-white-50 mb-0">
+                                    ¿Ya tienes una cuenta?
+                                    <a th:href="@{/auth/login}" class="link-yellow fw-bold ms-2">
+                                        Inicia Sesión
+                                    </a>
+                                </p>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Footer -->
-                <div class="text-center mt-4">
-                    <p class="text-white mb-0">
-                        <i class="bi bi-info-circle text-yellow me-2"></i>
-                        Todos los campos marcados con * son obligatorios
-                    </p>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
+    
+    <div th:replace="base :: footer"></div>
     
     <script>
-        // Toggle password visibility
-        function togglePassword(fieldId) {
-            const input = document.getElementById(fieldId);
-            const icon = document.getElementById(fieldId === 'password' ? 'togglePasswordIcon' : 'toggleConfirmIcon');
+        // Variables globales
+        let currentStep = 1;
+        const totalSteps = 4;
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar eventos
+            setupEventListeners();
+            updateStepIndicator();
+            
+            // Mostrar resumen inicial
+            updateSummary();
+        });
+        
+        function setupEventListeners() {
+            // Validación de contraseña en tiempo real
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', validatePassword);
+            }
+            
+            // Validación de confirmación de contraseña
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+            }
+            
+            // Actualizar resumen cuando cambian los datos
+            document.querySelectorAll('#firstName, #lastName, #email, #phone').forEach(input => {
+                input.addEventListener('input', updateSummary);
+            });
+        }
+        
+        // Navegación entre pasos
+        function nextStep(step) {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+            
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            updateStepIndicator();
+            
+            if (step === 4) {
+                updateSummary();
+            }
+        }
+        
+        function prevStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            updateStepIndicator();
+        }
+        
+        function updateStepIndicator() {
+            document.querySelectorAll('.step-register').forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) <= currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+        
+        // Validación de pasos
+        function validateStep(step) {
+            let isValid = true;
+            
+            switch(step) {
+                case 1:
+                    isValid = validateStep1();
+                    break;
+                case 2:
+                    isValid = validateStep2();
+                    break;
+                case 3:
+                    isValid = validateStep3();
+                    break;
+            }
+            
+            return isValid;
+        }
+        
+        function validateStep1() {
+            let isValid = true;
+            
+            // Validar nombre
+            const firstName = document.getElementById('firstName');
+            if (!firstName.value.trim()) {
+                showError('firstNameError', 'El nombre es requerido');
+                isValid = false;
+            } else {
+                hideError('firstNameError');
+            }
+            
+            // Validar apellido
+            const lastName = document.getElementById('lastName');
+            if (!lastName.value.trim()) {
+                showError('lastNameError', 'El apellido es requerido');
+                isValid = false;
+            } else {
+                hideError('lastNameError');
+            }
+            
+            // Validar email
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim()) {
+                showError('emailError', 'El email es requerido');
+                isValid = false;
+            } else if (!emailRegex.test(email.value)) {
+                showError('emailError', 'Ingresa un email válido');
+                isValid = false;
+            } else {
+                hideError('emailError');
+            }
+            
+            // Validar fecha de nacimiento
+            const birthDate = document.getElementById('birthDate');
+            if (!birthDate.value) {
+                showError('birthDateError', 'La fecha de nacimiento es requerida');
+                isValid = false;
+            } else {
+                const birth = new Date(birthDate.value);
+                const today = new Date();
+                const age = today.getFullYear() - birth.getFullYear();
+                
+                if (age < 16) {
+                    showError('birthDateError', 'Debes tener al menos 16 años');
+                    isValid = false;
+                } else {
+                    hideError('birthDateError');
+                }
+            }
+            
+            // Validar contraseña
+            if (!validatePassword()) {
+                isValid = false;
+            }
+            
+            // Validar confirmación de contraseña
+            if (!validateConfirmPassword()) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function validateStep2() {
+            // La membresía siempre está seleccionada por defecto
+            return true;
+        }
+        
+        function validateStep3() {
+            // Validar términos y condiciones
+            const terms = document.getElementById('terms');
+            if (!terms.checked) {
+                alert('Debes aceptar los términos y condiciones para continuar');
+                return false;
+            }
+            return true;
+        }
+        
+        // Validación de contraseña
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const requirements = document.getElementById('passwordRequirements');
+            let isValid = true;
+            let strength = 0;
+            
+            // Requisitos
+            const hasLength = password.length >= 8;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+            // Actualizar indicadores visuales
+            updateRequirement('reqLength', hasLength);
+            updateRequirement('reqUpper', hasUpper);
+            updateRequirement('reqNumber', hasNumber);
+            updateRequirement('reqSpecial', hasSpecial);
+            
+            // Calcular fortaleza
+            if (hasLength) strength += 25;
+            if (hasUpper) strength += 25;
+            if (hasNumber) strength += 25;
+            if (hasSpecial) strength += 25;
+            
+            // Actualizar barra
+            strengthBar.style.width = strength + '%';
+            
+            // Actualizar color
+            if (strength < 50) {
+                strengthBar.className = 'password-strength-bar strength-weak';
+                showError('passwordError', 'Contraseña débil');
+                isValid = false;
+            } else if (strength < 75) {
+                strengthBar.className = 'password-strength-bar strength-medium';
+                hideError('passwordError');
+            } else {
+                strengthBar.className = 'password-strength-bar strength-strong';
+                hideError('passwordError');
+            }
+            
+            // Validar todos los requisitos
+            if (!hasLength || !hasUpper || !hasNumber || !hasSpecial) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function validateConfirmPassword() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorElement = document.getElementById('confirmPasswordError');
+            
+            if (password !== confirmPassword) {
+                showError('confirmPasswordError', 'Las contraseñas no coinciden');
+                return false;
+            } else {
+                hideError('confirmPasswordError');
+                return true;
+            }
+        }
+        
+        // Funciones de utilidad
+        function updateRequirement(elementId, isValid) {
+            const element = document.getElementById(elementId);
+            if (isValid) {
+                element.classList.add('valid');
+            } else {
+                element.classList.remove('valid');
+            }
+        }
+        
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        function hideError(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'none';
+        }
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.parentElement.querySelector('button');
+            const icon = button.querySelector('i');
             
             if (input.type === 'password') {
                 input.type = 'text';
@@ -370,138 +917,151 @@
                 icon.classList.add('bi-eye');
             }
         }
-
-        // Check password strength
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthMeter = document.getElementById('passwordStrength');
-            const reqs = {
-                length: document.getElementById('req-length'),
-                uppercase: document.getElementById('req-uppercase'),
-                lowercase: document.getElementById('req-lowercase'),
-                number: document.getElementById('req-number')
-            };
+        
+        // Selección de membresía
+        function selectMembership(type) {
+            // Remover selección anterior
+            document.querySelectorAll('.membership-option').forEach(option => {
+                option.classList.remove('selected');
+            });
             
-            let strength = 0;
-            let totalReqs = 4;
-            let metReqs = 0;
+            // Añadir selección nueva
+            document.getElementById(`${type}Membership`).classList.add('selected');
+            document.getElementById('selectedMembership').value = type;
             
-            // Check length
-            if (password.length >= 8) {
-                strength += 25;
-                reqs.length.classList.remove('invalid');
-                reqs.length.classList.add('valid');
-                reqs.length.innerHTML = '<i class="bi bi-check-circle me-1"></i>Mínimo 8 caracteres';
-                metReqs++;
-            } else {
-                reqs.length.classList.remove('valid');
-                reqs.length.classList.add('invalid');
-                reqs.length.innerHTML = '<i class="bi bi-x-circle me-1"></i>Mínimo 8 caracteres';
-            }
-            
-            // Check uppercase
-            if (/[A-Z]/.test(password)) {
-                strength += 25;
-                reqs.uppercase.classList.remove('invalid');
-                reqs.uppercase.classList.add('valid');
-                reqs.uppercase.innerHTML = '<i class="bi bi-check-circle me-1"></i>Una mayúscula';
-                metReqs++;
-            } else {
-                reqs.uppercase.classList.remove('valid');
-                reqs.uppercase.classList.add('invalid');
-                reqs.uppercase.innerHTML = '<i class="bi bi-x-circle me-1"></i>Una mayúscula';
-            }
-            
-            // Check lowercase
-            if (/[a-z]/.test(password)) {
-                strength += 25;
-                reqs.lowercase.classList.remove('invalid');
-                reqs.lowercase.classList.add('valid');
-                reqs.lowercase.innerHTML = '<i class="bi bi-check-circle me-1"></i>Una minúscula';
-                metReqs++;
-            } else {
-                reqs.lowercase.classList.remove('valid');
-                reqs.lowercase.classList.add('invalid');
-                reqs.lowercase.innerHTML = '<i class="bi bi-x-circle me-1"></i>Una minúscula';
-            }
-            
-            // Check number
-            if (/[0-9]/.test(password)) {
-                strength += 25;
-                reqs.number.classList.remove('invalid');
-                reqs.number.classList.add('valid');
-                reqs.number.innerHTML = '<i class="bi bi-check-circle me-1"></i>Un número';
-                metReqs++;
-            } else {
-                reqs.number.classList.remove('valid');
-                reqs.number.classList.add('invalid');
-                reqs.number.innerHTML = '<i class="bi bi-x-circle me-1"></i>Un número';
-            }
-            
-            // Update strength meter
-            strengthMeter.style.width = strength + '%';
-            
-            // Color based on strength
-            if (strength <= 25) {
-                strengthMeter.style.background = '#dc3545';
-            } else if (strength <= 50) {
-                strengthMeter.style.background = '#fd7e14';
-            } else if (strength <= 75) {
-                strengthMeter.style.background = '#ffc107';
-            } else {
-                strengthMeter.style.background = '#198754';
-            }
+            updateSummary();
         }
-
-        // Check password match
-        function checkPasswordMatch() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const matchDiv = document.getElementById('passwordMatch');
+        
+        // Selección de metas
+        function selectGoal(element, goal) {
+            element.classList.toggle('selected');
             
-            if (confirmPassword === '') {
-                matchDiv.innerHTML = '';
+            const selectedGoalsInput = document.getElementById('selectedGoals');
+            let goals = selectedGoalsInput.value.split(',');
+            
+            if (goals[0] === '') {
+                goals = [];
+            }
+            
+            if (element.classList.contains('selected')) {
+                if (!goals.includes(goal)) {
+                    goals.push(goal);
+                }
+            } else {
+                goals = goals.filter(g => g !== goal);
+            }
+            
+            selectedGoalsInput.value = goals.join(',');
+            updateSummary();
+        }
+        
+        // Actualizar resumen
+        function updateSummary() {
+            if (currentStep !== 4) return;
+            
+            // Información personal
+            document.getElementById('summaryName').textContent = 
+                document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+            document.getElementById('summaryEmail').textContent = document.getElementById('email').value;
+            document.getElementById('summaryPhone').textContent = 
+                document.getElementById('phone').value || 'No proporcionado';
+            
+            // Membresía
+            const membershipType = document.getElementById('selectedMembership').value;
+            let membershipName = '', membershipPrice = '';
+            
+            switch(membershipType) {
+                case 'basic':
+                    membershipName = 'Básico';
+                    membershipPrice = '$29/mes';
+                    break;
+                case 'pro':
+                    membershipName = 'Pro';
+                    membershipPrice = '$49/mes';
+                    break;
+                case 'premium':
+                    membershipName = 'Premium';
+                    membershipPrice = '$79/mes';
+                    break;
+            }
+            
+            document.getElementById('summaryMembership').textContent = membershipName;
+            document.getElementById('summaryPrice').textContent = membershipPrice;
+            document.getElementById('summaryRenewal').textContent = 
+                document.getElementById('autoRenewal').checked ? 'Renovación automática activada' : 'Renovación manual';
+            
+            // Metas
+            const experienceLevel = document.getElementById('experienceLevel').value;
+            const frequency = document.getElementById('frequency').value;
+            const goals = document.getElementById('selectedGoals').value.split(',');
+            
+            let experienceText = '';
+            switch(experienceLevel) {
+                case 'beginner': experienceText = 'Principiante'; break;
+                case 'intermediate': experienceText = 'Intermedio'; break;
+                case 'advanced': experienceText = 'Avanzado'; break;
+                default: experienceText = 'No especificado';
+            }
+            
+            let frequencyText = '';
+            switch(frequency) {
+                case '1-2': frequencyText = '1-2 días/semana'; break;
+                case '3-4': frequencyText = '3-4 días/semana'; break;
+                case '5+': frequencyText = '5+ días/semana'; break;
+                default: frequencyText = 'No especificado';
+            }
+            
+            let goalsText = '';
+            goals.forEach(goal => {
+                switch(goal) {
+                    case 'weightLoss': goalsText += 'Perder Peso, '; break;
+                    case 'muscleGain': goalsText += 'Ganar Músculo, '; break;
+                    case 'strength': goalsText += 'Más Fuerza, '; break;
+                    case 'endurance': goalsText += 'Resistencia, '; break;
+                }
+            });
+            
+            goalsText = goalsText.replace(/,\s*$/, '');
+            
+            document.getElementById('summaryExperience').textContent = 'Nivel: ' + experienceText;
+            document.getElementById('summaryFrequency').textContent = 'Frecuencia: ' + frequencyText;
+            document.getElementById('summaryGoals').textContent = 'Objetivos: ' + (goalsText || 'No especificados');
+        }
+        
+        // Envío del formulario
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+                alert('Por favor, completa todos los campos requeridos correctamente');
                 return;
             }
             
-            if (password === confirmPassword) {
-                matchDiv.innerHTML = '<small class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Las contraseñas coinciden</small>';
-            } else {
-                matchDiv.innerHTML = '<small class="text-danger"><i class="bi bi-x-circle-fill me-1"></i>Las contraseñas no coinciden</small>';
-            }
-        }
-
-        // Form validation
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const terms = document.getElementById('terms').checked;
+            // Simular envío exitoso
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
             
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Las contraseñas no coinciden');
-                return false;
-            }
+            submitButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> PROCESANDO...';
+            submitButton.disabled = true;
             
-            if (!terms) {
-                e.preventDefault();
-                alert('Debes aceptar los términos y condiciones');
-                return false;
-            }
-            
-            return true;
-        });
-
-        // Auto-dismiss alerts
-        document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                setTimeout(function() {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                }, 5000);
-            });
+            // Simular tiempo de procesamiento
+            setTimeout(() => {
+                alert('¡Registro exitoso! Serás redirigido al dashboard.');
+                // En una implementación real, redirigir al dashboard
+                window.location.href = '/cliente/perfil';
+            }, 2000);
         });
     </script>
+    
+    <style>
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </body>
 </html>
