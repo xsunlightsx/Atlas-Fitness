@@ -64,19 +64,6 @@
 
     <!-- Contenido Principal -->
     <main class="container py-5">
-        <!-- Mensajes Flash -->
-        <div th:if="${#request.getParameter('success') != null}" class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${#request.getParameter('success')}">Operación exitosa</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        
-        <div th:if="${#request.getParameter('error') != null}" class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${#request.getParameter('error')}">Error en la operación</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-
         <div class="row">
             <!-- Título -->
             <div class="col-12 mb-4">
@@ -90,78 +77,122 @@
         <div class="row">
             <!-- Lista de productos -->
             <div class="col-lg-8 mb-4">
-                <!-- Carrito vacío -->
-                <div th:if="${carritoVacio}" class="cart-empty text-center p-5 bg-dark rounded border-gold">
-                    <i class="bi bi-cart-x text-gold icon-large mb-3"></i>
-                    <h4 class="text-white mb-3">Tu carrito está vacío</h4>
-                    <p class="text-white-50 mb-4">Agrega productos para comenzar tu compra</p>
-                    <a th:href="@{/productos}" class="btn btn-gold btn-lg">
-                        <i class="bi bi-shop me-2"></i>Ir al Catálogo
-                    </a>
-                </div>
-
-                <!-- Carrito con productos -->
-                <div th:unless="${carritoVacio}" class="bg-dark rounded p-4 border-gold">
-                    <!-- Productos dinámicos -->
-                    <div th:each="detalle : ${carrito.detalles}" 
-                         class="cart-item d-flex align-items-center py-3 border-bottom border-secondary cart-item-enter">
-                        
+                <!-- Carrito con productos (se muestra por defecto) -->
+                <div class="bg-dark rounded p-4 border-gold">
+                    <!-- Producto 1: Proteína Wiley Jkg -->
+                    <div class="cart-item d-flex align-items-center py-3 border-bottom border-secondary cart-item-enter" data-id="1" data-precio="120.00">
                         <div class="flex-shrink-0">
-                            <img th:src="@{'/images/' + (detalle.producto.imagenUrl != null ? detalle.producto.imagenUrl : 'default-product.png')}" 
-                                 class="rounded" 
-                                 th:alt="${detalle.producto.nombre}" 
-                                 style="width: 100px; height: 100px; object-fit: cover;">
+                            <img src="../../static/images/proteina.jpg" class="rounded" alt="Proteína Wiley Jkg" style="width: 100px; height: 100px; object-fit: cover;">
                         </div>
                         
                         <div class="flex-grow-1 ms-3">
-                            <h5 class="text-white mb-1" th:text="${detalle.producto.nombre}">Nombre del Producto</h5>
-                            <p class="text-white-50 mb-1" th:text="${detalle.producto.categoria}">Categoría</p>
-                            <p class="text-white-50 mb-0" th:text="'Precio unitario: S/ ' + ${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}">
-                                S/ 120.00
-                            </p>
+                            <h5 class="text-white mb-1">Proteína Wiley Jkg</h5>
+                            <p class="text-white-50 mb-1">Suplementos</p>
+                            <p class="text-white-50 mb-0 precio-unitario">Precio unitario: S/ 120.00</p>
                         </div>
                         
                         <div class="text-end">
                             <!-- Control de cantidad -->
                             <div class="d-flex align-items-center justify-content-end mb-2">
-                                <form th:action="@{/carrito/actualizar}" method="post" style="display: inline;">
-                                    <input type="hidden" name="productoId" th:value="${detalle.producto.idProducto}">
-                                    <input type="hidden" name="cantidad" th:value="${detalle.cantidad - 1}">
-                                    <button type="submit" class="btn btn-outline-gold quantity-btn" 
-                                            th:disabled="${detalle.cantidad <= 1}"
-                                            title="Disminuir cantidad">
-                                        <i class="bi bi-dash"></i>
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-outline-gold quantity-btn disminuir" 
+                                        title="Disminuir cantidad">
+                                    <i class="bi bi-dash"></i>
+                                </button>
                                 
-                                <span class="mx-3 text-white fw-bold" style="min-width: 40px; text-align: center;">
-                                    <span th:text="${detalle.cantidad}">1</span>
-                                </span>
+                                <span class="mx-3 text-white fw-bold cantidad" style="min-width: 40px; text-align: center;">1</span>
                                 
-                                <form th:action="@{/carrito/actualizar}" method="post" style="display: inline;">
-                                    <input type="hidden" name="productoId" th:value="${detalle.producto.idProducto}">
-                                    <input type="hidden" name="cantidad" th:value="${detalle.cantidad + 1}">
-                                    <button type="submit" class="btn btn-outline-gold quantity-btn"
-                                            title="Aumentar cantidad">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-outline-gold quantity-btn aumentar"
+                                        title="Aumentar cantidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
                             </div>
                             
                             <!-- Subtotal -->
-                            <h5 class="text-gold mb-2" 
-                                th:text="'S/ ' + ${#numbers.formatDecimal(detalle.calcularSubtotal(), 1, 2)}">
-                                S/ 120.00
-                            </h5>
+                            <h5 class="text-gold mb-2 subtotal-item">S/ 120.00</h5>
                             
                             <!-- Eliminar producto -->
-                            <form th:action="@{/carrito/eliminar}" method="post" style="display: inline;">
-                                <input type="hidden" name="productoId" th:value="${detalle.producto.idProducto}">
-                                <button type="submit" class="btn btn-outline-gold btn-sm mt-2"
-                                        onclick="return confirm('¿Eliminar este producto del carrito?')">
-                                    <i class="bi bi-trash me-1"></i> Eliminar
+                            <button type="button" class="btn btn-outline-gold btn-sm mt-2 eliminar-producto"
+                                    onclick="eliminarProducto(this)">
+                                <i class="bi bi-trash me-1"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 2: Creatina Monohidrato -->
+                    <div class="cart-item d-flex align-items-center py-3 border-bottom border-secondary cart-item-enter" data-id="2" data-precio="65.00">
+                        <div class="flex-shrink-0">
+                            <img src="../../static/images/creatina.jpg" class="rounded" alt="Creatina Monohidrato" style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="text-white mb-1">Creatina Monohidrato</h5>
+                            <p class="text-white-50 mb-1">Suplementos</p>
+                            <p class="text-white-50 mb-0 precio-unitario">Precio unitario: S/ 65.00</p>
+                        </div>
+                        
+                        <div class="text-end">
+                            <!-- Control de cantidad -->
+                            <div class="d-flex align-items-center justify-content-end mb-2">
+                                <button type="button" class="btn btn-outline-gold quantity-btn disminuir" 
+                                        title="Disminuir cantidad">
+                                    <i class="bi bi-dash"></i>
                                 </button>
-                            </form>
+                                
+                                <span class="mx-3 text-white fw-bold cantidad" style="min-width: 40px; text-align: center;">2</span>
+                                
+                                <button type="button" class="btn btn-outline-gold quantity-btn aumentar"
+                                        title="Aumentar cantidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Subtotal -->
+                            <h5 class="text-gold mb-2 subtotal-item">S/ 130.00</h5>
+                            
+                            <!-- Eliminar producto -->
+                            <button type="button" class="btn btn-outline-gold btn-sm mt-2 eliminar-producto"
+                                    onclick="eliminarProducto(this)">
+                                <i class="bi bi-trash me-1"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 3: Camiseta Dry Fit -->
+                    <div class="cart-item d-flex align-items-center py-3 border-bottom border-secondary cart-item-enter" data-id="3" data-precio="45.00">
+                        <div class="flex-shrink-0">
+                            <img src="../../static/images/camiseta.jpg" class="rounded" alt="Camiseta Dry Fit" style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="text-white mb-1">Camiseta Dry Fit</h5>
+                            <p class="text-white-50 mb-1">Ropa Deportiva</p>
+                            <p class="text-white-50 mb-0 precio-unitario">Precio unitario: S/ 45.00</p>
+                        </div>
+                        
+                        <div class="text-end">
+                            <!-- Control de cantidad -->
+                            <div class="d-flex align-items-center justify-content-end mb-2">
+                                <button type="button" class="btn btn-outline-gold quantity-btn disminuir" 
+                                        title="Disminuir cantidad">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                
+                                <span class="mx-3 text-white fw-bold cantidad" style="min-width: 40px; text-align: center;">1</span>
+                                
+                                <button type="button" class="btn btn-outline-gold quantity-btn aumentar"
+                                        title="Aumentar cantidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Subtotal -->
+                            <h5 class="text-gold mb-2 subtotal-item">S/ 45.00</h5>
+                            
+                            <!-- Eliminar producto -->
+                            <button type="button" class="btn btn-outline-gold btn-sm mt-2 eliminar-producto"
+                                    onclick="eliminarProducto(this)">
+                                <i class="bi bi-trash me-1"></i> Eliminar
+                            </button>
                         </div>
                     </div>
 
@@ -175,27 +206,21 @@
                                 </h6>
                                 <p class="text-white-50 mb-1">
                                     Productos en carrito: 
-                                    <span class="text-white fw-bold" th:text="${totalItems}">3</span>
+                                    <span class="text-white fw-bold" id="total-items">4</span>
                                 </p>
                                 <p class="text-white-50 mb-0">
                                     Subtotal productos: 
-                                    <span class="text-white fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(subtotal, 1, 2)}">
-                                        S/ 335.00
-                                    </span>
+                                    <span class="text-white fw-bold" id="subtotal-carrito">S/ 295.00</span>
                                 </p>
                             </div>
                             <div class="col-md-6 text-md-end">
                                 <!-- Vaciar carrito -->
-                                <form th:action="@{/carrito/vaciar}" method="post" class="d-inline-block">
-                                    <button type="submit" 
-                                            class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('¿Estás seguro de vaciar todo el carrito?')">
-                                        <i class="bi bi-trash3 me-1"></i> Vaciar Carrito
-                                    </button>
-                                </form>
+                                <button type="button" onclick="vaciarCarrito()" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash3 me-1"></i> Vaciar Carrito
+                                </button>
                                 
                                 <!-- Continuar comprando -->
-                                <a th:href="@{/productos}" class="btn btn-outline-gold btn-sm ms-2">
+                                <a href="/productos" class="btn btn-outline-gold btn-sm ms-2">
                                     <i class="bi bi-arrow-left me-1"></i> Seguir Comprando
                                 </a>
                             </div>
@@ -214,26 +239,20 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-white-50">Subtotal:</span>
-                            <span class="text-white" th:text="'S/ ' + ${#numbers.formatDecimal(subtotal, 1, 2)}">
-                                S/ 335.00
-                            </span>
+                            <span class="text-white" id="subtotal-resumen">S/ 295.00</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-white-50">Envío:</span>
-                            <span class="text-white" th:text="'S/ ' + ${#numbers.formatDecimal(envio, 1, 2)}">
-                                S/ 15.00
-                            </span>
+                            <span class="text-white" id="envio-resumen">S/ 15.00</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-white-50">Descuento:</span>
-                            <span class="text-success">-S/ 0.00</span>
+                            <span class="text-success" id="descuento-resumen">-S/ 0.00</span>
                         </div>
                         <hr class="bg-secondary">
                         <div class="d-flex justify-content-between">
                             <span class="text-white fw-bold">Total:</span>
-                            <span class="text-gold fw-bold h5" th:text="'S/ ' + ${#numbers.formatDecimal(total, 1, 2)}">
-                                S/ 350.00
-                            </span>
+                            <span class="text-gold fw-bold h5" id="total-resumen">S/ 310.00</span>
                         </div>
                     </div>
 
@@ -280,16 +299,14 @@
                     </div>
 
                     <!-- Botón de checkout -->
-                    <a th:href="@{/checkout}" class="btn btn-gold w-100 btn-lg mb-3" 
-                       th:classappend="${carritoVacio} ? 'disabled' : ''"
-                       th:onclick="${carritoVacio} ? 'return false' : ''">
+                    <button class="btn btn-gold w-100 btn-lg mb-3" onclick="procederPago()">
                         <i class="bi bi-lock-fill me-2"></i>Proceder al Pago
-                    </a>
+                    </button>
                     
                     <!-- O continuar sin login -->
-                    <div th:if="${session.usuario == null}" class="text-center">
+                    <div class="text-center">
                         <p class="text-white-50 mb-2">¿No tienes cuenta?</p>
-                        <a th:href="@{/auth/registro}" class="btn btn-outline-gold w-100">
+                        <a href="/auth/registro" class="btn btn-outline-gold w-100">
                             <i class="bi bi-person-plus me-2"></i>Registrarse
                         </a>
                     </div>
@@ -319,63 +336,222 @@
 
     <!-- Scripts -->
     <script>
-        // Actualizar costo de envío
-        function actualizarEnvio(costo) {
-            const subtotalElement = document.querySelector('[data-subtotal]');
-            const envioElement = document.querySelector('[data-envio]');
-            const totalElement = document.querySelector('[data-total]');
+        // Variables globales
+        let subtotal = 295.00;
+        let envio = 15.00;
+        let descuento = 0.00;
+        let cuponAplicado = false;
+
+        // Actualizar todos los cálculos
+        function actualizarCalculos() {
+            // Calcular subtotal sumando todos los productos
+            let nuevoSubtotal = 0;
+            let totalItems = 0;
             
-            if (subtotalElement && envioElement && totalElement) {
-                const subtotal = parseFloat(subtotalElement.textContent.replace('S/ ', ''));
-                envioElement.textContent = 'S/ ' + costo.toFixed(2);
-                const total = subtotal + costo;
-                totalElement.textContent = 'S/ ' + total.toFixed(2);
-            }
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const cantidad = parseInt(item.querySelector('.cantidad').textContent);
+                const precio = parseFloat(item.getAttribute('data-precio'));
+                const subtotalItem = cantidad * precio;
+                
+                // Actualizar subtotal del item
+                item.querySelector('.subtotal-item').textContent = 'S/ ' + subtotalItem.toFixed(2);
+                
+                nuevoSubtotal += subtotalItem;
+                totalItems += cantidad;
+            });
+            
+            subtotal = nuevoSubtotal;
+            
+            // Actualizar total
+            const total = subtotal + envio - descuento;
+            
+            // Actualizar UI
+            document.getElementById('subtotal-carrito').textContent = 'S/ ' + subtotal.toFixed(2);
+            document.getElementById('subtotal-resumen').textContent = 'S/ ' + subtotal.toFixed(2);
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('total-resumen').textContent = 'S/ ' + total.toFixed(2);
+            
+            // Guardar en localStorage
+            guardarCarrito();
         }
-        
-        // Aplicar cupón
-        document.getElementById('aplicar-cupon')?.addEventListener('click', function() {
-            const cupon = document.getElementById('cupon').value.trim();
-            if (cupon) {
-                alert('Cupón "' + cupon + '" aplicado. (Funcionalidad en desarrollo)');
-            } else {
-                alert('Ingresa un código de cupón');
-            }
-        });
-        
-        // Animación al eliminar producto
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('button[type="submit"][onclick*="confirm"]');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const item = this.closest('.cart-item');
-                    if (item && confirm('¿Eliminar este producto del carrito?')) {
-                        item.classList.add('cart-item-exit');
-                        setTimeout(() => {
-                            // El formulario se enviará automáticamente
-                        }, 300);
-                    } else {
-                        e.preventDefault();
-                    }
-                });
+
+        // Aumentar cantidad
+        document.querySelectorAll('.aumentar').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const item = this.closest('.cart-item');
+                const cantidadSpan = item.querySelector('.cantidad');
+                let cantidad = parseInt(cantidadSpan.textContent);
+                cantidad++;
+                cantidadSpan.textContent = cantidad;
+                actualizarCalculos();
             });
         });
-        
-        // Actualizar elementos con data attributes
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar elementos de datos si existen
-            const subtotalElement = document.querySelector('.text-white[th\\:text*="subtotal"]');
-            const envioElement = document.querySelector('.text-white[th\\:text*="envio"]');
-            const totalElement = document.querySelector('.text-gold.h5[th\\:text*="total"]');
+
+        // Disminuir cantidad
+        document.querySelectorAll('.disminuir').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const item = this.closest('.cart-item');
+                const cantidadSpan = item.querySelector('.cantidad');
+                let cantidad = parseInt(cantidadSpan.textContent);
+                
+                if (cantidad > 1) {
+                    cantidad--;
+                    cantidadSpan.textContent = cantidad;
+                    actualizarCalculos();
+                }
+            });
+        });
+
+        // Eliminar producto
+        function eliminarProducto(boton) {
+            const item = boton.closest('.cart-item');
+            item.classList.add('cart-item-exit');
             
-            if (subtotalElement && envioElement && totalElement) {
-                subtotalElement.setAttribute('data-subtotal', 
-                    subtotalElement.textContent.replace('S/ ', ''));
-                envioElement.setAttribute('data-envio', 
-                    envioElement.textContent.replace('S/ ', ''));
-                totalElement.setAttribute('data-total', 
-                    totalElement.textContent.replace('S/ ', ''));
+            setTimeout(() => {
+                item.remove();
+                actualizarCalculos();
+                
+                // Mostrar mensaje
+                mostrarMensaje('Producto eliminado del carrito', 'info');
+            }, 300);
+        }
+
+        // Vaciar carrito
+        function vaciarCarrito() {
+            if (confirm('¿Estás seguro de vaciar todo el carrito?')) {
+                document.querySelectorAll('.cart-item').forEach(item => {
+                    item.classList.add('cart-item-exit');
+                });
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.cart-item').forEach(item => item.remove());
+                    actualizarCalculos();
+                    mostrarMensaje('Carrito vaciado', 'info');
+                }, 300);
             }
+        }
+
+        // Actualizar costo de envío
+        function actualizarEnvio(costo) {
+            envio = costo;
+            document.getElementById('envio-resumen').textContent = 'S/ ' + envio.toFixed(2);
+            actualizarCalculos();
+        }
+
+        // Aplicar cupón
+        document.getElementById('aplicar-cupon').addEventListener('click', function() {
+            const cupon = document.getElementById('cupon').value.trim().toUpperCase();
+            
+            if (cupon === 'FITNESS10') {
+                if (!cuponAplicado) {
+                    descuento = subtotal * 0.10; // 10% de descuento
+                    cuponAplicado = true;
+                    
+                    document.getElementById('descuento-resumen').textContent = '-S/ ' + descuento.toFixed(2);
+                    document.getElementById('descuento-resumen').classList.remove('text-success');
+                    document.getElementById('descuento-resumen').classList.add('text-danger');
+                    
+                    actualizarCalculos();
+                    mostrarMensaje('¡Cupón FITNESS10 aplicado! 10% de descuento', 'success');
+                } else {
+                    mostrarMensaje('Ya tienes un cupón aplicado', 'warning');
+                }
+            } else if (cupon === 'ATLAS20') {
+                if (!cuponAplicado) {
+                    descuento = 20.00; // S/ 20 de descuento
+                    cuponAplicado = true;
+                    
+                    document.getElementById('descuento-resumen').textContent = '-S/ ' + descuento.toFixed(2);
+                    document.getElementById('descuento-resumen').classList.remove('text-success');
+                    document.getElementById('descuento-resumen').classList.add('text-danger');
+                    
+                    actualizarCalculos();
+                    mostrarMensaje('¡Cupón ATLAS20 aplicado! S/ 20 de descuento', 'success');
+                } else {
+                    mostrarMensaje('Ya tienes un cupón aplicado', 'warning');
+                }
+            } else if (cupon) {
+                mostrarMensaje('Cupón inválido', 'danger');
+            } else {
+                mostrarMensaje('Ingresa un código de cupón', 'warning');
+            }
+        });
+
+        // Proceder al pago
+        function procederPago() {
+            const total = subtotal + envio - descuento;
+            if (total > 0) {
+                mostrarMensaje(`Redirigiendo al pago... Total: S/ ${total.toFixed(2)}`, 'info');
+                // Aquí normalmente redirigirías a una página de checkout
+                setTimeout(() => {
+                    alert('Funcionalidad de pago en desarrollo. Total: S/ ' + total.toFixed(2));
+                }, 1000);
+            } else {
+                mostrarMensaje('Agrega productos al carrito primero', 'warning');
+            }
+        }
+
+        // Mostrar mensaje
+        function mostrarMensaje(texto, tipo) {
+            // Crear elemento de mensaje
+            const mensajeDiv = document.createElement('div');
+            mensajeDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            mensajeDiv.style.zIndex = '1050';
+            mensajeDiv.innerHTML = `
+                <i class="bi bi-${tipo === 'success' ? 'check-circle' : tipo === 'warning' ? 'exclamation-triangle' : 'info-circle'}-fill me-2"></i>
+                ${texto}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Agregar al body
+            document.body.appendChild(mensajeDiv);
+            
+            // Auto-eliminar después de 3 segundos
+            setTimeout(() => {
+                if (mensajeDiv.parentNode) {
+                    mensajeDiv.remove();
+                }
+            }, 3000);
+        }
+
+        // Guardar carrito en localStorage
+        function guardarCarrito() {
+            const carrito = [];
+            document.querySelectorAll('.cart-item').forEach(item => {
+                carrito.push({
+                    id: item.getAttribute('data-id'),
+                    cantidad: parseInt(item.querySelector('.cantidad').textContent),
+                    precio: parseFloat(item.getAttribute('data-precio'))
+                });
+            });
+            
+            localStorage.setItem('carritoAtlasFitness', JSON.stringify(carrito));
+            localStorage.setItem('subtotal', subtotal);
+            localStorage.setItem('envio', envio);
+            localStorage.setItem('descuento', descuento);
+        }
+
+        // Cargar carrito desde localStorage (si existe)
+        function cargarCarrito() {
+            const carritoGuardado = localStorage.getItem('carritoAtlasFitness');
+            const subtotalGuardado = localStorage.getItem('subtotal');
+            const envioGuardado = localStorage.getItem('envio');
+            const descuentoGuardado = localStorage.getItem('descuento');
+            
+            if (carritoGuardado && subtotalGuardado) {
+                // Aquí podrías cargar los productos guardados
+                console.log('Carrito cargado desde localStorage');
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarCarrito();
+            
+            // Agregar event listeners a todos los botones de cantidad
+            document.querySelectorAll('.aumentar, .disminuir').forEach(btn => {
+                btn.addEventListener('click', actualizarCalculos);
+            });
         });
     </script>
 </body>
